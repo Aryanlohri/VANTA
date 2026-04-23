@@ -1,0 +1,33 @@
+{
+  "name": "@aicr/review-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "migrate": "knex migrate:latest --knexfile src/config/knexfile.ts"
+  },
+  "dependencies": {
+    "@aicr/shared": "*",
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "helmet": "^8.0.0",
+    "knex": "^3.1.0",
+    "pg": "^8.13.3",
+    "bullmq": "^5.34.8",
+    "ioredis": "^5.4.2",
+    "socket.io": "^4.8.1",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.10",
+    "typescript": "^5.7.3",
+    "tsx": "^4.19.3",
+    "pino-pretty": "^13.0.0"
+  }
+}
