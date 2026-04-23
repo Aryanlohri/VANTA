@@ -5,25 +5,25 @@
    ============================================ */
 
 @theme {
-  /* Colors — Premium dark palette */
-  --color-bg-primary: #0a0a0f;
-  --color-bg-secondary: #12121a;
-  --color-bg-card: #16161f;
-  --color-bg-hover: #1e1e2a;
-  --color-bg-input: #1a1a25;
+  /* Colors — Cod Gray palette */
+  --color-bg-primary: #111111;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-card: #1f1f1f;
+  --color-bg-hover: #262626;
+  --color-bg-input: #222222;
 
-  --color-border: #2a2a3a;
-  --color-border-hover: #3a3a4f;
-  --color-border-focus: #6366f1;
+  --color-border: #333333;
+  --color-border-hover: #444444;
+  --color-border-focus: #5E4B43;
 
   --color-text-primary: #f0f0f5;
-  --color-text-secondary: #8888a0;
-  --color-text-muted: #55556a;
+  --color-text-secondary: #999999;
+  --color-text-muted: #666666;
 
-  /* Accent gradients */
-  --color-accent-start: #6366f1;
-  --color-accent-end: #8b5cf6;
-  --color-accent-glow: rgba(99, 102, 241, 0.15);
+  /* Accent gradients — Walnut Noir */
+  --color-accent-start: #5E4B43;
+  --color-accent-end: #2E1F1B;
+  --color-accent-glow: rgba(94, 75, 67, 0.3);
 
   /* Status colors */
   --color-success: #22c55e;
@@ -88,7 +88,7 @@ body {
 
 /* Glassmorphism card */
 .glass-card {
-  background: rgba(22, 22, 31, 0.7);
+  background: rgba(31, 31, 31, 0.7);
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: 16px;
@@ -96,7 +96,7 @@ body {
 
 /* Glow effect */
 .glow {
-  box-shadow: 0 0 20px var(--color-accent-glow), 0 0 60px rgba(99, 102, 241, 0.05);
+  box-shadow: 0 0 20px var(--color-accent-glow), 0 0 60px rgba(94, 75, 67, 0.1);
 }
 
 /* Animated gradient border */
