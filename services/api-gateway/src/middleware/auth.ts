@@ -11,7 +11,7 @@ const logger = createLogger('api-gateway:auth');
 const AUTH_SERVICE_URL =
   process.env.AUTH_SERVICE_URL || `http://localhost:${SERVICE_PORTS.AUTH_SERVICE}`;
 
-/** Routes that don't require authentication */
+/** Routes that don't require authentication (matched against req.originalUrl) */
 const PUBLIC_ROUTES = [
   '/api/auth/github',
   '/api/auth/github/callback',
@@ -21,14 +21,16 @@ const PUBLIC_ROUTES = [
 /**
  * Gateway auth middleware.
  * Verifies JWT tokens by calling the auth service.
+ * Note: This is mounted at /api, so req.path strips the /api prefix.
+ * We use req.originalUrl to match the full path.
  */
 export async function gatewayAuthMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  // Skip auth for public routes
-  if (PUBLIC_ROUTES.some((route) => req.path.startsWith(route))) {
+  // Skip auth for public routes — use originalUrl since Express strips mount path from req.path
+  if (PUBLIC_ROUTES.some((route) => req.originalUrl.startsWith(route))) {
     return next();
   }
 

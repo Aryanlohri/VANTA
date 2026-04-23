@@ -19,7 +19,7 @@ const PORT = Number(process.env.AUTH_SERVICE_PORT) || SERVICE_PORTS.AUTH_SERVICE
 // ---- Middleware ----
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3010',
   credentials: true,
 }));
 app.use(express.json());

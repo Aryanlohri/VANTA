@@ -51,16 +51,20 @@ function createServiceProxy(serviceName: string, target: string, pathRewrite?: R
 }
 
 /** Proxy for Auth Service */
+// Express strips /api (via app.use) and /auth (via router.use), so req.url = /github
+// We need to prepend /auth back so it hits the auth service at /auth/github
 export const authProxy = createServiceProxy('auth', SERVICE_URLS.auth, {
-  '^/api/auth': '/auth',
+  '^/': '/auth/',
 });
 
 /** Proxy for Repository Service */
+// Same: req.url = / or /github or /:id/files, prepend /repos
 export const repoProxy = createServiceProxy('repos', SERVICE_URLS.repos, {
-  '^/api/repos': '/repos',
+  '^/': '/repos/',
 });
 
 /** Proxy for Review Service */
+// Same: req.url = / or /:id, prepend /reviews
 export const reviewProxy = createServiceProxy('reviews', SERVICE_URLS.reviews, {
-  '^/api/reviews': '/reviews',
+  '^/': '/reviews/',
 });

@@ -88,7 +88,7 @@ export const AuthController = {
       const tokens = TokenService.generateTokens(user.id, user.username);
 
       // Redirect to frontend with token
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3010';
       res.redirect(
         `${frontendUrl}/auth/callback?token=${tokens.accessToken}&expiresIn=${tokens.expiresIn}`
       );
