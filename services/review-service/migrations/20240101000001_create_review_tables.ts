@@ -1,11 +1,9 @@
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
-
   // Reviews table
   await knex.schema.withSchema('reviews').createTable('reviews', (table) => {
-    table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
+    table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.uuid('repo_id').notNullable();
     table.uuid('user_id').notNullable();
     table.string('title', 500).notNullable();
@@ -23,7 +21,7 @@ export async function up(knex: Knex): Promise<void> {
 
   // Review files
   await knex.schema.withSchema('reviews').createTable('review_files', (table) => {
-    table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
+    table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.uuid('review_id').notNullable().references('id').inTable('reviews.reviews').onDelete('CASCADE');
     table.string('file_path', 1000).notNullable();
     table.text('content').notNullable();
@@ -33,7 +31,7 @@ export async function up(knex: Knex): Promise<void> {
 
   // Review comments (AI-generated)
   await knex.schema.withSchema('reviews').createTable('review_comments', (table) => {
-    table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'));
+    table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.uuid('review_file_id').notNullable().references('id').inTable('reviews.review_files').onDelete('CASCADE');
     table.integer('line_number').notNullable();
     table.enum('type', ['bug', 'security', 'performance', 'style', 'best_practice']).notNullable();
