@@ -4,6 +4,7 @@
 
 import type { Knex } from 'knex';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config({ path: '../../.env' });
 
@@ -24,7 +25,7 @@ const config: Knex.Config = {
     idleTimeoutMillis: 10000,
   },
   migrations: {
-    directory: '../migrations',
+    directory: path.resolve(__dirname, '../../migrations'),
     tableName: 'auth_migrations',
     schemaName: 'auth',
   },

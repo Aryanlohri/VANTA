@@ -4,6 +4,7 @@
 
 import type { Knex } from 'knex';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config({ path: '../../.env' });
 
@@ -19,7 +20,7 @@ const config: Knex.Config = {
   searchPath: ['repositories', 'public'],
   pool: { min: 2, max: 10 },
   migrations: {
-    directory: '../migrations',
+    directory: path.resolve(__dirname, '../../migrations'),
     tableName: 'repo_migrations',
     schemaName: 'repositories',
   },
