@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   LayoutDashboard, GitBranch, FileCode, Plus, LogOut,
-  Sparkles, ChevronRight
+  ChevronRight
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 
@@ -32,8 +32,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-bg-primary)' }}>
-        <div className="w-8 h-8 rounded-lg pulse-glow" style={{ background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#030303' }}>
+        <div className="text-sm tracking-[0.3em] font-light pulse-glow px-4 py-2 rounded-lg"
+          style={{ color: '#616161' }}>
+          VANTA
+        </div>
       </div>
     );
   }
@@ -41,47 +44,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--color-bg-primary)' }}>
+    <div className="min-h-screen flex" style={{ background: '#030303' }}>
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 flex flex-col h-screen sticky top-0"
-        style={{ background: 'var(--color-bg-secondary)', borderRight: '1px solid var(--color-border)' }}>
+      <aside className="w-60 shrink-0 flex flex-col h-screen sticky top-0"
+        style={{ background: '#0a0a0a', borderRight: '1px solid var(--color-border)' }}>
         
         {/* Logo */}
-        <div className="px-5 h-16 flex items-center gap-2" style={{ borderBottom: '1px solid var(--color-border)' }}>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))' }}>
-            <Sparkles size={16} color="white" />
-          </div>
-          <span className="font-bold" style={{ color: 'var(--color-text-primary)' }}>CodeLens AI</span>
+        <div className="px-5 h-14 flex items-center" style={{ borderBottom: '1px solid var(--color-border)' }}>
+          <span className="text-sm tracking-[0.3em] font-light" style={{ color: '#898989' }}>VANTA</span>
         </div>
 
         {/* New Review Button */}
         <div className="px-4 pt-4">
           <Link href="/dashboard/reviews/new"
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-[1.02]"
-            style={{
-              background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))',
-              color: 'white',
-            }}>
-            <Plus size={16} /> New Review
+            className="btn-metal w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-medium tracking-wider uppercase">
+            <Plus size={14} strokeWidth={1.5} /> New Review
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-0.5">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             return (
               <Link key={item.href} href={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium tracking-wider transition-all duration-300"
                 style={{
-                  background: isActive ? 'var(--color-accent-glow)' : 'transparent',
-                  color: isActive ? 'var(--color-accent-start)' : 'var(--color-text-secondary)',
-                  borderLeft: isActive ? '2px solid var(--color-accent-start)' : '2px solid transparent',
+                  background: isActive ? 'rgba(137,137,137,0.06)' : 'transparent',
+                  color: isActive ? '#e8e8e8' : '#616161',
+                  borderLeft: isActive ? '2px solid #898989' : '2px solid transparent',
                 }}>
-                <item.icon size={18} />
+                <item.icon size={16} strokeWidth={1.5} />
                 {item.label}
-                {isActive && <ChevronRight size={14} className="ml-auto" />}
+                {isActive && <ChevronRight size={12} className="ml-auto" style={{ color: '#494949' }} />}
               </Link>
             );
           })}
@@ -91,19 +86,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="px-4 py-4" style={{ borderTop: '1px solid var(--color-border)' }}>
           <div className="flex items-center gap-3 mb-3">
             {user?.avatar_url ? (
-              <img src={user.avatar_url} alt={user.username} className="w-8 h-8 rounded-full" />
+              <img src={user.avatar_url} alt={user.username} className="w-7 h-7 rounded-full opacity-80" />
             ) : (
-              <div className="w-8 h-8 rounded-full" style={{ background: 'var(--color-bg-hover)' }} />
+              <div className="w-7 h-7 rounded-full" style={{ background: '#1a1a1a' }} />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{user?.username}</p>
-              <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{user?.email || 'No email'}</p>
+              <p className="text-xs font-medium truncate" style={{ color: '#8B8B8B' }}>{user?.username}</p>
+              <p className="text-[10px] truncate" style={{ color: '#494949' }}>{user?.email || ''}</p>
             </div>
           </div>
           <button onClick={logout}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 hover:opacity-80"
-            style={{ background: 'var(--color-bg-hover)', color: 'var(--color-text-secondary)' }}>
-            <LogOut size={14} /> Sign Out
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[10px] font-medium tracking-wider uppercase transition-all duration-300"
+            style={{ background: 'rgba(137,137,137,0.04)', color: '#616161', border: '1px solid rgba(46,46,46,0.4)' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#898989'}
+            onMouseLeave={e => e.currentTarget.style.color = '#616161'}>
+            <LogOut size={12} strokeWidth={1.5} /> Sign Out
           </button>
         </div>
       </aside>
