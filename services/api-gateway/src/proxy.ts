@@ -2,7 +2,7 @@
 // API Gateway — Proxy Configuration
 // ============================================
 
-import { createProxyMiddleware, Options } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody, Options } from 'http-proxy-middleware';
 import { SERVICE_PORTS, createLogger } from '@aicr/shared';
 
 const logger = createLogger('api-gateway:proxy');
@@ -17,6 +17,10 @@ const SERVICE_URLS = {
 
 /**
  * Create a proxy middleware for a specific service.
+ * 
+ * IMPORTANT: Express's json() body parser consumes the request stream before
+ * the proxy can forward it. fixRequestBody re-serializes req.body so the
+ * downstream service receives the correct payload.
  */
 function createServiceProxy(serviceName: string, target: string, pathRewrite?: Record<string, string>) {
   const options: Options = {
@@ -26,11 +30,13 @@ function createServiceProxy(serviceName: string, target: string, pathRewrite?: R
     timeout: 30000,
     proxyTimeout: 30000,
     on: {
-      proxyReq: (proxyReq, req: any) => {
-        logger.debug(
-          { service: serviceName, method: req.method, path: req.path },
+      proxyReq: (proxyReq, req: any, res: any) => {
+        logger.info(
+          { service: serviceName, method: req.method, path: req.originalUrl, target: `${target}${proxyReq.path}` },
           'Proxying request'
         );
+        // Re-serialize body that was consumed by express.json()
+        fixRequestBody(proxyReq, req);
       },
       error: (err, req: any, res: any) => {
         logger.error({ err, service: serviceName, path: req.path }, 'Proxy error');

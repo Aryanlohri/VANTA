@@ -5,11 +5,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 export const api = axios.create({
   baseURL: API_URL,
   timeout: 30000,
-  headers: { 'Content-Type': 'application/json' },
 });
 
 // Request interceptor — attach auth token
 api.interceptors.request.use((config) => {
+  // Only set Content-Type for requests with a body
+  if (config.method && ['post', 'put', 'patch'].includes(config.method)) {
+    config.headers['Content-Type'] = 'application/json';
+  }
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('aicr_token');
     if (token) {
