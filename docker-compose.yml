@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # Infrastructure
+  # ============================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: aicr-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aicr_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aicr_password_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-aicr_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aicr_user} -d ${POSTGRES_DB:-aicr_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aicr-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # ============================================
+  # Services (uncomment when ready to containerize)
+  # ============================================
+  # api-gateway:
+  #   build:
+  #     context: .
+  #     dockerfile: services/api-gateway/Dockerfile
+  #   container_name: aicr-gateway
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${API_GATEWAY_PORT:-3000}:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - JWT_SECRET=${JWT_SECRET}
+  #     - REDIS_URL=redis://redis:6379
+  #     - AUTH_SERVICE_URL=http://auth-service:3001
+  #     - REPO_SERVICE_URL=http://repository-service:3002
+  #     - REVIEW_SERVICE_URL=http://review-service:3003
+  #     - AI_SERVICE_URL=http://ai-service:3004
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+  # auth-service:
+  #   build:
+  #     context: .
+  #     dockerfile: services/auth-service/Dockerfile
+  #   container_name: aicr-auth
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${AUTH_SERVICE_PORT:-3001}:3001"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=auth
+  #     - JWT_SECRET=${JWT_SECRET}
+  #     - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+  #     - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+  #     - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+  #     - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+  # repository-service:
+  #   build:
+  #     context: .
+  #     dockerfile: services/repository-service/Dockerfile
+  #   container_name: aicr-repo
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${REPO_SERVICE_PORT:-3002}:3002"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=repositories
+  #     - REDIS_URL=redis://redis:6379
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+
+  # review-service:
+  #   build:
+  #     context: .
+  #     dockerfile: services/review-service/Dockerfile
+  #   container_name: aicr-review
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${REVIEW_SERVICE_PORT:-3003}:3003"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=reviews
+  #     - REDIS_URL=redis://redis:6379
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+
+  # ai-service:
+  #   build:
+  #     context: .
+  #     dockerfile: services/ai-service/Dockerfile
+  #   container_name: aicr-ai
+  #   restart: unless-stopped
+  #   ports:
+  #     - "${AI_SERVICE_PORT:-3004}:3004"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - AI_MOCK_MODE=${AI_MOCK_MODE:-true}
+  #     - REDIS_URL=redis://redis:6379
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

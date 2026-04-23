@@ -1,0 +1,36 @@
+{
+  "name": "ai-code-review",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered Code Review Platform",
+  "workspaces": [
+    "packages/*",
+    "services/*",
+    "client"
+  ],
+  "scripts": {
+    "dev": "docker compose up -d postgres redis && concurrently \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:repo\" \"npm run dev:review\" \"npm run dev:ai\" \"npm run dev:client\"",
+    "dev:gateway": "npm run dev -w services/api-gateway",
+    "dev:auth": "npm run dev -w services/auth-service",
+    "dev:repo": "npm run dev -w services/repository-service",
+    "dev:review": "npm run dev -w services/review-service",
+    "dev:ai": "npm run dev -w services/ai-service",
+    "dev:client": "npm run dev -w client",
+    "build": "npm run build --workspaces --if-present",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "db:migrate": "npm run migrate --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "rimraf node_modules packages/*/node_modules services/*/node_modules client/node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
