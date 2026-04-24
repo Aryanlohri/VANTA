@@ -479,3 +479,22 @@ body {
 .social-proof-logo:hover {
   opacity: 0.35;
 }
+
+/* --- VANTA Loader CSS --- */
+#vanta-loader {
+  position: fixed;
+  inset: 0;
+  background: #060606;
+  z-index: 9999;
+  transition: opacity 0.8s ease;
+}
+#vanta-loader.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+#loader-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
