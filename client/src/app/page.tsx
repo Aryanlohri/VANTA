@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
 import {
   Shield, Zap, GitBranch, Users, BarChart3, Code2,
@@ -502,6 +502,56 @@ export default function LandingPage() {
     };
   }, []);
 
+  /* ── PHASE 2: Scroll-triggered section reveals ── */
+  useEffect(() => {
+    const revealElements = document.querySelectorAll('.scroll-reveal, .scroll-reveal-stagger');
+    if (revealElements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    revealElements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  /* ── PHASE 3: Feature card cursor-following glow ── */
+  const handleCardMouseMove = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+  }, []);
+
+  /* ── PHASE 4: Magnetic CTA button effect ── */
+  const handleMagneticMove = useCallback((e: ReactMouseEvent<HTMLAnchorElement>) => {
+    const btn = e.currentTarget;
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const deltaX = (x - centerX) / centerX;
+    const deltaY = (y - centerY) / centerY;
+    btn.style.setProperty('--btn-x', `${x}px`);
+    btn.style.setProperty('--btn-y', `${y}px`);
+    btn.style.transform = `translate(${deltaX * 4}px, ${deltaY * 3}px)`;
+  }, []);
+
+  const handleMagneticLeave = useCallback((e: ReactMouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.transform = 'translate(0, 0)';
+  }, []);
+
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: '#030303' }}>
 
@@ -534,20 +584,27 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <span
-              className="text-xl tracking-[0.35em] font-light"
-              style={{ color: '#898989' }}
+              className="text-xl font-extralight"
+              style={{ color: '#898989', fontFamily: 'var(--font-sans)', letterSpacing: '0.35em' }}
             >
               VANTA
             </span>
           </Link>
           <div className="flex items-center gap-6">
-            <a href="#features" className="text-xs tracking-widest uppercase transition-colors duration-300"
-              style={{ color: '#616161' }}
+            <a href="#features" className="text-xs uppercase transition-colors duration-300"
+              style={{ color: '#616161', fontFamily: 'var(--font-sans)', fontWeight: 500, letterSpacing: '0.14em' }}
               onMouseEnter={e => e.currentTarget.style.color = '#898989'}
               onMouseLeave={e => e.currentTarget.style.color = '#616161'}
             >
               Features
             </a>
+            <Link href="/pricing" className="text-xs uppercase transition-colors duration-300"
+              style={{ color: '#616161', fontFamily: 'var(--font-sans)', fontWeight: 500, letterSpacing: '0.14em' }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#898989'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#616161'}
+            >
+              Pricing
+            </Link>
             <Link href="/login"
               className="btn-metal px-5 py-2 rounded-lg text-xs font-medium tracking-wider uppercase"
             >
@@ -573,17 +630,20 @@ export default function LandingPage() {
 
 
 
-        <div className="max-w-6xl mx-auto relative" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="max-w-6xl mx-auto relative" style={{ position: 'relative', zIndex: 1, transform: `translateY(${scrollY * -0.08}px)` }}>
           <div className="flex flex-col items-center text-center">
 
             {/* Badge / Eyebrow */}
             <div
-              className="hero-eyebrow inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs tracking-wider uppercase mb-10"
+              className="hero-eyebrow inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs uppercase mb-10"
               style={{
                 background: 'rgba(137,137,137,0.06)',
                 border: '1px solid rgba(137,137,137,0.12)',
                 color: '#898989',
                 opacity: 0,
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 500,
+                letterSpacing: '0.14em',
               }}
             >
               <Eye size={12} />
@@ -592,9 +652,10 @@ export default function LandingPage() {
 
             {/* Title — letter-by-letter blur reveal */}
             <h1
-              className="vanta-wordmark text-7xl md:text-8xl lg:text-9xl font-extralight tracking-[0.15em] mb-8"
+              className="vanta-wordmark text-7xl md:text-8xl lg:text-9xl font-extralight mb-8"
               style={{
                 letterSpacing: '0.2em',
+                fontFamily: 'var(--font-sans)',
               }}
             >
               {['V', 'A', 'N', 'T', 'A'].map((letter, i) => (
@@ -616,21 +677,25 @@ export default function LandingPage() {
 
             {/* Tagline */}
             <p
-              className="animate-hero-reveal text-lg md:text-xl font-light max-w-xl mb-6"
+              className="animate-hero-reveal text-lg md:text-xl max-w-xl mb-6"
               style={{
                 animationDelay: '0.4s',
                 color: '#8B8B8B',
                 lineHeight: 1.8,
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 300,
               }}
             >
               Push code. Get expert-level feedback in seconds.
             </p>
             <p
-              className="animate-hero-reveal text-sm font-light max-w-lg mb-14"
+              className="animate-hero-reveal text-sm max-w-lg mb-14"
               style={{
                 animationDelay: '0.5s',
                 color: '#616161',
                 lineHeight: 1.8,
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 300,
               }}
             >
               Detect bugs, security vulnerabilities, and performance issues —
@@ -640,14 +705,20 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="animate-hero-reveal flex items-center gap-4 mb-20" style={{ animationDelay: '0.6s' }}>
               <Link href="/login"
-                className="btn-metal px-8 py-3.5 rounded-xl text-sm font-medium tracking-wider uppercase flex items-center gap-3"
+                className="btn-metal btn-magnetic px-8 py-3.5 rounded-xl text-sm uppercase flex items-center gap-3"
+                style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, letterSpacing: '0.08em' }}
+                onMouseMove={handleMagneticMove}
+                onMouseLeave={handleMagneticLeave}
               >
                 Start Reviewing
                 <ArrowRight size={14} />
               </Link>
               <a href="#features"
-                className="px-8 py-3.5 rounded-xl text-sm font-medium tracking-wider transition-all duration-300"
+                className="px-8 py-3.5 rounded-xl text-sm transition-all duration-300"
                 style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontWeight: 400,
+                  letterSpacing: '0.04em',
                   color: '#616161',
                   border: '1px solid rgba(46,46,46,0.5)',
                 }}
@@ -677,14 +748,15 @@ export default function LandingPage() {
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <div
-                    className="text-2xl md:text-3xl font-extralight tracking-wider gradient-text-bright"
+                    className="text-2xl md:text-3xl gradient-text-bright"
+                    style={{ fontFamily: 'var(--font-sans)', fontWeight: 200, letterSpacing: '0.05em' }}
                     data-target={stat.target}
                     data-suffix={stat.suffix}
                     data-prefix={stat.prefix}
                   >
                     0
                   </div>
-                  <div className="text-[10px] tracking-[0.2em] uppercase mt-1" style={{ color: '#616161' }}>{stat.label}</div>
+                  <div className="text-[10px] uppercase mt-1" style={{ color: '#616161', fontFamily: 'var(--font-sans)', fontWeight: 500, letterSpacing: '0.2em' }}>{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -702,13 +774,13 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           CODE DEMO SECTION
          ═══════════════════════════════════════════ */}
-      <section className="relative py-28 px-6" style={{ zIndex: 1 }}>
+      <section className="scroll-reveal relative py-28 px-6" style={{ zIndex: 1 }}>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-3xl tracking-wider mb-4" style={{ color: '#e8e8e8', fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 700, letterSpacing: '-0.02em' }}>
+            <h2 className="text-2xl md:text-3xl mb-4" style={{ color: '#e8e8e8', fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.02em' }}>
               See it in action
             </h2>
-            <p className="text-sm font-light" style={{ color: '#616161' }}>
+            <p className="text-sm" style={{ color: '#616161', fontFamily: 'var(--font-sans)', fontWeight: 300 }}>
               Real-time AI analysis as you push your code
             </p>
           </div>
@@ -796,7 +868,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           FEATURES SECTION — Bento Grid
          ═══════════════════════════════════════════ */}
-      <section id="features" className="relative py-28 px-6" style={{ zIndex: 1 }}>
+      <section id="features" className="scroll-reveal relative py-28 px-6" style={{ zIndex: 1 }}>
         <div className="max-w-5xl mx-auto">
           {/* Section header */}
           <div className="text-center">
@@ -806,23 +878,27 @@ export default function LandingPage() {
               color: 'rgba(255,255,255,0.2)',
               marginBottom: '14px',
               textTransform: 'uppercase' as const,
+              fontFamily: 'var(--font-sans)',
+              fontWeight: 500,
             }}>
               Features
             </div>
-            <h2 className="text-2xl md:text-3xl tracking-wider mb-4" style={{ color: '#e8e8e8', fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 700, letterSpacing: '-0.02em', fontSize: '26px' }}>
+            <h2 className="text-2xl md:text-3xl mb-4" style={{ color: '#e8e8e8', fontFamily: 'var(--font-display)', fontWeight: 500, letterSpacing: '-0.02em', fontSize: '26px' }}>
               Built for developers who ship
             </h2>
             <p style={{
               fontSize: '12px',
               color: 'rgba(255,255,255,0.25)',
               marginBottom: '36px',
+              fontFamily: 'var(--font-sans)',
+              fontWeight: 300,
             }}>
               Everything you need for faster, safer, and cleaner code — in one place.
             </p>
           </div>
 
           {/* Bento grid */}
-          <div style={{
+          <div className="scroll-reveal-stagger" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '1px',
@@ -833,6 +909,8 @@ export default function LandingPage() {
             {FEATURES.map((feature, i) => (
               <div
                 key={feature.title}
+                className="bento-card"
+                onMouseMove={handleCardMouseMove}
                 style={{
                   background: '#080808',
                   padding: '22px 20px',
@@ -853,13 +931,15 @@ export default function LandingPage() {
                     borderRadius: '20px',
                     padding: '2px 8px',
                     textTransform: 'uppercase' as const,
+                    fontFamily: 'var(--font-sans)',
+                    fontWeight: 500,
                   }}>
                     Core
                   </span>
                 )}
 
                 {/* Icon box */}
-                <div style={{
+                <div className="bento-icon" style={{
                   width: '30px',
                   height: '30px',
                   borderRadius: '7px',
@@ -869,8 +949,11 @@ export default function LandingPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: '12px',
+                  transition: 'all 0.4s ease',
+                  position: 'relative',
+                  zIndex: 2,
                 }}>
-                  <feature.icon size={13} strokeWidth={1.5} style={{ color: 'rgba(255,255,255,0.38)' }} />
+                  <feature.icon size={13} strokeWidth={1.5} style={{ color: 'rgba(255,255,255,0.38)', transition: 'color 0.4s ease' }} />
                 </div>
 
                 {/* Title */}
@@ -879,6 +962,10 @@ export default function LandingPage() {
                   fontWeight: 500,
                   color: 'rgba(255,255,255,0.68)',
                   marginBottom: '5px',
+                  fontFamily: 'var(--font-sans)',
+                  position: 'relative',
+                  zIndex: 2,
+                  transition: 'color 0.4s ease',
                 }}>
                   {feature.title}
                 </h3>
@@ -888,6 +975,11 @@ export default function LandingPage() {
                   fontSize: '11px',
                   color: 'rgba(255,255,255,0.25)',
                   lineHeight: 1.6,
+                  fontFamily: 'var(--font-sans)',
+                  fontWeight: 300,
+                  position: 'relative',
+                  zIndex: 2,
+                  transition: 'color 0.4s ease',
                 }}>
                   {feature.desc}
                 </p>
@@ -896,10 +988,11 @@ export default function LandingPage() {
                 {i === 0 && (
                   <div style={{
                     fontSize: '30px',
-                    fontWeight: 300,
+                    fontWeight: 200,
                     color: 'rgba(255,255,255,0.06)',
                     letterSpacing: '-0.03em',
                     marginTop: '10px',
+                    fontFamily: 'var(--font-sans)',
                   }}>
                     0.3s
                   </div>
@@ -910,28 +1003,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Separator ── */}
-      <div className="relative" style={{ zIndex: 1 }}>
-        <div className="max-w-4xl mx-auto h-px" style={{
-          background: 'linear-gradient(90deg, transparent, rgba(137,137,137,0.15), transparent)',
-        }} />
-      </div>
+
 
       {/* ═══════════════════════════════════════════
           CTA SECTION
          ═══════════════════════════════════════════ */}
-      <section className="relative py-32 px-6" style={{ zIndex: 1 }}>
+      <section className="scroll-reveal relative py-32 px-6" style={{ zIndex: 1 }}>
         <div className="max-w-xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-extralight tracking-wider mb-6"
-            style={{ color: '#e8e8e8' }}>
+          <h2 className="text-3xl md:text-4xl mb-6"
+            style={{ color: '#e8e8e8', fontFamily: 'var(--font-display)', fontWeight: 400, letterSpacing: '-0.01em' }}>
             Ship better code,{' '}
             <span className="gradient-text-bright">today</span>
           </h2>
-          <p className="text-sm font-light mb-10" style={{ color: '#616161', lineHeight: 1.8 }}>
+          <p className="text-sm mb-10" style={{ color: '#616161', lineHeight: 1.8, fontFamily: 'var(--font-sans)', fontWeight: 300 }}>
             Connect your GitHub account and get your first AI review in under 60 seconds.
           </p>
           <Link href="/login"
-            className="btn-metal inline-flex items-center gap-3 px-8 py-3.5 rounded-xl text-sm font-medium tracking-wider uppercase"
+            className="btn-metal btn-magnetic inline-flex items-center gap-3 px-8 py-3.5 rounded-xl text-sm uppercase"
+            style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, letterSpacing: '0.08em' }}
+            onMouseMove={handleMagneticMove}
+            onMouseLeave={handleMagneticLeave}
           >
             <GitBranch size={16} strokeWidth={1.5} />
             Connect GitHub
@@ -941,12 +1032,92 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════
-          FOOTER
+          FOOTER — Enhanced
          ═══════════════════════════════════════════ */}
-      <footer className="relative py-10 px-6" style={{ zIndex: 1, borderTop: '1px solid rgba(46,46,46,0.3)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <span className="text-xs tracking-[0.3em] font-light" style={{ color: '#414141' }}>VANTA</span>
-          <span className="text-[10px] tracking-wider" style={{ color: '#333333' }}>Built for developers</span>
+      <footer className="relative py-16 px-6" style={{ zIndex: 1, borderTop: '1px solid rgba(46,46,46,0.3)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
+            {/* Brand column */}
+            <div className="col-span-2 md:col-span-1">
+              <span className="text-sm font-extralight" style={{ color: '#616161', fontFamily: 'var(--font-sans)', letterSpacing: '0.3em' }}>VANTA</span>
+              <p className="mt-3 text-[11px]" style={{ color: '#333333', lineHeight: 1.7, fontFamily: 'var(--font-sans)', fontWeight: 300 }}>
+                AI-powered code intelligence.<br />Ship safer, ship faster.
+              </p>
+            </div>
+
+            {/* Product column */}
+            <div>
+              <h4 style={{
+                fontSize: '10px',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase' as const,
+                color: 'rgba(255,255,255,0.2)',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 500,
+                marginBottom: '12px',
+              }}>Product</h4>
+              {['Features', 'Pricing', 'Integrations', 'Changelog'].map(item => (
+                <a key={item} href="#" className="block text-[11px] mb-2 transition-colors duration-300"
+                  style={{ color: '#414141', fontFamily: 'var(--font-sans)', fontWeight: 300 }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#898989'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#414141'}
+                >{item}</a>
+              ))}
+            </div>
+
+            {/* Resources column */}
+            <div>
+              <h4 style={{
+                fontSize: '10px',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase' as const,
+                color: 'rgba(255,255,255,0.2)',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 500,
+                marginBottom: '12px',
+              }}>Resources</h4>
+              {['Documentation', 'API Reference', 'Blog', 'Support'].map(item => (
+                <a key={item} href="#" className="block text-[11px] mb-2 transition-colors duration-300"
+                  style={{ color: '#414141', fontFamily: 'var(--font-sans)', fontWeight: 300 }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#898989'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#414141'}
+                >{item}</a>
+              ))}
+            </div>
+
+            {/* Company column */}
+            <div>
+              <h4 style={{
+                fontSize: '10px',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase' as const,
+                color: 'rgba(255,255,255,0.2)',
+                fontFamily: 'var(--font-sans)',
+                fontWeight: 500,
+                marginBottom: '12px',
+              }}>Company</h4>
+              {['About', 'Careers', 'Privacy', 'Terms'].map(item => (
+                <a key={item} href="#" className="block text-[11px] mb-2 transition-colors duration-300"
+                  style={{ color: '#414141', fontFamily: 'var(--font-sans)', fontWeight: 300 }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#898989'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#414141'}
+                >{item}</a>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer bottom bar */}
+          <div className="h-px w-full mb-8" style={{
+            background: 'linear-gradient(90deg, transparent, rgba(137,137,137,0.1), transparent)',
+          }} />
+          <div className="flex items-center justify-between">
+            <span className="text-[10px]" style={{ color: '#2E2E2E', fontFamily: 'var(--font-sans)', fontWeight: 300, letterSpacing: '0.06em' }}>
+              © {new Date().getFullYear()} VANTA. All rights reserved.
+            </span>
+            <span className="text-[10px]" style={{ color: '#2E2E2E', fontFamily: 'var(--font-sans)', fontWeight: 300, letterSpacing: '0.06em' }}>
+              Built with precision for developers
+            </span>
+          </div>
         </div>
       </footer>
     </div>

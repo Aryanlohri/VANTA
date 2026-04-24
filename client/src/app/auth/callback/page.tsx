@@ -16,7 +16,13 @@ function CallbackContent() {
     if (token) {
       setToken(token);
       loadUser().then(() => {
-        router.push('/dashboard');
+        const returnTo = localStorage.getItem('aicr_return_to');
+        if (returnTo) {
+          localStorage.removeItem('aicr_return_to');
+          router.push(returnTo);
+        } else {
+          router.push('/dashboard');
+        }
       });
     } else {
       router.push('/login');

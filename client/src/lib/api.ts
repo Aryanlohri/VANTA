@@ -62,3 +62,17 @@ export const reviewApi = {
   getById: (id: string) => api.get(`/reviews/${id}`),
   deleteReview: (id: string) => api.delete(`/reviews/${id}`),
 };
+
+export const paymentApi = {
+  getPlans: () => api.get('/payment/plans'),
+  createOrder: (data: { plan: string; billing_cycle: string }) =>
+    api.post('/payment/create-order', data),
+  verifyPayment: (data: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    plan: string;
+    billing_cycle: string;
+  }) => api.post('/payment/verify', data),
+  getUsage: () => api.get('/payment/usage'),
+};
