@@ -11,6 +11,7 @@ import helmet from 'helmet';
 import { createLogger, AppError, SERVICE_PORTS } from '@aicr/shared';
 import { initDatabase, closeDatabase } from './config/database';
 import authRoutes from './routes/auth.routes';
+import paymentRoutes from './routes/payment.routes';
 
 const logger = createLogger('auth-service');
 const app = express();
@@ -36,6 +37,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/auth', authRoutes);
+app.use('/payment', paymentRoutes); // triggered reload
 
 // ---- Error Handler ----
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

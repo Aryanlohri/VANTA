@@ -3,7 +3,7 @@
 // ============================================
 
 import { Router } from 'express';
-import { authProxy, repoProxy, reviewProxy } from './proxy';
+import { authProxy, repoProxy, reviewProxy, paymentProxy } from './proxy';
 
 const router = Router();
 
@@ -18,5 +18,8 @@ router.use('/repos', repoProxy);
 
 // Review routes → Review Service
 router.use('/reviews', reviewProxy);
+
+// Payment routes → Auth Service (payment module)
+router.use('/payment', paymentProxy);
 
 export default router;

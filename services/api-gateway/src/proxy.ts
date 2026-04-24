@@ -74,3 +74,8 @@ export const repoProxy = createServiceProxy('repos', SERVICE_URLS.repos, {
 export const reviewProxy = createServiceProxy('reviews', SERVICE_URLS.reviews, {
   '^/': '/reviews/',
 });
+
+/** Proxy for Payment Routes (handled by Auth Service) */
+export const paymentProxy = createServiceProxy('payment', SERVICE_URLS.auth, {
+  '^/': '/payment/',
+});
