@@ -100,7 +100,7 @@ router.post('/create-order', async (req: Request, res: Response) => {
       body: JSON.stringify(orderPayload),
     });
 
-    const order = await response.json();
+    const order = (await response.json()) as any;
 
     if (!response.ok) {
       logger.error({ order }, 'Razorpay order creation failed');
