@@ -15,6 +15,7 @@ const AUTH_SERVICE_URL =
 const PUBLIC_ROUTES = [
   '/api/auth/github',
   '/api/auth/github/callback',
+  '/api/v1/webhooks',
   '/health',
 ];
 

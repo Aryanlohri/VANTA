@@ -36,7 +36,9 @@ function createServiceProxy(serviceName: string, target: string, pathRewrite?: R
           'Proxying request'
         );
         // Re-serialize body that was consumed by express.json()
-        fixRequestBody(proxyReq, req);
+        if (req.originalUrl && !req.originalUrl.startsWith('/api/v1/webhooks')) {
+          fixRequestBody(proxyReq, req);
+        }
       },
       error: (err, req: any, res: any) => {
         logger.error({ err, service: serviceName, path: req.path }, 'Proxy error');
@@ -78,4 +80,9 @@ export const reviewProxy = createServiceProxy('reviews', SERVICE_URLS.reviews, {
 /** Proxy for Payment Routes (handled by Auth Service) */
 export const paymentProxy = createServiceProxy('payment', SERVICE_URLS.auth, {
   '^/': '/payment/',
+});
+
+/** Proxy for Webhooks (handled by Repository Service) */
+export const webhookProxy = createServiceProxy('webhooks', SERVICE_URLS.repos, {
+  '^/': '/webhooks/',
 });

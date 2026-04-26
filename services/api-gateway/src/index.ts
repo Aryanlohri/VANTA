@@ -26,7 +26,16 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use(express.json({ limit: '5mb' }));
+const jsonParser = express.json({ limit: '5mb' });
+
+// Bypass express.json() for webhooks to preserve the raw body for HMAC verification
+app.use((req, res, next) => {
+  if (req.originalUrl && req.originalUrl.startsWith('/api/v1/webhooks')) {
+    next();
+  } else {
+    jsonParser(req, res, next);
+  }
+});
 
 // Request correlation ID
 app.use((req, _res, next) => {
