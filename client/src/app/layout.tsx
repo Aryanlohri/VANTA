@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased min-h-screen">
         <div id="vanta-loader">
-          <canvas id="loader-canvas"></canvas>
+          <canvas id="loader-canvas" suppressHydrationWarning></canvas>
         </div>
         {children}
         <script dangerouslySetInnerHTML={{ __html: `
@@ -180,7 +180,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   loader.style.transition = 'opacity 1.2s ease';
                   loader.classList.add('fade-out');
                 }
-                setTimeout(() => { if (loader) loader.remove(); }, 1200);
+                setTimeout(() => { if (loader) loader.style.display = 'none'; }, 1200);
               }
             }
 
