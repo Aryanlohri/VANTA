@@ -36,6 +36,17 @@ export const RepositoryModel = {
   },
 
   /**
+   * Find a repository solely by its GitHub repo ID.
+   * Useful for webhooks where we don't have the user ID.
+   */
+  async findByGitHubIdOnly(githubRepoId: number): Promise<Repository | null> {
+    const repo = await getDb()(TABLE)
+      .where({ github_repo_id: githubRepoId })
+      .first();
+    return repo || null;
+  },
+
+  /**
    * Connect (create) a new repository.
    */
   async connect(data: {
