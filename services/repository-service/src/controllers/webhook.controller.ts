@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import axios from 'axios';
-import { createLogger, AppError, SERVICE_PORTS } from '@aicr/shared';
+import { createLogger, AppError, SERVICE_PORTS, EXTENSION_TO_LANGUAGE } from '@aicr/shared';
 import { RepositoryModel } from '../models/repository.model';
+import { GitHubApi } from '../services/github.api';
 
 const logger = createLogger('repository-service:webhook');
 
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || `http://localhost:${SERVICE_PORTS.AI_SERVICE}`;
+const REVIEW_SERVICE_URL = process.env.REVIEW_SERVICE_URL || `http://localhost:${SERVICE_PORTS.REVIEW_SERVICE}`;
 
 export const WebhookController = {
   /**
@@ -64,26 +65,47 @@ export const WebhookController = {
     const commitSha = payload.after; // the latest commit SHA
     const branch = payload.ref.replace('refs/heads/', '');
     
-    // Check if we track this repo
-    const repo = await RepositoryModel.findByGitHubId(payload.repository.owner.id.toString(), githubRepoId);
+    // Find the repo by its GitHub ID
+    const repo = await RepositoryModel.findByGitHubIdOnly(githubRepoId);
     
-    // Wait, the user_id in our DB is the internal user_id, not GitHub's.
-    // Our findByGitHubId requires our internal user_id.
-    // Since webhooks don't have our internal user_id, we need to find the repo just by github_repo_id!
-    // Let's call the internal trigger endpoint anyway
+    if (!repo) {
+      logger.warn({ githubRepoId }, 'Webhook received for untracked repository');
+      return;
+    }
+
     logger.info({ repoFullName: payload.repository.full_name, branch, commitSha }, 'Processing push event');
     
     try {
-      await axios.post(`${AI_SERVICE_URL}/internal/reviews/trigger`, {
-        github_repo_id: githubRepoId,
-        commit_sha: commitSha,
-        branch,
-        type: 'push',
-        repository_name: payload.repository.full_name,
-        // We'll let AI service figure out the rest
+      const rawFiles = await GitHubApi.getCommitFiles(repo.user_id, payload.repository.owner.login, payload.repository.name, commitSha);
+      
+      const files = rawFiles
+        .filter((f: any) => f.patch && f.status !== 'removed') // only files with code changes
+        .map((f: any) => {
+          const ext = '.' + f.filename.split('.').pop()?.toLowerCase();
+          return {
+            path: f.filename,
+            content: f.patch,
+            language: EXTENSION_TO_LANGUAGE[ext] || null
+          };
+        })
+        .filter((f: any) => f.language); // Only review supported source code files
+
+      if (files.length === 0) {
+        logger.info('No supported code files changed in commit');
+        return;
+      }
+
+      await axios.post(`${REVIEW_SERVICE_URL}/reviews`, {
+        repo_id: repo.id,
+        title: `Commit Review: ${commitSha.substring(0, 7)}`,
+        files
+      }, {
+        headers: { 'x-user-id': repo.user_id }
       });
+
+      logger.info('Successfully triggered review for push event');
     } catch (err: any) {
-      logger.error({ err: err.message }, 'Failed to trigger AI review for push');
+      logger.error({ err: err.response?.data || err.message }, 'Failed to trigger review for push');
     }
   },
 
@@ -92,20 +114,48 @@ export const WebhookController = {
     const prNumber = payload.pull_request.number;
     const headSha = payload.pull_request.head.sha;
     const branch = payload.pull_request.head.ref;
+    const prTitle = payload.pull_request.title;
 
     logger.info({ repoFullName: payload.repository.full_name, prNumber, headSha }, 'Processing pull_request event');
 
+    const repo = await RepositoryModel.findByGitHubIdOnly(githubRepoId);
+    
+    if (!repo) {
+      logger.warn({ githubRepoId }, 'Webhook received for untracked repository');
+      return;
+    }
+
     try {
-      await axios.post(`${AI_SERVICE_URL}/internal/reviews/trigger`, {
-        github_repo_id: githubRepoId,
-        commit_sha: headSha,
-        branch,
-        pr_number: prNumber,
-        type: 'pull_request',
-        repository_name: payload.repository.full_name,
+      const rawFiles = await GitHubApi.getPullRequestFiles(repo.user_id, payload.repository.owner.login, payload.repository.name, prNumber);
+      
+      const files = rawFiles
+        .filter((f: any) => f.patch && f.status !== 'removed')
+        .map((f: any) => {
+          const ext = '.' + f.filename.split('.').pop()?.toLowerCase();
+          return {
+            path: f.filename,
+            content: f.patch,
+            language: EXTENSION_TO_LANGUAGE[ext] || null
+          };
+        })
+        .filter((f: any) => f.language);
+
+      if (files.length === 0) {
+        logger.info('No supported code files changed in PR');
+        return;
+      }
+
+      await axios.post(`${REVIEW_SERVICE_URL}/reviews`, {
+        repo_id: repo.id,
+        title: `PR Review: #${prNumber} ${prTitle}`,
+        files
+      }, {
+        headers: { 'x-user-id': repo.user_id }
       });
+
+      logger.info('Successfully triggered review for pull request');
     } catch (err: any) {
-      logger.error({ err: err.message }, 'Failed to trigger AI review for PR');
+      logger.error({ err: err.response?.data || err.message }, 'Failed to trigger review for PR');
     }
   }
 };
