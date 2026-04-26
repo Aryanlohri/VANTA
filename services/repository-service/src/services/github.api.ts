@@ -153,6 +153,34 @@ export const GitHubApi = {
   },
 
   /**
+   * Get files changed in a pull request, including their diff patch.
+   */
+  async getPullRequestFiles(userId: string, owner: string, repo: string, prNumber: number): Promise<any[]> {
+    const token = await getGitHubToken(userId);
+    const client = createGitHubClient(token);
+    
+    // https://docs.github.com/en/rest/pulls/pulls#list-pull-requests-files
+    const response = await client.get(`/repos/${owner}/${repo}/pulls/${prNumber}/files`, {
+      params: { per_page: 100 }
+    });
+
+    return response.data;
+  },
+
+  /**
+   * Get files changed in a specific commit, including their diff patch.
+   */
+  async getCommitFiles(userId: string, owner: string, repo: string, commitSha: string): Promise<any[]> {
+    const token = await getGitHubToken(userId);
+    const client = createGitHubClient(token);
+
+    // https://docs.github.com/en/rest/commits/commits#get-a-commit
+    const response = await client.get(`/repos/${owner}/${repo}/commits/${commitSha}`);
+
+    return response.data.files || [];
+  },
+
+  /**
    * Create a webhook on a GitHub repository.
    */
   async createWebhook(userId: string, owner: string, repo: string, webhookUrl: string, secret: string): Promise<number> {
