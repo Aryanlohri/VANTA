@@ -373,7 +373,7 @@ body {
 /* ── PHASE 3: Feature card cursor glow ── */
 .bento-card {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -390,6 +390,7 @@ body {
   );
   pointer-events: none;
   z-index: 1;
+  border-radius: inherit;
 }
 
 .bento-card:hover::before {
