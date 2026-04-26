@@ -41,98 +41,114 @@ services:
   # ============================================
   # Services (uncomment when ready to containerize)
   # ============================================
-  # api-gateway:
-  #   build:
-  #     context: .
-  #     dockerfile: services/api-gateway/Dockerfile
-  #   container_name: aicr-gateway
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${API_GATEWAY_PORT:-3000}:3000"
-  #   environment:
-  #     - NODE_ENV=development
-  #     - JWT_SECRET=${JWT_SECRET}
-  #     - REDIS_URL=redis://redis:6379
-  #     - AUTH_SERVICE_URL=http://auth-service:3001
-  #     - REPO_SERVICE_URL=http://repository-service:3002
-  #     - REVIEW_SERVICE_URL=http://review-service:3003
-  #     - AI_SERVICE_URL=http://ai-service:3004
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api-gateway/Dockerfile
+    container_name: aicr-gateway
+    restart: unless-stopped
+    ports:
+      - "${API_GATEWAY_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=development
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - REPO_SERVICE_URL=http://repository-service:3002
+      - REVIEW_SERVICE_URL=http://review-service:3003
+      - AI_SERVICE_URL=http://ai-service:3004
+    depends_on:
+      redis:
+        condition: service_healthy
 
-  # auth-service:
-  #   build:
-  #     context: .
-  #     dockerfile: services/auth-service/Dockerfile
-  #   container_name: aicr-auth
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${AUTH_SERVICE_PORT:-3001}:3001"
-  #   environment:
-  #     - NODE_ENV=development
-  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=auth
-  #     - JWT_SECRET=${JWT_SECRET}
-  #     - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
-  #     - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-  #     - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-  #     - ENCRYPTION_KEY=${ENCRYPTION_KEY}
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: aicr-auth
+    restart: unless-stopped
+    ports:
+      - "${AUTH_SERVICE_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=auth
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
-  # repository-service:
-  #   build:
-  #     context: .
-  #     dockerfile: services/repository-service/Dockerfile
-  #   container_name: aicr-repo
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${REPO_SERVICE_PORT:-3002}:3002"
-  #   environment:
-  #     - NODE_ENV=development
-  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=repositories
-  #     - REDIS_URL=redis://redis:6379
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
+  repository-service:
+    build:
+      context: .
+      dockerfile: services/repository-service/Dockerfile
+    container_name: aicr-repo
+    restart: unless-stopped
+    ports:
+      - "${REPO_SERVICE_PORT:-3002}:3002"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=repositories
+      - REDIS_URL=redis://redis:6379
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - REVIEW_SERVICE_URL=http://review-service:3003
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
-  # review-service:
-  #   build:
-  #     context: .
-  #     dockerfile: services/review-service/Dockerfile
-  #   container_name: aicr-review
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${REVIEW_SERVICE_PORT:-3003}:3003"
-  #   environment:
-  #     - NODE_ENV=development
-  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=reviews
-  #     - REDIS_URL=redis://redis:6379
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
+  review-service:
+    build:
+      context: .
+      dockerfile: services/review-service/Dockerfile
+    container_name: aicr-review
+    restart: unless-stopped
+    ports:
+      - "${REVIEW_SERVICE_PORT:-3003}:3003"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=reviews
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
-  # ai-service:
-  #   build:
-  #     context: .
-  #     dockerfile: services/ai-service/Dockerfile
-  #   container_name: aicr-ai
-  #   restart: unless-stopped
-  #   ports:
-  #     - "${AI_SERVICE_PORT:-3004}:3004"
-  #   environment:
-  #     - NODE_ENV=development
-  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
-  #     - AI_MOCK_MODE=${AI_MOCK_MODE:-true}
-  #     - REDIS_URL=redis://redis:6379
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
+  ai-service:
+    build:
+      context: .
+      dockerfile: services/ai-service/Dockerfile
+    container_name: aicr-ai
+    restart: unless-stopped
+    ports:
+      - "${AI_SERVICE_PORT:-3004}:3004"
+    environment:
+      - NODE_ENV=development
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AI_MOCK_MODE=${AI_MOCK_MODE:-true}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: aicr-client
+    restart: unless-stopped
+    ports:
+      - "3005:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://api-gateway:3000
+
 
 volumes:
   postgres_data:
