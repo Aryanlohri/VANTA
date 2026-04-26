@@ -5,11 +5,6 @@
 import type { Knex } from 'knex';
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Fix for ES modules or tsx
-const filename = typeof __filename !== 'undefined' ? __filename : fileURLToPath(import.meta.url);
-const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(filename);
 
 dotenv.config({ path: '../../.env' });
 
@@ -30,7 +25,7 @@ const config: Knex.Config = {
     idleTimeoutMillis: 10000,
   },
   migrations: {
-    directory: path.resolve(dirname, '../../migrations'),
+    directory: path.resolve(__dirname, '../../migrations'),
     tableName: 'auth_migrations',
     schemaName: 'auth',
   },
