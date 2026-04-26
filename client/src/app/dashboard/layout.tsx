@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!isAuthenticated) return null;
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#030303' }}>
+    <div className="min-h-screen flex font-sans" style={{ background: '#030303' }}>
       {/* Sidebar */}
       <aside className="w-60 shrink-0 flex flex-col h-screen sticky top-0"
         style={{ background: '#0a0a0a', borderRight: '1px solid var(--color-border)' }}>
@@ -63,45 +63,45 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
+        <nav className="flex-1 px-3 py-4 space-y-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             return (
               <Link key={item.href} href={item.href}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium tracking-wider transition-all duration-300"
+                className="flex items-center gap-3 rounded-lg text-[13px] tracking-wide transition-all duration-300"
                 style={{
+                  padding: '9px 20px',
                   background: isActive ? 'rgba(137,137,137,0.06)' : 'transparent',
                   color: isActive ? '#e8e8e8' : '#616161',
                   borderLeft: isActive ? '2px solid #898989' : '2px solid transparent',
+                  fontWeight: isActive ? 500 : 400,
                 }}>
-                <item.icon size={16} strokeWidth={1.5} />
+                <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} />
                 {item.label}
-                {isActive && <ChevronRight size={12} className="ml-auto" style={{ color: '#494949' }} />}
+                {isActive && <ChevronRight size={14} className="ml-auto" style={{ color: '#616161' }} />}
               </Link>
             );
           })}
         </nav>
 
-        {/* User */}
-        <div className="px-4 py-4" style={{ borderTop: '1px solid var(--color-border)' }}>
-          <div className="flex items-center gap-3 mb-3">
-            {user?.avatar_url ? (
-              <img src={user.avatar_url} alt={user.username} className="w-7 h-7 rounded-full opacity-80" />
-            ) : (
-              <div className="w-7 h-7 rounded-full" style={{ background: '#1a1a1a' }} />
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate" style={{ color: '#8B8B8B' }}>{user?.username}</p>
-              <p className="text-[10px] truncate" style={{ color: '#494949' }}>{user?.email || ''}</p>
-            </div>
+        {/* User Footer */}
+        <div className="p-5 flex gap-3 items-start" style={{ borderTop: '1px solid var(--color-border)' }}>
+          {user?.avatar_url ? (
+            <img src={user.avatar_url} alt={user.username} className="w-8 h-8 rounded-full opacity-80 shrink-0 mt-0.5" />
+          ) : (
+            <div className="w-8 h-8 rounded-full shrink-0 mt-0.5" style={{ background: '#1a1a1a' }} />
+          )}
+          <div className="flex-1 min-w-0 flex flex-col items-start">
+            <p className="text-[13px] font-medium truncate w-full" style={{ color: '#e8e8e8' }}>{user?.username}</p>
+            <p className="text-[11px] truncate w-full mb-3" style={{ color: '#616161' }}>{user?.email || 'No email'}</p>
+            <button onClick={logout}
+              className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider transition-colors duration-200"
+              style={{ color: '#898989' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#e8e8e8'}
+              onMouseLeave={e => e.currentTarget.style.color = '#898989'}>
+              <LogOut size={12} strokeWidth={2} /> Sign Out
+            </button>
           </div>
-          <button onClick={logout}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-[10px] font-medium tracking-wider uppercase transition-all duration-300"
-            style={{ background: 'rgba(137,137,137,0.04)', color: '#616161', border: '1px solid rgba(46,46,46,0.4)' }}
-            onMouseEnter={e => e.currentTarget.style.color = '#898989'}
-            onMouseLeave={e => e.currentTarget.style.color = '#616161'}>
-            <LogOut size={12} strokeWidth={1.5} /> Sign Out
-          </button>
         </div>
       </aside>
 

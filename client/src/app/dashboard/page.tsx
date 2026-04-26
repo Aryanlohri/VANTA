@@ -58,65 +58,63 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8 stagger">
+      <div className="grid grid-cols-4 gap-[12px] mb-8 stagger">
         {stats.map((stat) => (
-          <div key={stat.label} className="glass-card p-5 transition-all duration-200 hover:scale-[1.02]">
+          <div key={stat.label} className="glass-card p-5 transition-all duration-200 hover:border-[var(--color-border-hover)]">
             <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{ background: `${stat.color}15`, color: stat.color }}>
+              <div className="w-[32px] h-[32px] rounded-[8px] flex items-center justify-center"
+                style={{ background: 'var(--color-bg-hover)', color: stat.color }}>
                 <stat.icon size={18} />
               </div>
             </div>
-            <p className="text-2xl font-bold mb-0.5" style={{ color: 'var(--color-text-primary)' }}>
+            <p className="text-[28px] font-bold mb-0.5" style={{ color: 'var(--color-text-primary)' }}>
               {loading ? <span className="skeleton inline-block w-12 h-7" /> : stat.value}
             </p>
-            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{stat.label}</p>
+            <p className="text-[11px] uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* Quick Actions & Recent Reviews */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-[1fr_1.6fr] gap-[14px]">
         {/* Quick Actions */}
         <div className="glass-card p-6">
-          <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Quick Actions</h3>
+          <h3 className="text-[12px] uppercase tracking-[0.08em] mb-4" style={{ color: 'var(--color-text-muted)' }}>Quick Actions</h3>
           <div className="space-y-3">
             <Link href="/dashboard/reviews/new"
-              className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              style={{ background: 'var(--color-bg-hover)', border: '1px solid var(--color-border)' }}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+              className="flex items-center gap-3 py-3 px-3 -mx-3 rounded-lg transition-all duration-200 hover:bg-[var(--color-bg-hover)] hover:translate-x-[2px]">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                 style={{ background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))', color: 'white' }}>
                 <Plus size={14} />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>New Review</p>
-                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Submit code for AI analysis</p>
+                <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>Submit code for AI analysis</p>
               </div>
-              <ArrowRight size={14} style={{ color: 'var(--color-text-muted)' }} />
+              <span className="text-[16px] leading-none shrink-0" style={{ color: 'var(--color-text-muted)' }}>›</span>
             </Link>
 
             <Link href="/dashboard/repositories"
-              className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              style={{ background: 'var(--color-bg-hover)', border: '1px solid var(--color-border)' }}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+              className="flex items-center gap-3 py-3 px-3 -mx-3 rounded-lg transition-all duration-200 hover:bg-[var(--color-bg-hover)] hover:translate-x-[2px]">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                 style={{ background: '#6366f115', color: '#6366f1' }}>
                 <GitBranch size={14} />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Connect Repo</p>
-                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Link a GitHub repository</p>
+                <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>Link a GitHub repository</p>
               </div>
-              <ArrowRight size={14} style={{ color: 'var(--color-text-muted)' }} />
+              <span className="text-[16px] leading-none shrink-0" style={{ color: 'var(--color-text-muted)' }}>›</span>
             </Link>
           </div>
         </div>
 
         {/* Recent Reviews */}
-        <div className="lg:col-span-2 glass-card p-6">
+        <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>Recent Reviews</h3>
+            <h3 className="text-[12px] uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-muted)' }}>Recent Reviews</h3>
             <Link href="/dashboard/reviews" className="text-xs font-medium transition-colors" style={{ color: 'var(--color-accent-start)' }}>
-              View All <ArrowRight size={12} className="inline" />
+              View All ›
             </Link>
           </div>
 
@@ -128,15 +126,14 @@ export default function DashboardPage() {
             <div className="text-center py-8">
               <FileCode size={32} className="mx-auto mb-3" style={{ color: 'var(--color-text-muted)' }} />
               <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>No reviews yet</p>
-              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Submit your first review to get started</p>
+              <p className="text-[12px] mt-2" style={{ color: 'var(--color-text-muted)' }}>No other reviews yet — start a new one above.</p>
             </div>
           ) : (
             <div className="space-y-2">
               {reviews.slice(0, 5).map((review: any) => (
                 <Link key={review.id} href={`/dashboard/reviews/${review.id}`}
-                  className="flex items-center gap-4 p-3 rounded-lg transition-all duration-200 hover:scale-[1.01]"
-                  style={{ background: 'var(--color-bg-hover)' }}>
-                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: STATUS_COLORS[review.status] || '#888' }} />
+                  className="flex items-center gap-4 py-3 px-3 -mx-3 rounded-lg transition-all duration-200 hover:bg-[var(--color-bg-hover)]">
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: review.status === 'completed' ? '#22c55e' : STATUS_COLORS[review.status] || '#888' }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{review.title}</p>
                     <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
@@ -157,6 +154,9 @@ export default function DashboardPage() {
                   </span>
                 </Link>
               ))}
+              <div className="pt-3 text-center">
+                <p className="text-[12px]" style={{ color: 'var(--color-text-muted)' }}>No other reviews yet — start a new one above.</p>
+              </div>
             </div>
           )}
         </div>
