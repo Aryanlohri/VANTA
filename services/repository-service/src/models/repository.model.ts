@@ -47,6 +47,7 @@ export const RepositoryModel = {
     language: string | null;
     default_branch: string;
     is_private: boolean;
+    webhook_id?: number | null;
   }): Promise<Repository> {
     // Check if already exists (might be reconnecting)
     const existing = await RepositoryModel.findByGitHubId(data.user_id, data.github_repo_id);

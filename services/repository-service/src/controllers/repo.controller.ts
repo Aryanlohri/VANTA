@@ -73,6 +73,22 @@ export const RepoController = {
         throw new ValidationError('Missing required fields: github_repo_id, name, full_name');
       }
 
+      let webhook_id: number | null = null;
+      const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
+      const webhookBaseUrl = process.env.WEBHOOK_BASE_URL;
+
+      if (webhookSecret && webhookBaseUrl) {
+        const [owner, repoName] = full_name.split('/');
+        // The API Gateway rewrites /api/v1/webhooks to the repository service
+        const webhookUrl = `${webhookBaseUrl}/api/v1/webhooks/github`;
+        try {
+          webhook_id = await GitHubApi.createWebhook(userId, owner, repoName, webhookUrl, webhookSecret);
+          logger.info({ webhook_id, full_name }, 'Webhook created successfully');
+        } catch (e: any) {
+          logger.warn({ full_name, err: e.message }, 'Failed to create webhook during connection. Proceeding anyway.');
+        }
+      }
+
       const repo = await RepositoryModel.connect({
         user_id: userId,
         github_repo_id,
@@ -82,6 +98,7 @@ export const RepoController = {
         language: language || null,
         default_branch: default_branch || 'main',
         is_private: is_private || false,
+        webhook_id,
       });
 
       logger.info({ repoId: repo.id, fullName: full_name }, 'Repository connected');

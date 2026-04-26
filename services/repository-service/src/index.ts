@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import { createLogger, AppError, SERVICE_PORTS } from '@aicr/shared';
 import { initDatabase, closeDatabase } from './config/database';
 import repoRoutes from './routes/repo.routes';
+import webhookRoutes from './routes/webhook.routes';
 
 const logger = createLogger('repository-service');
 const app = express();
@@ -14,6 +15,10 @@ const PORT = Number(process.env.REPO_SERVICE_PORT) || SERVICE_PORTS.REPO_SERVICE
 
 app.use(helmet());
 app.use(cors());
+
+// Mount webhooks before express.json() so express.raw() works
+app.use('/webhooks', webhookRoutes);
+
 app.use(express.json());
 
 app.get('/health', (_req, res) => {

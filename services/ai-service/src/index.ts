@@ -24,6 +24,24 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// Internal endpoint to receive webhook triggers
+app.post('/internal/reviews/trigger', (req, res) => {
+  const { github_repo_id, commit_sha, branch, type, repository_name, pr_number } = req.body;
+  
+  logger.info({
+    github_repo_id,
+    commit_sha,
+    branch,
+    type,
+    repository_name,
+    pr_number,
+  }, 'Received webhook trigger for AI review');
+
+  // TODO: Phase 1.2 - Fetch git diff, chunk files, and push to REVIEW_PROCESSING queue
+  
+  res.status(202).json({ success: true, message: 'Review job accepted' });
+});
+
 // Start the BullMQ worker
 startAIWorker();
 

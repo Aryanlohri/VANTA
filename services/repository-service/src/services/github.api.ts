@@ -151,4 +151,44 @@ export const GitHubApi = {
       language,
     };
   },
+
+  /**
+   * Create a webhook on a GitHub repository.
+   */
+  async createWebhook(userId: string, owner: string, repo: string, webhookUrl: string, secret: string): Promise<number> {
+    const token = await getGitHubToken(userId);
+    const client = createGitHubClient(token);
+
+    try {
+      const response = await client.post(`/repos/${owner}/${repo}/hooks`, {
+        name: 'web',
+        active: true,
+        events: ['push', 'pull_request'],
+        config: {
+          url: webhookUrl,
+          content_type: 'json',
+          insecure_ssl: '0',
+          secret: secret,
+        },
+      });
+
+      return response.data.id; // Returns the webhook_id
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        // Validation failed, possibly webhook already exists
+        logger.warn({ owner, repo }, 'Webhook might already exist');
+        
+        // Try to fetch existing webhooks to find our ID
+        try {
+          const hooksRes = await client.get(`/repos/${owner}/${repo}/hooks`);
+          const existingHook = hooksRes.data.find((h: any) => h.config.url === webhookUrl);
+          if (existingHook) return existingHook.id;
+        } catch (e) {
+          logger.error('Failed to fetch existing webhooks');
+        }
+      }
+      logger.error({ err: error.response?.data || error.message }, 'Failed to create GitHub webhook');
+      throw new AppError('Failed to create webhook on GitHub', 500);
+    }
+  },
 };
