@@ -2,10 +2,14 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install dependencies
-COPY package.json ./
+COPY package.json package-lock.json ./
 COPY packages/shared/package.json ./packages/shared/
+COPY services/api-gateway/package.json ./services/api-gateway/
+COPY services/auth-service/package.json ./services/auth-service/
+COPY services/repository-service/package.json ./services/repository-service/
 COPY services/review-service/package.json ./services/review-service/
-
+COPY services/ai-service/package.json ./services/ai-service/
+COPY client/package.json ./client/
 RUN npm install --workspace=services/review-service --workspace=packages/shared
 
 # Copy source
