@@ -219,4 +219,47 @@ export const GitHubApi = {
       throw new AppError('Failed to create webhook on GitHub', 500);
     }
   },
+
+  /**
+   * Create a review on a pull request with inline comments.
+   */
+  async createPullRequestReview(
+    userId: string,
+    owner: string,
+    repo: string,
+    prNumber: number,
+    commitSha: string,
+    comments: Array<{ path: string; line: number; body: string }>
+  ): Promise<any> {
+    const token = await getGitHubToken(userId);
+    const client = createGitHubClient(token);
+
+    // Filter out comments without valid lines or paths
+    const validComments = comments.filter((c) => c.path && c.line && c.body).map((c) => ({
+      path: c.path,
+      line: c.line,
+      side: 'RIGHT',
+      body: c.body,
+    }));
+
+    if (validComments.length === 0) {
+      logger.info({ prNumber }, 'No valid comments to post to GitHub');
+      return null;
+    }
+
+    try {
+      const response = await client.post(`/repos/${owner}/${repo}/pulls/${prNumber}/reviews`, {
+        commit_id: commitSha,
+        event: 'COMMENT',
+        body: '✨ **VANTA AI Code Review**\nHere are some suggestions to improve your code quality, security, and performance.',
+        comments: validComments,
+      });
+
+      logger.info({ prNumber, reviewId: response.data.id }, 'Successfully posted PR review to GitHub');
+      return response.data;
+    } catch (error: any) {
+      logger.error({ err: error.response?.data || error.message }, 'Failed to create PR review');
+      throw new AppError('Failed to post review to GitHub', 500);
+    }
+  },
 };

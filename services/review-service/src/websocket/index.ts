@@ -8,7 +8,7 @@ const logger = createLogger('review-service:websocket');
 export function initWebSocket(httpServer: HttpServer): SocketServer {
   const io = new SocketServer(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+      origin: process.env.FRONTEND_URL || 'http://localhost:3010',
       methods: ['GET', 'POST'],
       credentials: true,
     },

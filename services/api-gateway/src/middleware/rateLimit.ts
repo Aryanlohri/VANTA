@@ -3,36 +3,50 @@
 // ============================================
 
 import { Request, Response, NextFunction } from 'express';
-import { RateLimiterMemory } from 'rate-limiter-flexible';
+import { RateLimiterRedis } from 'rate-limiter-flexible';
+import IORedis from 'ioredis';
 import { createLogger, RateLimitError } from '@aicr/shared';
 
 const logger = createLogger('api-gateway:rate-limit');
 
+// Use a shared Redis instance for distributed rate limiting
+const redisClient = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  enableOfflineQueue: false, // Return error immediately if redis is down
+  maxRetriesPerRequest: 1,
+});
+
+redisClient.on('error', (err) => {
+  logger.error({ err: err.message }, 'Redis connection error in rate limiter');
+});
+
 // General API rate limit: 100 requests per minute
-const generalLimiter = new RateLimiterMemory({
+const generalLimiter = new RateLimiterRedis({
+  storeClient: redisClient,
   points: 100,
   duration: 60,
-  keyPrefix: 'general',
+  keyPrefix: 'rate:general',
 });
 
 // Auth rate limit: 20 requests per minute (more lenient for OAuth flows)
-const authLimiter = new RateLimiterMemory({
+const authLimiter = new RateLimiterRedis({
+  storeClient: redisClient,
   points: 20,
   duration: 60,
-  keyPrefix: 'auth',
+  keyPrefix: 'rate:auth',
 });
 
 // AI review rate limit: 10 requests per minute (expensive operations)
-const aiLimiter = new RateLimiterMemory({
+const aiLimiter = new RateLimiterRedis({
+  storeClient: redisClient,
   points: 10,
   duration: 60,
-  keyPrefix: 'ai',
+  keyPrefix: 'rate:ai',
 });
 
 /**
  * Select the appropriate rate limiter based on the route.
  */
-function getLimiter(path: string): RateLimiterMemory {
+function getLimiter(path: string): RateLimiterRedis {
   if (path.startsWith('/api/auth')) return authLimiter;
   if (path.startsWith('/api/reviews') && path.includes('POST')) return aiLimiter;
   return generalLimiter;
@@ -61,6 +75,12 @@ export async function rateLimitMiddleware(
 
     next();
   } catch (rejRes: any) {
+    // If rejRes is an Error, Redis failed. Fail open to avoid breaking API if Redis crashes.
+    if (rejRes instanceof Error) {
+      logger.error({ err: rejRes.message }, 'Rate limiter Redis failure — failing open');
+      return next();
+    }
+
     logger.warn({ key, path: req.path }, 'Rate limit exceeded');
 
     res.set({

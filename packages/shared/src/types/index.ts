@@ -107,6 +107,8 @@ export interface Review {
   summary: string | null;
   positives: string[];
   overall_suggestions: string[];
+  pull_request_number?: number | null;
+  commit_sha?: string | null;
   created_at: Date;
   updated_at: Date;
 }

@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: '../../.env' });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: '../../.env' });
+}
 
 import express from 'express';
 import { createServer } from 'http';
@@ -8,7 +10,7 @@ import helmet from 'helmet';
 import { createLogger, AppError, SERVICE_PORTS } from '@aicr/shared';
 import { initDatabase, closeDatabase } from './config/database';
 import { initWebSocket } from './websocket';
-import { initResultConsumer } from './queue/review.consumer';
+import { initResultConsumer, stopResultConsumer } from './queue/review.consumer';
 import reviewRoutes from './routes/review.routes';
 
 const logger = createLogger('review-service');
@@ -17,7 +19,7 @@ const httpServer = createServer(app);
 const PORT = Number(process.env.REVIEW_SERVICE_PORT) || SERVICE_PORTS.REVIEW_SERVICE;
 
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3001', credentials: true }));
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3010', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 
 app.get('/health', (_req, res) => {
@@ -39,6 +41,13 @@ async function start() {
   httpServer.listen(PORT, () => logger.info(`Review service running on port ${PORT}`));
 }
 
-process.on('SIGTERM', async () => { await closeDatabase(); process.exit(0); });
-process.on('SIGINT', async () => { await closeDatabase(); process.exit(0); });
+async function shutdown(signal: string) {
+  logger.info(`${signal} received. Shutting down gracefully...`);
+  await stopResultConsumer();
+  await closeDatabase();
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 start();

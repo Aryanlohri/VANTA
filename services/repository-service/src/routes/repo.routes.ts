@@ -28,4 +28,7 @@ router.get('/:id/files', RepoController.listFiles);
 // Get file content (wildcard path)
 router.get('/:id/content/*', RepoController.getFileContent);
 
+// Post PR review (internal endpoint)
+router.post('/:id/reviews', RepoController.createPullRequestReview);
+
 export default router;

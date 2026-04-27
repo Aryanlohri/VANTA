@@ -204,4 +204,41 @@ export const RepoController = {
       next(error);
     }
   },
+
+  /**
+   * POST /repos/:id/reviews
+   * Create a PR review on GitHub with inline comments.
+   * Note: This is an internal endpoint called by the review-service.
+   */
+  async createPullRequestReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.headers['x-user-id'] as string;
+      if (!userId) throw new AppError('User ID required', 401, ERROR_CODES.UNAUTHORIZED);
+
+      const id = req.params.id as string;
+      const { prNumber, commitSha, comments } = req.body;
+
+      if (!prNumber || !commitSha || !comments || !Array.isArray(comments)) {
+        throw new ValidationError('Missing required fields: prNumber, commitSha, comments[]');
+      }
+
+      const repo = await RepositoryModel.findById(id);
+      if (!repo) throw new NotFoundError('Repository', id);
+
+      const [owner, repoName] = repo.full_name.split('/');
+
+      const reviewData = await GitHubApi.createPullRequestReview(
+        userId,
+        owner,
+        repoName,
+        prNumber,
+        commitSha,
+        comments
+      );
+
+      res.status(201).json({ success: true, data: reviewData });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

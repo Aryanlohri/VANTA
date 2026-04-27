@@ -12,6 +12,8 @@ export async function up(knex: Knex): Promise<void> {
     table.text('summary').nullable();
     table.specificType('positives', 'text[]').defaultTo('{}');
     table.specificType('overall_suggestions', 'text[]').defaultTo('{}');
+    table.integer('pull_request_number').nullable();
+    table.string('commit_sha').nullable();
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
     table.index('user_id');

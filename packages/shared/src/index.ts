@@ -11,6 +11,7 @@ export * from './constants';
 // Utilities
 export { createLogger } from './utils/logger';
 export type { Logger } from './utils/logger';
+export { requireEnv, optionalEnv, isProduction } from './utils/env';
 export {
   AppError,
   AuthError,

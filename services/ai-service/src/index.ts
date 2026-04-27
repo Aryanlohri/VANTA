@@ -1,11 +1,13 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: '../../.env' });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: '../../.env' });
+}
 
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { createLogger, SERVICE_PORTS } from '@aicr/shared';
-import { startAIWorker } from './queue/ai.worker';
+import { startAIWorker, stopAIWorker } from './queue/ai.worker';
 
 const logger = createLogger('ai-service');
 const app = express();
@@ -24,14 +26,21 @@ app.get('/health', (_req, res) => {
   });
 });
 
-
 // Start the BullMQ worker
 startAIWorker();
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info(`AI service running on port ${PORT}`);
   logger.info(`Mock mode: ${process.env.AI_MOCK_MODE === 'true' ? 'ON' : 'OFF'}`);
 });
 
-process.on('SIGTERM', () => { logger.info('Shutting down...'); process.exit(0); });
-process.on('SIGINT', () => { logger.info('Shutting down...'); process.exit(0); });
+// Graceful shutdown — drain worker, close Redis, then exit
+async function shutdown(signal: string) {
+  logger.info(`${signal} received. Shutting down gracefully...`);
+  server.close();
+  await stopAIWorker();
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

@@ -98,6 +98,7 @@ export const WebhookController = {
       await axios.post(`${REVIEW_SERVICE_URL}/reviews`, {
         repo_id: repo.id,
         title: `Commit Review: ${commitSha.substring(0, 7)}`,
+        commit_sha: commitSha,
         files
       }, {
         headers: { 'x-user-id': repo.user_id }
@@ -148,6 +149,8 @@ export const WebhookController = {
       await axios.post(`${REVIEW_SERVICE_URL}/reviews`, {
         repo_id: repo.id,
         title: `PR Review: #${prNumber} ${prTitle}`,
+        pull_request_number: prNumber,
+        commit_sha: headSha,
         files
       }, {
         headers: { 'x-user-id': repo.user_id }
