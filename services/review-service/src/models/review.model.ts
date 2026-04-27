@@ -6,7 +6,7 @@ const FILES = 'reviews.review_files';
 const COMMENTS = 'reviews.review_comments';
 
 export const ReviewModel = {
-  async create(data: { repo_id: string; user_id: string; title: string }): Promise<Review> {
+  async create(data: { repo_id: string; user_id: string; title: string; pull_request_number?: number; commit_sha?: string }): Promise<Review> {
     const [review] = await getDb()(REVIEWS).insert(data).returning('*');
     return review;
   },

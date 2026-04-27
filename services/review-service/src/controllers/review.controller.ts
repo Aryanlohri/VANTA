@@ -11,7 +11,7 @@ export const ReviewController = {
       const userId = req.headers['x-user-id'] as string;
       if (!userId) throw new AppError('User ID required', 401, ERROR_CODES.UNAUTHORIZED);
 
-      const { repo_id, title, files } = req.body;
+      const { repo_id, title, files, pull_request_number, commit_sha } = req.body;
       if (!repo_id || !title || !files || !Array.isArray(files) || files.length === 0) {
         throw new ValidationError('Required: repo_id, title, files[]');
       }
@@ -20,7 +20,7 @@ export const ReviewController = {
       }
 
       // Create review
-      const review = await ReviewModel.create({ repo_id, user_id: userId, title });
+      const review = await ReviewModel.create({ repo_id, user_id: userId, title, pull_request_number, commit_sha });
 
       // Add files and enqueue AI jobs
       for (const file of files) {
