@@ -130,7 +130,9 @@ services:
       - "${AI_SERVICE_PORT:-3004}:3004"
     environment:
       - NODE_ENV=development
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - VERTEX_PROJECT_ID=${VERTEX_PROJECT_ID}
+      - VERTEX_LOCATION=${VERTEX_LOCATION:-us-central1}
       - AI_MOCK_MODE=${AI_MOCK_MODE:-true}
       - REDIS_URL=redis://redis:6379
     depends_on:
