@@ -28,7 +28,7 @@ function generateMockResponse(code: string, language: string | null): AIReviewRe
 
   return {
     overall_score: Math.floor(Math.random() * 30) + 65,
-    summary: `[MOCK] Code review completed for ${language || 'unknown'} file using Gemini 2.1 Pro.`,
+    summary: `[MOCK] Code review completed for ${language || 'unknown'} file using Gemini.`,
     issues: [
       {
         line: Math.min(3, lineCount),
@@ -50,32 +50,19 @@ function generateMockResponse(code: string, language: string | null): AIReviewRe
 }
 
 // Define the schema for structured output
-const responseSchema = {
-  description: "Code review response",
+const responseSchema: any = {
   type: SchemaType.OBJECT,
   properties: {
-    overall_score: {
-      type: SchemaType.NUMBER,
-      description: "Overall quality score from 0-100",
-    },
-    summary: {
-      type: SchemaType.STRING,
-      description: "Brief summary of the review",
-    },
+    overall_score: { type: SchemaType.NUMBER },
+    summary: { type: SchemaType.STRING },
     issues: {
       type: SchemaType.ARRAY,
       items: {
         type: SchemaType.OBJECT,
         properties: {
           line: { type: SchemaType.NUMBER },
-          type: { 
-            type: SchemaType.STRING,
-            enum: ["bug", "security", "performance", "style", "best_practice"]
-          },
-          severity: { 
-            type: SchemaType.STRING,
-            enum: ["critical", "major", "minor", "info"]
-          },
+          type: { type: SchemaType.STRING },
+          severity: { type: SchemaType.STRING },
           message: { type: SchemaType.STRING },
           suggestion: { type: SchemaType.STRING },
           improved_code: { type: SchemaType.STRING },
@@ -83,14 +70,8 @@ const responseSchema = {
         required: ["line", "type", "severity", "message", "suggestion"]
       },
     },
-    positives: {
-      type: SchemaType.ARRAY,
-      items: { type: SchemaType.STRING }
-    },
-    overall_suggestions: {
-      type: SchemaType.ARRAY,
-      items: { type: SchemaType.STRING }
-    }
+    positives: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+    overall_suggestions: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
   },
   required: ["overall_score", "summary", "issues", "positives", "overall_suggestions"]
 };
@@ -106,54 +87,50 @@ export const GeminiService = {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
+    if (!apiKey) throw new Error('GEMINI_API_KEY not configured in environment');
 
-    const projectId = process.env.VERTEX_PROJECT_ID;
-    const location = process.env.VERTEX_LOCATION || 'us-central1';
-
-    // Initialize the Generative AI client
-    // If Project ID is provided, we log that we are using Vertex-specific routing
-    if (projectId) {
-      logger.info({ projectId, location }, 'Initializing Vertex AI Gemini Client');
+    // Responsible validation: AI Studio keys should start with AIza
+    if (!apiKey.startsWith('AIza')) {
+      logger.warn('GEMINI_API_KEY does not appear to be a valid Google AI Studio key (should start with AIza)');
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.1-pro',
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: responseSchema,
-      },
-    });
-
-    const hints = getLanguageHints(language);
-    const prompt = buildReviewPrompt(language, code, hints);
-
-    logger.info({ 
-      language, 
-      codeLength: code.length,
-      usingVertex: !!projectId
-    }, 'Sending code to Gemini 2.1 Pro');
-
+    const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-pro';
+    
     try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      const parsed: AIReviewResponse = JSON.parse(text);
+      const hints = getLanguageHints(language);
+      const prompt = buildReviewPrompt(language, code, hints);
 
-      // Validate and clamp score
-      parsed.overall_score = Math.max(0, Math.min(100, Math.floor(parsed.overall_score)));
+      logger.info({ modelName }, 'Calling Google AI Studio Gemini API');
+      
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: responseSchema,
+        },
+      });
+
+      const result = await model.generateContent(prompt);
+      const resultText = result.response.text();
+
+      const parsed: AIReviewResponse = JSON.parse(resultText);
+      
+      // Data integrity: ensure score is an integer between 0-100
+      parsed.overall_score = Math.max(0, Math.min(100, Math.floor(parsed.overall_score || 0)));
 
       logger.info({
-        reviewId: parsed.overall_score,
-        issueCount: parsed.issues.length
-      }, 'Gemini response received and parsed');
+        score: parsed.overall_score,
+        issues: parsed.issues?.length
+      }, 'Gemini review completed successfully');
 
       return parsed;
     } catch (error: any) {
-      logger.error({ err: error }, 'Gemini API Error');
-      throw error;
+      logger.error({ err: error.message }, 'Gemini AI Studio Error');
+      throw new Error(`AI Review failed: ${error.message}`);
     }
   },
 };
+
+
+
