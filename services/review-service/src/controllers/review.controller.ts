@@ -104,7 +104,7 @@ export const ReviewController = {
           success: false,
           error: {
             code: 'USAGE_LIMIT_EXCEEDED',
-            message: `You have used ${usageCheck.used} of ${usageCheck.limit} reviews in this billing period. Upgrade your plan to continue.`,
+            message: `Quota exhausted. You have used ${usageCheck.used} of ${usageCheck.limit} reviews in this billing period.`,
           },
         });
       }

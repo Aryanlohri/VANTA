@@ -598,13 +598,6 @@ export default function LandingPage() {
             >
               Features
             </a>
-            <Link href="/pricing" className="text-xs uppercase transition-colors duration-300"
-              style={{ color: '#616161', fontFamily: 'var(--font-sans)', fontWeight: 500, letterSpacing: '0.14em' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#898989'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#616161'}
-            >
-              Pricing
-            </Link>
             <Link href="/login"
               className="btn-metal px-5 py-2 rounded-lg text-xs font-medium tracking-wider uppercase"
             >

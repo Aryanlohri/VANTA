@@ -77,10 +77,7 @@ export const reviewProxy = createServiceProxy('reviews', SERVICE_URLS.reviews, {
   '^/': '/reviews/',
 });
 
-/** Proxy for Payment Routes (handled by Auth Service) */
-export const paymentProxy = createServiceProxy('payment', SERVICE_URLS.auth, {
-  '^/': '/payment/',
-});
+
 
 /** Proxy for Webhooks (handled by Repository Service) */
 export const webhookProxy = createServiceProxy('webhooks', SERVICE_URLS.repos, {
