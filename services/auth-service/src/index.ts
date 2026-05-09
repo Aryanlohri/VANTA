@@ -2,9 +2,9 @@
 // Auth Service — Entry Point
 // ============================================
 
-import dotenv from 'dotenv';
 if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: '../../.env' });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('dotenv').config({ path: '../../.env' });
 }
 
 import express from 'express';
@@ -12,6 +12,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { createLogger, AppError, SERVICE_PORTS } from '@aicr/shared';
 import { initDatabase, closeDatabase } from './config/database';
+import { closeRedis } from './config/redis';
 import authRoutes from './routes/auth.routes';
 import paymentRoutes from './routes/payment.routes';
 
@@ -39,7 +40,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/auth', authRoutes);
-app.use('/payment', paymentRoutes); // triggered reload
+app.use('/payment', paymentRoutes);
 
 // ---- Error Handler ----
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -74,6 +75,7 @@ async function start() {
 async function shutdown(signal: string) {
   logger.info(`Received ${signal}. Shutting down gracefully...`);
   await closeDatabase();
+  await closeRedis();
   process.exit(0);
 }
 

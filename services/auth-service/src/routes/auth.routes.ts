@@ -5,24 +5,34 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/auth.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { requireInternalSecret } from '../middleware/internalAuth.middleware';
 
 const router = Router();
 
-// ---- Public routes ----
+// ── Public routes (no JWT required) ────────────────────────────────────────
 
-// Initiate GitHub OAuth
+// Initiate GitHub OAuth — returns the authorization URL
 router.get('/github', AuthController.initiateOAuth);
 
-// GitHub OAuth callback
+// GitHub OAuth callback — validates state, exchanges code, issues one-time code
 router.get('/github/callback', AuthController.handleCallback);
 
-// Verify token (internal — used by API gateway)
-router.post('/verify', AuthController.verifyToken);
+// Exchange one-time code for JWT — the ONLY way clients get their token
+// This endpoint is public because clients don't have a JWT yet at this point.
+router.post('/exchange', AuthController.exchangeCode);
 
-// Get GitHub token for a user (internal — used by other services)
-router.get('/token/:userId', AuthController.getGitHubToken);
+// ── Internal-only routes — protected by inter-service secret ───────────────
+// These endpoints MUST NOT be reachable by end users or external callers.
+// requireInternalSecret validates the X-Internal-Secret header using
+// timingSafeEqual against INTERNAL_SERVICE_SECRET from the environment.
 
-// ---- Protected routes ----
+// Verify JWT — used by API gateway on every authenticated request
+router.post('/verify', requireInternalSecret, AuthController.verifyToken);
+
+// Get decrypted GitHub token — used by repository-service to call GitHub API
+router.get('/token/:userId', requireInternalSecret, AuthController.getGitHubToken);
+
+// ── Protected routes (JWT required) ────────────────────────────────────────
 
 // Get current user profile
 router.get('/me', authMiddleware, AuthController.getProfile);
