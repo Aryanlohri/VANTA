@@ -19,9 +19,21 @@ export const RepositoryModel = {
 
   /**
    * Find a repository by ID.
+   * NOTE: Do NOT use this for user-facing requests — it has no ownership check.
+   * Use findByIdAndUserId for all user-facing endpoints.
    */
   async findById(id: string): Promise<Repository | null> {
     const repo = await getDb()(TABLE).where({ id }).first();
+    return repo || null;
+  },
+
+  /**
+   * Find a repository by ID AND enforce ownership in a single query.
+   * Returns null if the repo doesn't exist OR belongs to a different user.
+   * Use this for ALL user-facing endpoints to prevent IDOR attacks.
+   */
+  async findByIdAndUserId(id: string, userId: string): Promise<Repository | null> {
+    const repo = await getDb()(TABLE).where({ id, user_id: userId }).first();
     return repo || null;
   },
 

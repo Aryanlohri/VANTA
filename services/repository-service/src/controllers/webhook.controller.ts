@@ -34,7 +34,13 @@ export const WebhookController = {
       const hmac = crypto.createHmac('sha256', secret);
       const digest = 'sha256=' + hmac.update(req.body).digest('hex');
 
-      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest))) {
+      const sigBuf = Buffer.from(signature);
+      const digBuf = Buffer.from(digest);
+
+      // Length MUST be checked before timingSafeEqual — it throws RangeError
+      // if buffer lengths differ, which an attacker can exploit to get 500s
+      // instead of 401s and probe valid signature length via timing.
+      if (sigBuf.length !== digBuf.length || !crypto.timingSafeEqual(sigBuf, digBuf)) {
         logger.warn({ deliveryId }, 'Webhook signature mismatch');
         return res.status(401).send('Invalid signature');
       }
