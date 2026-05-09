@@ -12,12 +12,37 @@ const AUTH_SERVICE_URL =
   process.env.AUTH_SERVICE_URL || `http://localhost:${SERVICE_PORTS.AUTH_SERVICE}`;
 
 /**
+ * Lazily load and validate the inter-service secret.
+ * Deferred to first use to avoid dotenv ordering issues with tsx.
+ */
+let _internalSecret: string | null = null;
+
+function getInternalSecret(): string {
+  if (_internalSecret) return _internalSecret;
+
+  const secret = process.env.INTERNAL_SERVICE_SECRET;
+  if (!secret || secret === 'REPLACE_WITH_GENERATED_SECRET_BEFORE_PRODUCTION') {
+    logger.fatal(
+      'INTERNAL_SERVICE_SECRET is not configured. ' +
+      'Repository service cannot securely call the auth service.'
+    );
+    process.exit(1);
+  }
+  _internalSecret = secret;
+  return secret;
+}
+
+/**
  * Get the GitHub access token for a user from the auth service.
+ * Sends the X-Internal-Secret header so the auth service accepts the request.
  */
 async function getGitHubToken(userId: string): Promise<string> {
   try {
     const response = await axios.get(`${AUTH_SERVICE_URL}/auth/token/${userId}`, {
       timeout: 5000,
+      headers: {
+        'x-internal-secret': getInternalSecret(),
+      },
     });
 
     if (response.data.success) {

@@ -44,11 +44,13 @@ const aiLimiter = new RateLimiterRedis({
 });
 
 /**
- * Select the appropriate rate limiter based on the route.
+ * Select the appropriate rate limiter based on the route and method.
  */
-function getLimiter(path: string): RateLimiterRedis {
-  if (path.startsWith('/api/auth')) return authLimiter;
-  if (path.startsWith('/api/reviews') && path.includes('POST')) return aiLimiter;
+function getLimiter(req: { path: string; method: string }): RateLimiterRedis {
+  if (req.path.startsWith('/api/auth')) return authLimiter;
+  // IMPORTANT: Check req.method, NOT req.path.includes('POST').
+  // The HTTP method is never part of the URL path — that check always returns false.
+  if (req.method === 'POST' && req.path.startsWith('/api/reviews')) return aiLimiter;
   return generalLimiter;
 }
 
@@ -60,7 +62,7 @@ export async function rateLimitMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const limiter = getLimiter(req.path);
+  const limiter = getLimiter(req);
   const key = (req as any).userId || req.ip || 'anonymous';
 
   try {
