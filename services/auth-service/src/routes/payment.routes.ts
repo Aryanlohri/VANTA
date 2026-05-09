@@ -188,34 +188,54 @@ router.post('/verify', async (req: Request, res: Response) => {
  */
 router.post('/webhook', async (req: Request, res: Response) => {
   try {
+    // MANDATORY signature verification — we NEVER process unsigned webhooks.
+    // If RAZORPAY_WEBHOOK_SECRET is not configured, the service refuses to
+    // process any webhook rather than opening an unauthenticated door.
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
-    if (webhookSecret) {
-      const signature = req.headers['x-razorpay-signature'] as string;
-      const expectedSig = crypto
-        .createHmac('sha256', webhookSecret)
-        .update(JSON.stringify(req.body))
-        .digest('hex');
+    if (!webhookSecret || webhookSecret === 'REPLACE_WITH_REAL_RAZORPAY_WEBHOOK_SECRET') {
+      logger.error(
+        'RAZORPAY_WEBHOOK_SECRET is not configured. ' +
+        'Rejecting all webhooks. Set this variable to enable webhook processing.'
+      );
+      return res.status(500).json({ success: false, error: { message: 'Webhook endpoint not configured' } });
+    }
 
-      if (signature !== expectedSig) {
-        logger.warn('Invalid webhook signature');
-        return res.status(400).json({ success: false });
-      }
+    const signature = req.headers['x-razorpay-signature'] as string;
+
+    if (!signature) {
+      logger.warn({ ip: req.ip }, 'Webhook received without signature — rejecting');
+      return res.status(401).json({ success: false, error: { message: 'Missing signature' } });
+    }
+
+    const expectedSig = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(JSON.stringify(req.body))
+      .digest('hex');
+
+    const sigBuf = Buffer.from(signature);
+    const expectedBuf = Buffer.from(expectedSig);
+
+    // Length check BEFORE timingSafeEqual — it throws on length mismatch
+    if (
+      sigBuf.length !== expectedBuf.length ||
+      !crypto.timingSafeEqual(sigBuf, expectedBuf)
+    ) {
+      logger.warn({ ip: req.ip }, 'Webhook signature mismatch — rejecting');
+      return res.status(401).json({ success: false, error: { message: 'Invalid signature' } });
     }
 
     const event = req.body.event;
     const payload = req.body.payload;
 
-    logger.info({ event }, 'Razorpay webhook received');
+    logger.info({ event }, 'Razorpay webhook received and verified');
 
     switch (event) {
       case 'payment.captured':
-        // Payment was successful
         logger.info({ paymentId: payload.payment?.entity?.id }, 'Payment captured');
         break;
 
-      case 'subscription.cancelled':
-        // Subscription was cancelled
+      case 'subscription.cancelled': {
         const subId = payload.subscription?.entity?.id;
         if (subId) {
           const sub = await SubscriptionModel.getByRazorpayId(subId);
@@ -225,9 +245,10 @@ router.post('/webhook', async (req: Request, res: Response) => {
           }
         }
         break;
+      }
 
       default:
-        logger.info({ event }, 'Unhandled webhook event');
+        logger.info({ event }, 'Unhandled webhook event — no action taken');
     }
 
     res.json({ success: true });
@@ -262,6 +283,40 @@ router.get('/usage', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error({ err: error }, 'Failed to get usage');
     res.status(500).json({ success: false, error: { message: 'Failed to get usage' } });
+  }
+});
+
+/**
+ * POST /payment/usage/increment
+ * Atomically check and increment the review usage counter for a user.
+ *
+ * INTERNAL ONLY — protected by requireInternalSecret middleware.
+ * This endpoint is called by the review-service before creating each review.
+ *
+ * Uses a single SQL UPDATE with a conditional WHERE (reviews_used < reviews_limit)
+ * to prevent race conditions when multiple review requests arrive simultaneously.
+ */
+import { requireInternalSecret } from '../middleware/internalAuth.middleware';
+
+router.post('/usage/increment', requireInternalSecret, async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId || typeof userId !== 'string') {
+      return res.status(400).json({ success: false, error: { message: 'userId is required' } });
+    }
+
+    const result = await SubscriptionModel.atomicIncrementUsage(userId);
+
+    logger.info(
+      { userId, allowed: result.allowed, used: result.used, limit: result.limit },
+      'Usage increment checked'
+    );
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error({ err: error }, 'Failed to increment usage');
+    res.status(500).json({ success: false, error: { message: 'Failed to process usage' } });
   }
 });
 

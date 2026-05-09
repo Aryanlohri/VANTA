@@ -111,20 +111,54 @@ export const SubscriptionModel = {
     return sub;
   },
 
-  /** Increment review usage counter */
-  async incrementUsage(userId: string): Promise<{ allowed: boolean; used: number; limit: number }> {
+  /**
+   * Atomically check and increment the review usage counter.
+   *
+   * RACE CONDITION FIX: The previous implementation did a read-then-write
+   * (two separate DB round-trips), which allowed two concurrent requests to
+   * both pass the limit check and both write, bypassing the quota.
+   *
+   * This implementation uses a single UPDATE with a conditional WHERE clause
+   * (reviews_used < reviews_limit). PostgreSQL evaluates both conditions and
+   * performs the increment atomically. If 0 rows are affected, the limit has
+   * been reached — there is no window for a concurrent request to sneak through.
+   *
+   * Returns:
+   *   { allowed: true, used, limit }  — increment succeeded, review is permitted
+   *   { allowed: false, used, limit } — limit already reached, review is denied
+   */
+  async atomicIncrementUsage(userId: string): Promise<{
+    allowed: boolean;
+    used: number;
+    limit: number;
+  }> {
+    // Ensure subscription exists first
     const sub = await this.getOrCreate(userId);
-    if (sub.reviews_used >= sub.reviews_limit) {
+
+    // Single atomic UPDATE: only increments if reviews_used < reviews_limit
+    const result = await getDb()(TABLE)
+      .where({ id: sub.id })
+      .whereRaw('reviews_used < reviews_limit')
+      .update({
+        reviews_used: getDb().raw('reviews_used + 1'),
+        updated_at: getDb().fn.now(),
+      })
+      .returning(['reviews_used', 'reviews_limit']);
+
+    if (result.length === 0) {
+      // 0 rows updated means the WHERE condition failed — limit was reached
       return { allowed: false, used: sub.reviews_used, limit: sub.reviews_limit };
     }
-    await getDb()(TABLE)
-      .where({ id: sub.id })
-      .update({ reviews_used: sub.reviews_used + 1, updated_at: getDb().fn.now() });
-    return { allowed: true, used: sub.reviews_used + 1, limit: sub.reviews_limit };
+
+    const updated = result[0];
+    return { allowed: true, used: updated.reviews_used, limit: updated.reviews_limit };
   },
 
   /** Reset monthly usage (called by cron or webhook on renewal) */
   async resetUsage(userId: string): Promise<void> {
-    await getDb()(TABLE).where({ user_id: userId }).update({ reviews_used: 0, updated_at: getDb().fn.now() });
+    await getDb()(TABLE).where({ user_id: userId }).update({
+      reviews_used: 0,
+      updated_at: getDb().fn.now(),
+    });
   },
 };
