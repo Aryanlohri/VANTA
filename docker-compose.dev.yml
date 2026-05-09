@@ -1,0 +1,27 @@
+# ============================================
+# docker-compose.dev.yml — Local Development Override
+# ============================================
+#
+# This file extends docker-compose.yml ONLY for local development.
+# It publishes Postgres and Redis ports to localhost so that Node.js
+# services running on the HOST (via `npm run dev`) can connect to them.
+#
+# PRODUCTION DEPLOYMENTS MUST NOT use this file.
+# In production, everything runs inside Docker and services communicate
+# via internal Docker DNS only (no host port binding).
+#
+# Usage: this file is automatically applied by `npm run dev` via:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres redis
+
+services:
+  postgres:
+    ports:
+      # Expose Postgres to localhost for local development only.
+      # Node services on the host connect via DATABASE_URL with host=localhost.
+      - "5432:5432"
+
+  redis:
+    ports:
+      # Expose Redis to localhost for local development only.
+      # Node services on the host connect via REDIS_URL=redis://localhost:6379.
+      - "6379:6379"
