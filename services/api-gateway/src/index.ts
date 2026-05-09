@@ -1,10 +1,15 @@
 // ============================================
 // API Gateway — Entry Point
 // ============================================
+//
+// IMPORTANT: dotenv MUST be loaded before any other import that reads
+// process.env at module-evaluation time (e.g. loadInternalSecret() in auth.ts).
+// We use a dynamic require() here because ES module imports are hoisted and
+// would execute before a top-level `import dotenv` + dotenv.config() can run.
 
-import dotenv from 'dotenv';
 if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: '../../.env' });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('dotenv').config({ path: '../../.env' });
 }
 
 import express from 'express';

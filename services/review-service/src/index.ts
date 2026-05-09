@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
 if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: '../../.env' });
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('dotenv').config({ path: '../../.env' });
 }
 
 import express from 'express';
