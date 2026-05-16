@@ -61,6 +61,7 @@ export const reviewApi = {
   list: (page = 1) => api.get(`/reviews?page=${page}`),
   getById: (id: string) => api.get(`/reviews/${id}`),
   deleteReview: (id: string) => api.delete(`/reviews/${id}`),
+  postToGitHub: (id: string) => api.post(`/reviews/${id}/github`),
 };
 
 export const paymentApi = {

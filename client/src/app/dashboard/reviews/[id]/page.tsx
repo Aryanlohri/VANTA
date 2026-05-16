@@ -6,7 +6,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import {
   ArrowLeft, FileCode, Shield, Bug, Zap, Palette, CheckCircle,
-  AlertTriangle, Info, ChevronDown, ChevronRight, Lightbulb, Loader2
+  AlertTriangle, Info, ChevronDown, ChevronRight, Lightbulb, Loader2, GitPullRequest
 } from 'lucide-react';
 import { reviewApi } from '@/lib/api';
 import { useSocket } from '@/lib/socket';
@@ -37,6 +37,8 @@ export default function ReviewDetailPage() {
   const [activeFile, setActiveFile] = useState(0);
   const [filterType, setFilterType] = useState<string | null>(null);
   const [expandedComment, setExpandedComment] = useState<string | null>(null);
+  const [postingToGithub, setPostingToGithub] = useState(false);
+  const [postedToGithub, setPostedToGithub] = useState(false);
 
   const { onEvent } = useSocket(reviewId);
 
@@ -62,6 +64,20 @@ export default function ReviewDetailPage() {
     const unsub3 = onEvent('review:failed', () => loadReview());
     return () => { unsub1(); unsub2(); unsub3(); };
   }, [onEvent, loadReview]);
+
+  const handlePostToGithub = async () => {
+    if (!review || !review.pull_request_number) return;
+    setPostingToGithub(true);
+    try {
+      await reviewApi.postToGitHub(review.id);
+      setPostedToGithub(true);
+    } catch (error) {
+      console.error('Failed to post to GitHub:', error);
+      alert('Failed to post review to GitHub. Please try again.');
+    } finally {
+      setPostingToGithub(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -134,20 +150,49 @@ export default function ReviewDetailPage() {
           </p>
         </div>
 
-        {/* Status badge */}
-        {review.status === 'processing' ? (
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl"
-            style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)' }}>
-            <Loader2 size={14} className="animate-spin" style={{ color: '#3b82f6' }} />
-            <span className="text-xs font-medium" style={{ color: '#3b82f6' }}>AI is reviewing...</span>
-          </div>
-        ) : review.status === 'completed' ? (
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl"
-            style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}>
-            <CheckCircle size={14} style={{ color: '#22c55e' }} />
-            <span className="text-xs font-medium" style={{ color: '#22c55e' }}>Review Complete</span>
-          </div>
-        ) : null}
+        <div className="flex items-center gap-3">
+          {/* Post to GitHub button for PRs */}
+          {review.status === 'completed' && review.pull_request_number && (
+            <button
+              onClick={handlePostToGithub}
+              disabled={postingToGithub || postedToGithub}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
+              style={{ 
+                background: postedToGithub ? 'rgba(34,197,94,0.1)' : 'var(--color-bg-hover)', 
+                color: postedToGithub ? '#22c55e' : 'var(--color-text-primary)',
+                border: `1px solid ${postedToGithub ? 'rgba(34,197,94,0.2)' : 'var(--color-border)'}`,
+                opacity: (postingToGithub || postedToGithub) ? 0.7 : 1,
+                cursor: (postingToGithub || postedToGithub) ? 'default' : 'pointer'
+              }}
+            >
+              {postingToGithub ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : postedToGithub ? (
+                <CheckCircle size={16} />
+              ) : (
+                <GitPullRequest size={16} />
+              )}
+              <span className="text-sm font-medium">
+                {postingToGithub ? 'Posting...' : postedToGithub ? 'Posted to PR' : 'Post to GitHub'}
+              </span>
+            </button>
+          )}
+
+          {/* Status badge */}
+          {review.status === 'processing' ? (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl"
+              style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)' }}>
+              <Loader2 size={14} className="animate-spin" style={{ color: '#3b82f6' }} />
+              <span className="text-xs font-medium" style={{ color: '#3b82f6' }}>AI is reviewing...</span>
+            </div>
+          ) : review.status === 'completed' ? (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl"
+              style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}>
+              <CheckCircle size={14} style={{ color: '#22c55e' }} />
+              <span className="text-xs font-medium" style={{ color: '#22c55e' }}>Review Complete</span>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Score + Summary Row */}
@@ -170,24 +215,25 @@ export default function ReviewDetailPage() {
           </div>
 
           {/* Summary */}
-          <div className="lg:col-span-3 glass-card p-5">
+          <div className="lg:col-span-3 glass-card p-6 flex flex-col justify-center">
             {review.summary && (
-              <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{review.summary}</p>
+              <p className="text-base mb-5" style={{ color: 'var(--color-text-primary)', lineHeight: 1.7, fontWeight: 400 }}>{review.summary}</p>
             )}
 
             {/* Issue type counts */}
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-3 mb-5">
               {Object.entries(typeCounts).map(([type, count]) => {
                 const cfg = TYPE_CONFIG[type] || TYPE_CONFIG.bug;
                 return (
                   <button key={type} onClick={() => setFilterType(filterType === type ? null : type)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
                     style={{
-                      background: filterType === type ? `${cfg.color}20` : 'var(--color-bg-hover)',
-                      color: filterType === type ? cfg.color : 'var(--color-text-secondary)',
-                      border: `1px solid ${filterType === type ? `${cfg.color}40` : 'var(--color-border)'}`,
+                      background: filterType === type ? `${cfg.color}20` : 'var(--color-bg-elevated)',
+                      color: filterType === type ? cfg.color : 'var(--color-text-primary)',
+                      border: `1px solid ${filterType === type ? `${cfg.color}50` : 'var(--color-border-hover)'}`,
+                      boxShadow: filterType === type ? `0 0 10px ${cfg.color}20` : 'none'
                     }}>
-                    <cfg.icon size={12} /> {cfg.label}: {count as number}
+                    <cfg.icon size={16} /> {cfg.label}: {count as number}
                   </button>
                 );
               })}
@@ -195,10 +241,10 @@ export default function ReviewDetailPage() {
 
             {/* Positives */}
             {review.positives?.length > 0 && (
-              <div className="space-y-1">
+              <div className="space-y-2 mt-2 bg-green-950/10 p-4 rounded-xl border border-green-900/30">
                 {review.positives.map((p: string, i: number) => (
-                  <div key={i} className="flex items-start gap-2 text-xs" style={{ color: '#22c55e' }}>
-                    <CheckCircle size={12} className="mt-0.5 shrink-0" /> {p}
+                  <div key={i} className="flex items-start gap-2 text-sm font-medium" style={{ color: '#4ade80' }}>
+                    <CheckCircle size={16} className="mt-0.5 shrink-0" /> {p}
                   </div>
                 ))}
               </div>
@@ -215,16 +261,16 @@ export default function ReviewDetailPage() {
           <div className="flex overflow-x-auto" style={{ borderBottom: '1px solid var(--color-border)' }}>
             {review.files?.map((file: any, idx: number) => (
               <button key={file.id} onClick={() => setActiveFile(idx)}
-                className="px-4 py-2.5 text-xs font-medium whitespace-nowrap transition-all shrink-0"
+                className="px-5 py-3 text-sm font-medium whitespace-nowrap transition-all shrink-0"
                 style={{
                   background: idx === activeFile ? 'var(--color-bg-hover)' : 'transparent',
-                  color: idx === activeFile ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+                  color: idx === activeFile ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                   borderBottom: idx === activeFile ? '2px solid var(--color-accent-start)' : '2px solid transparent',
                 }}>
-                <FileCode size={12} className="inline mr-1.5" />
+                <FileCode size={16} className="inline mr-2 -mt-0.5" />
                 {file.file_path.split('/').pop()}
                 {file.comments?.length > 0 && (
-                  <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px]"
+                  <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold"
                     style={{ background: '#ef444420', color: '#ef4444' }}>
                     {file.comments.length}
                   </span>
@@ -264,8 +310,8 @@ export default function ReviewDetailPage() {
         </div>
 
         {/* Comments panel */}
-        <div className="glass-card p-4 overflow-y-auto max-h-[580px]">
-          <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+        <div className="glass-card p-5 overflow-y-auto max-h-[580px]">
+          <h3 className="text-base font-semibold mb-5" style={{ color: 'var(--color-text-primary)' }}>
             Issues ({filteredComments.length})
           </h3>
 
@@ -277,7 +323,7 @@ export default function ReviewDetailPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filteredComments.map((comment: any) => {
                 const typeConfig = TYPE_CONFIG[comment.type] || TYPE_CONFIG.bug;
                 const severityConfig = SEVERITY_CONFIG[comment.severity] || SEVERITY_CONFIG.info;
@@ -285,41 +331,45 @@ export default function ReviewDetailPage() {
 
                 return (
                   <div key={comment.id}
-                    className="rounded-lg overflow-hidden transition-all duration-200"
-                    style={{ background: 'var(--color-bg-hover)', border: `1px solid ${typeConfig.color}30` }}>
+                    className="rounded-xl overflow-hidden transition-all duration-200"
+                    style={{ 
+                      background: isExpanded ? 'var(--color-bg-elevated)' : 'var(--color-bg-hover)', 
+                      border: `1px solid ${isExpanded ? typeConfig.color : typeConfig.color + '40'}`,
+                      boxShadow: isExpanded ? `0 4px 20px ${typeConfig.color}15` : 'none'
+                    }}>
                     <button onClick={() => setExpandedComment(isExpanded ? null : comment.id)}
-                      className="w-full p-3 text-left">
-                      <div className="flex items-start gap-2">
-                        <typeConfig.icon size={14} className="mt-0.5 shrink-0" style={{ color: typeConfig.color }} />
+                      className="w-full p-4 text-left">
+                      <div className="flex items-start gap-3">
+                        <typeConfig.icon size={18} className="mt-0.5 shrink-0" style={{ color: typeConfig.color }} />
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs px-1.5 py-0.5 rounded capitalize"
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded capitalize"
                               style={{ background: `${severityConfig.color}20`, color: severityConfig.color }}>
                               {comment.severity}
                             </span>
-                            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Line {comment.line_number}</span>
+                            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Line {comment.line_number}</span>
                           </div>
-                          <p className="text-xs" style={{ color: 'var(--color-text-primary)', lineHeight: 1.5 }}>
+                          <p className="text-sm" style={{ color: 'var(--color-text-primary)', lineHeight: 1.6 }}>
                             {comment.message}
                           </p>
                         </div>
-                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                        {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                       </div>
                     </button>
 
                     {isExpanded && (
-                      <div className="px-3 pb-3 space-y-2" style={{ borderTop: `1px solid ${typeConfig.color}15` }}>
+                      <div className="px-4 pb-4 space-y-3" style={{ borderTop: `1px solid ${typeConfig.color}20` }}>
                         {comment.suggestion && (
-                          <div className="flex items-start gap-2 pt-2">
-                            <Lightbulb size={12} className="mt-0.5 shrink-0" style={{ color: '#eab308' }} />
-                            <p className="text-xs" style={{ color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                          <div className="flex items-start gap-2 pt-3">
+                            <Lightbulb size={16} className="mt-0.5 shrink-0" style={{ color: '#eab308' }} />
+                            <p className="text-sm" style={{ color: 'var(--color-text-primary)', lineHeight: 1.6 }}>
                               {comment.suggestion}
                             </p>
                           </div>
                         )}
                         {comment.improved_code && (
-                          <pre className="p-2 rounded text-[11px] overflow-x-auto"
-                            style={{ background: 'var(--color-bg-primary)', color: '#22c55e', fontFamily: 'var(--font-mono)' }}>
+                          <pre className="p-3 rounded-lg text-sm overflow-x-auto mt-2 shadow-inner"
+                            style={{ background: '#000000', color: '#4ade80', border: '1px solid #1f2937', fontFamily: 'var(--font-mono)' }}>
                             {comment.improved_code}
                           </pre>
                         )}

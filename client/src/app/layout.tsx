@@ -25,6 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <script dangerouslySetInnerHTML={{ __html: `
           (function () {
+            if (sessionStorage.getItem('vanta_loaded')) {
+              const loader = document.getElementById('vanta-loader');
+              if (loader) loader.style.display = 'none';
+              return;
+            }
+            sessionStorage.setItem('vanta_loaded', 'true');
+
             const loader = document.getElementById('vanta-loader');
             const cv = document.getElementById('loader-canvas');
             if (!loader || !cv) return;
