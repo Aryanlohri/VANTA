@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="antialiased min-h-screen">
-        <div id="vanta-loader">
+        <div id="vanta-loader" suppressHydrationWarning>
           <canvas id="loader-canvas" suppressHydrationWarning></canvas>
         </div>
         {children}
