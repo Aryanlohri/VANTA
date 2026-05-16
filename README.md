@@ -1,128 +1,102 @@
-<![CDATA[<div align="center">
 
-<br/>
+![VANTA Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=220&section=header&text=VANTA&fontSize=90&fontColor=e8e8e8&animation=fadeIn&fontAlignY=38&desc=AI-Powered%20Code%20Intelligence%20Platform&descAlignY=58&descSize=18&descColor=898989)
 
-```
-██╗   ██╗ █████╗ ███╗   ██╗████████╗ █████╗
-██║   ██║██╔══██╗████╗  ██║╚══██╔══╝██╔══██╗
-██║   ██║███████║██╔██╗ ██║   ██║   ███████║
-╚██╗ ██╔╝██╔══██║██║╚██╗██║   ██║   ██╔══██║
- ╚████╔╝ ██║  ██║██║ ╚████║   ██║   ██║  ██║
-  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝
-```
+[![Node.js](https://img.shields.io/badge/Node.js-≥20-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
-### AI-Powered Code Intelligence Platform
+> **Push code. Get expert-level feedback in seconds.**
+> Detect bugs, security vulnerabilities, and performance issues — before they reach production. One platform, zero friction.
 
-[![Node.js](https://img.shields.io/badge/Node.js-≥20-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-8E75B2?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)](https://redis.io/)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+---
 
-**Push code. Get expert-level feedback in seconds.**
+## 📖 Table of Contents
 
-Detect bugs, security vulnerabilities, and performance issues — before they reach production.
-
-[Getting Started](#-getting-started) · [Architecture](#-architecture) · [Features](#-features) · [API Reference](#-api-reference) · [Contributing](#-contributing)
-
-<br/>
-
-</div>
+- [Overview](#-overview)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Security Model](#-security-model)
+- [API Reference](#-api-reference)
+- [AI Review Pipeline](#-ai-review-pipeline)
+- [Docker](#-docker)
+- [Database](#-database)
+- [Tech Stack](#-tech-stack)
+- [Scripts](#-scripts)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
 ## ✦ Overview
 
-**VANTA** is a production-grade, microservice-based platform that performs AI-driven code reviews using Google's Gemini 2.5 Flash model. Connect your GitHub repositories, select files or open a Pull Request, and receive instant line-by-line feedback covering bugs, security flaws, performance bottlenecks, and style violations — all scored on a 0–100 quality scale.
+**VANTA** is a production-grade, microservice-based platform that performs AI-driven code reviews using Google's **Gemini 2.5 Flash** model. Connect your GitHub repositories, select files or open a Pull Request, and receive instant line-by-line feedback covering bugs, security flaws, performance bottlenecks, and style violations — all scored on a **0–100 quality scale**.
 
-The platform is built with a security-first philosophy: encrypted token storage, Redis-backed sessions, inter-service authentication, IDOR protection, and strict ownership enforcement at every layer.
+The platform is built with a **security-first philosophy**: encrypted token storage, Redis-backed sessions, inter-service authentication, IDOR protection, and strict ownership enforcement at every layer.
 
-<br/>
+---
 
 ## ⚡ Features
 
-<table>
-<tr>
-<td width="50%">
-
 ### 🔍 Intelligent Code Analysis
-Line-by-line AI review with language-specific expertise for **JavaScript**, **TypeScript**, **Python**, **Java**, **Go**, **Rust**, and 7+ more languages. Each review produces a quantified **0–100 quality score**, categorized findings by severity, and actionable fix suggestions with improved code snippets.
-
-</td>
-<td width="50%">
+Line-by-line AI review with **language-specific expertise** for JavaScript, TypeScript, Python, Java, Go, Rust, and 7+ more languages. Each review produces a quantified **0–100 quality score**, categorized findings by severity, and actionable fix suggestions with improved code snippets.
 
 ### 🔗 Deep GitHub Integration
-One-click OAuth login and repository connection. Reviews can be triggered from any branch or file. For Pull Requests, users can manually post AI reviews directly to the PR as inline comments — with an automatic fallback to general comments if GitHub rejects inline positioning.
-
-</td>
-</tr>
-<tr>
-<td width="50%">
+One-click OAuth login and repository connection. Reviews can be triggered from any branch or file. For Pull Requests, users can **manually post AI reviews** directly to the PR as inline comments — with an automatic fallback to general comments if GitHub rejects inline positioning.
 
 ### 🛡️ Security-First Architecture
 AES-256-GCM encrypted GitHub tokens, Redis-backed sessions with one-time auth codes, HMAC-verified webhooks, shared-secret inter-service auth, strict IDOR protection, input sanitization, and rate limiting. No ports are exposed except the API Gateway and the client.
 
-</td>
-<td width="50%">
-
 ### ⚙️ Real-Time Processing
-Asynchronous review processing via BullMQ + Redis queues with WebSocket-powered live progress updates. Watch files get reviewed one-by-one in the dashboard with instant status transitions — no polling required.
-
-</td>
-</tr>
-<tr>
-<td width="50%">
+Asynchronous review processing via **BullMQ + Redis** queues with WebSocket-powered live progress updates. Watch files get reviewed one-by-one in the dashboard with instant status transitions — no polling required.
 
 ### 🎨 Premium Dashboard
-A dark-mode, metallic-themed Next.js dashboard featuring a Monaco code editor (VS Code engine), animated starfield hero, cinematic loading sequences, and glassmorphism card design. Built for developers who care about aesthetics.
-
-</td>
-<td width="50%">
+A dark-mode, metallic-themed Next.js dashboard featuring a **Monaco code editor** (VS Code engine), animated starfield hero, cinematic loading sequences, and glassmorphism card design. Built for developers who care about aesthetics.
 
 ### 💳 Subscription & Billing
 Razorpay-powered subscription tiers (Free, Pro, Enterprise) with server-verified webhook payments, usage tracking, and quota enforcement. Seamlessly upgradeable from the dashboard.
 
-</td>
-</tr>
-</table>
-
-<br/>
+---
 
 ## 🏗 Architecture
 
 VANTA follows a **microservice architecture** with strict network isolation. Only the API Gateway and Client are publicly accessible — all backend services communicate over Docker's internal DNS.
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         PUBLIC NETWORK                              │
-│                                                                     │
-│   ┌──────────────┐                    ┌──────────────┐              │
-│   │    Client     │ ◄──────────────── │  API Gateway  │             │
-│   │  (Next.js)   │    HTTP/WS         │  (Express)    │             │
-│   │   :3010      │                    │   :3000       │             │
-│   └──────────────┘                    └──────┬───────┘              │
-│                                              │                      │
-├──────────────────────────────────────────────┼──────────────────────┤
-│                     INTERNAL NETWORK         │                      │
-│                   (Docker Bridge)             │                      │
-│                                              │                      │
-│   ┌──────────────┐  ┌──────────────┐  ┌──────┴───────┐             │
-│   │ Auth Service  │  │  Repo Service │  │Review Service│             │
-│   │   :3001      │  │   :3002      │  │   :3003      │             │
-│   └──────┬───────┘  └──────┬───────┘  └──────┬───────┘             │
-│          │                 │                  │                      │
-│          │    ┌────────────┴──────────────────┘                     │
-│          │    │                                                      │
-│   ┌──────┴────┴──┐  ┌──────────────┐  ┌──────────────┐             │
-│   │  PostgreSQL   │  │    Redis     │  │  AI Service   │             │
-│   │   :5432      │  │   :6379      │  │   :3004      │             │
-│   │  (3 schemas) │  │ (Queue/Cache)│  │  (Gemini AI) │             │
-│   └──────────────┘  └──────────────┘  └──────────────┘             │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                       PUBLIC NETWORK                            │
+│                                                                 │
+│   ┌────────────┐                      ┌────────────┐           │
+│   │   Client   │  ◄── HTTP/WS ──►    │ API Gateway │           │
+│   │ (Next.js)  │                      │  (Express)  │           │
+│   │   :3010    │                      │   :3000     │           │
+│   └────────────┘                      └─────┬──────┘           │
+│                                             │                   │
+├─────────────────────────────────────────────┼───────────────────┤
+│                 INTERNAL NETWORK            │                   │
+│               (Docker Bridge)               │                   │
+│                                             │                   │
+│   ┌────────────┐ ┌──────────────┐  ┌───────┴──────┐           │
+│   │   Auth     │ │   Repo       │  │   Review     │           │
+│   │  Service   │ │  Service     │  │  Service     │           │
+│   │   :3001    │ │   :3002      │  │   :3003      │           │
+│   └─────┬──────┘ └──────┬───────┘  └──────┬───────┘           │
+│         │               │                  │                    │
+│         └───────┬───────┴──────────────────┘                   │
+│                 │                                               │
+│   ┌─────────────┴─┐  ┌────────────┐  ┌────────────┐           │
+│   │  PostgreSQL   │  │   Redis    │  │ AI Service  │           │
+│   │    :5432      │  │   :6379    │  │   :3004     │           │
+│   │ (3 schemas)   │  │(Queue/Cache)│  │ (Gemini AI) │           │
+│   └───────────────┘  └────────────┘  └────────────┘           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Service Breakdown
@@ -136,7 +110,7 @@ VANTA follows a **microservice architecture** with strict network isolation. Onl
 | **AI Service** | `3004` | Gemini prompt engineering, language-specific analysis, structured output |
 | **Client** | `3010` | Next.js 16 dashboard, Monaco editor, real-time UI |
 
-<br/>
+---
 
 ## 📂 Project Structure
 
@@ -187,7 +161,7 @@ vanta/
 └── package.json                     # NPM workspaces root
 ```
 
-<br/>
+---
 
 ## 🚀 Getting Started
 
@@ -241,10 +215,10 @@ npm run dev
 ```
 
 This single command will:
-1. Spin up PostgreSQL and Redis via Docker Compose
+1. Spin up **PostgreSQL** and **Redis** via Docker Compose
 2. Run database migrations automatically
-3. Launch all 5 backend microservices concurrently
-4. Start the Next.js development server
+3. Launch all **5 backend microservices** concurrently
+4. Start the **Next.js** development server
 
 ### 4. Open the Dashboard
 
@@ -253,11 +227,11 @@ Frontend:    http://localhost:3010
 API Gateway: http://localhost:3000/api
 ```
 
-<br/>
+---
 
 ## 🔐 Security Model
 
-VANTA implements defense-in-depth across every layer:
+VANTA implements **defense-in-depth** across every layer:
 
 | Layer | Mechanism |
 |:------|:----------|
@@ -270,7 +244,7 @@ VANTA implements defense-in-depth across every layer:
 | **Rate Limiting** | Redis-backed distributed rate limiter on the API Gateway |
 | **Input Validation** | Request body sanitization and header injection prevention |
 
-<br/>
+---
 
 ## 📡 API Reference
 
@@ -314,43 +288,43 @@ All endpoints are accessed through the API Gateway at `http://localhost:3000/api
 | `POST` | `/payment/verify` | Verify payment signature |
 | `GET` | `/payment/usage` | Get current usage & quota |
 
-<br/>
+---
 
 ## 🧠 AI Review Pipeline
 
 ```
-User selects files → Review created → Jobs queued (BullMQ)
-                                            │
-                                            ▼
-                                    ┌───────────────┐
-                                    │  AI Service    │
-                                    │                │
-                                    │ 1. Detect lang │
-                                    │ 2. Load prompt │
-                                    │ 3. Call Gemini │
-                                    │ 4. Parse JSON  │
-                                    └───────┬───────┘
-                                            │
-                                            ▼
-                              ┌─────────────────────────┐
-                              │   Review Service        │
-                              │                         │
-                              │ • Store comments in DB  │
-                              │ • Compute quality score │
-                              │ • Emit WS event         │
-                              └─────────────────────────┘
-                                            │
-                                            ▼
-                              ┌─────────────────────────┐
-                              │   Client Dashboard      │
-                              │                         │
-                              │ • Live progress bar     │
-                              │ • Monaco editor view    │
-                              │ • [Post to GitHub] btn  │
-                              └─────────────────────────┘
+User selects files ──► Review created ──► Jobs queued (BullMQ)
+                                                │
+                                                ▼
+                                       ┌────────────────┐
+                                       │   AI Service   │
+                                       │                │
+                                       │ 1. Detect lang │
+                                       │ 2. Load prompt │
+                                       │ 3. Call Gemini │
+                                       │ 4. Parse JSON  │
+                                       └───────┬────────┘
+                                               │
+                                               ▼
+                                 ┌──────────────────────────┐
+                                 │    Review Service        │
+                                 │                          │
+                                 │  • Store comments in DB  │
+                                 │  • Compute quality score │
+                                 │  • Emit WS event         │
+                                 └────────────┬─────────────┘
+                                              │
+                                              ▼
+                                 ┌──────────────────────────┐
+                                 │    Client Dashboard      │
+                                 │                          │
+                                 │  • Live progress bar     │
+                                 │  • Monaco editor view    │
+                                 │  • [Post to GitHub] btn  │
+                                 └──────────────────────────┘
 ```
 
-Each AI review produces a structured JSON response containing:
+Each AI review produces a **structured JSON response** containing:
 
 - **Comments** — line-specific findings with `type`, `severity`, `message`, `suggestion`, and `improved_code`
 - **Quality Score** — 0–100 composite score
@@ -377,7 +351,7 @@ Each AI review produces a structured JSON response containing:
 | `minor` | Nice to fix — style or minor improvements |
 | `info` | Informational — suggestions and positive observations |
 
-<br/>
+---
 
 ## 🐳 Docker
 
@@ -404,7 +378,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d postgres re
 npm run dev
 ```
 
-<br/>
+---
 
 ## 🗄️ Database
 
@@ -422,11 +396,9 @@ Run migrations:
 npm run db:migrate
 ```
 
-<br/>
+---
 
 ## 🛠 Tech Stack
-
-<div align="center">
 
 | Layer | Technology |
 |:------|:-----------|
@@ -441,9 +413,7 @@ npm run db:migrate
 | **Infra** | Docker Compose, npm Workspaces, TypeScript 5.7 |
 | **Design** | Glassmorphism, CSS Custom Properties, Google Fonts |
 
-</div>
-
-<br/>
+---
 
 ## 📜 Scripts
 
@@ -457,31 +427,24 @@ npm run db:migrate
 | `npm run docker:build` | Rebuild Docker images |
 | `npm run clean` | Remove all `node_modules` |
 
-<br/>
+---
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feat/amazing-feature`)
-3. Commit using [Conventional Commits](https://www.conventionalcommits.org/) (`git commit -m 'feat(scope): add amazing feature'`)
-4. Push to the branch (`git push origin feat/amazing-feature`)
-5. Open a Pull Request
+1. **Fork** the repository
+2. **Create** your feature branch — `git checkout -b feat/amazing-feature`
+3. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/) — `git commit -m 'feat(scope): add amazing feature'`
+4. **Push** to the branch — `git push origin feat/amazing-feature`
+5. **Open** a Pull Request
 
-<br/>
+---
 
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
-<br/>
-
 ---
 
-<div align="center">
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=120&section=footer)
 
-**Built with obsessive attention to detail.**
-
-<sub>Designed and engineered by <a href="https://github.com/Aryanlohri">Aryan Lohri</a></sub>
-
-</div>
-]]>
+**Built with obsessive attention to detail** by [Aryan Lohri](https://github.com/Aryanlohri)
