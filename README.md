@@ -69,34 +69,35 @@ Razorpay-powered subscription tiers (Free, Pro, Enterprise) with server-verified
 VANTA follows a **microservice architecture** with strict network isolation. Only the API Gateway and Client are publicly accessible — all backend services communicate over Docker's internal DNS.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                       PUBLIC NETWORK                            │
-│                                                                 │
-│   ┌────────────┐                      ┌────────────┐           │
-│   │   Client   │  ◄── HTTP/WS ──►    │ API Gateway │           │
-│   │ (Next.js)  │                      │  (Express)  │           │
-│   │   :3010    │                      │   :3000     │           │
-│   └────────────┘                      └─────┬──────┘           │
-│                                             │                   │
-├─────────────────────────────────────────────┼───────────────────┤
-│                 INTERNAL NETWORK            │                   │
-│               (Docker Bridge)               │                   │
-│                                             │                   │
-│   ┌────────────┐ ┌──────────────┐  ┌───────┴──────┐           │
-│   │   Auth     │ │   Repo       │  │   Review     │           │
-│   │  Service   │ │  Service     │  │  Service     │           │
-│   │   :3001    │ │   :3002      │  │   :3003      │           │
-│   └─────┬──────┘ └──────┬───────┘  └──────┬───────┘           │
-│         │               │                  │                    │
-│         └───────┬───────┴──────────────────┘                   │
-│                 │                                               │
-│   ┌─────────────┴─┐  ┌────────────┐  ┌────────────┐           │
-│   │  PostgreSQL   │  │   Redis    │  │ AI Service  │           │
-│   │    :5432      │  │   :6379    │  │   :3004     │           │
-│   │ (3 schemas)   │  │(Queue/Cache)│  │ (Gemini AI) │           │
-│   └───────────────┘  └────────────┘  └────────────┘           │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+                          +------------------+
+                          |   API Gateway    |
+                          |    (Express)     |
+    +-------------+       |     :3000        |       PUBLIC
+    |   Client    | <---> +--------+---------+
+    |  (Next.js)  |                |
+    |    :3010    |                |
+    +-------------+   ============ | ============   INTERNAL
+                                   |
+              +--------------------+-------------------+
+              |                    |                    |
+     +--------+-------+  +--------+-------+  +---------+------+
+     |  Auth Service   |  |  Repo Service   |  | Review Service  |
+     |     :3001       |  |     :3002       |  |     :3003       |
+     +--------+-------+  +--------+-------+  +---------+------+
+              |                    |                    |
+              +---------+----------+---------+---------+
+                        |                    |
+              +---------+------+   +---------+------+
+              |   PostgreSQL   |   |     Redis      |
+              |     :5432      |   |     :6379      |
+              |  (3 schemas)   |   | (Queue/Cache)  |
+              +----------------+   +--------+-------+
+                                            |
+                                   +--------+-------+
+                                   |   AI Service   |
+                                   |     :3004      |
+                                   |  (Gemini AI)   |
+                                   +----------------+
 ```
 
 ### Service Breakdown
@@ -448,3 +449,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=120&section=footer)
 
 **Built with obsessive attention to detail** by [Aryan Lohri](https://github.com/Aryanlohri)
+
+<br/>
+
+> *"I built an AI to review my code so I don't have to mass dm senior devs at 3 AM anymore. You're welcome."*
