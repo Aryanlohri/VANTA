@@ -223,4 +223,63 @@ export const ReviewController = {
       next(error);
     }
   },
+
+  /**
+   * POST /reviews/:id/github
+   * Manually post a completed review to GitHub as a PR comment.
+   */
+  async postToGitHub(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.headers['x-user-id'] as string;
+      if (!userId) throw new AppError('User ID required', 401, ERROR_CODES.UNAUTHORIZED);
+
+      const id = req.params.id as string;
+      const fullReview = await ReviewModel.getFullReview(id);
+
+      if (!fullReview || fullReview.user_id !== userId) {
+        throw new NotFoundError('Review', id);
+      }
+
+      if (fullReview.status !== ReviewStatus.COMPLETED) {
+        throw new ValidationError('Review must be completed before posting to GitHub');
+      }
+
+      if (!fullReview.pull_request_number || !fullReview.commit_sha) {
+        throw new ValidationError('Review is not associated with a Pull Request');
+      }
+
+      const allComments = fullReview.files.flatMap((f) => f.comments || []);
+      
+      const githubComments = allComments.map((c: any) => {
+        const file = fullReview.files.find((f: any) => f.id === c.review_file_id);
+        return {
+          path: file?.file_path,
+          line: c.line_number,
+          body: `**[${c.severity.toUpperCase()}] ${c.type}**\n${c.message}\n\n${
+            c.suggestion ? `*Suggestion:*\n${c.suggestion}\n` : ''
+          }${
+            c.improved_code ? `\n\`\`\`${file?.language || ''}\n${c.improved_code}\n\`\`\`` : ''
+          }`,
+        };
+      });
+
+      const REPOSITORY_SERVICE_URL = process.env.REPOSITORY_SERVICE_URL || `http://localhost:${SERVICE_PORTS.REPO_SERVICE}`;
+
+      const response = await axios.post(
+        `${REPOSITORY_SERVICE_URL}/repos/${fullReview.repo_id}/reviews`,
+        {
+          prNumber: fullReview.pull_request_number,
+          commitSha: fullReview.commit_sha,
+          comments: githubComments,
+        },
+        { headers: { 'x-user-id': userId } }
+      );
+
+      logger.info({ reviewId: id }, 'Successfully posted PR review to GitHub manually');
+      res.json({ success: true, data: response.data });
+    } catch (error: any) {
+      logger.error({ err: error.response?.data || error.message }, 'Failed to post manual review to GitHub');
+      next(error);
+    }
+  },
 };

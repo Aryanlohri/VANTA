@@ -93,38 +93,6 @@ export function initResultConsumer(socketIo: SocketServer) {
             // Clean up the progress tracker
             reviewFileProgress.delete(result.reviewId);
 
-            // Post back to GitHub if this is a PR review
-            if (fullReview.pull_request_number && fullReview.commit_sha) {
-              try {
-                // Map comments to GitHub's format
-                const githubComments = allComments.map((c: any) => {
-                  const file = fullReview.files.find((f: any) => f.id === c.review_file_id);
-                  return {
-                    path: file?.file_path,
-                    line: c.line_number,
-                    body: `**[${c.severity.toUpperCase()}] ${c.type}**\n${c.message}\n\n${
-                      c.suggestion ? `*Suggestion:*\n${c.suggestion}\n` : ''
-                    }${
-                      c.improved_code ? `\n\`\`\`${file?.language || ''}\n${c.improved_code}\n\`\`\`` : ''
-                    }`,
-                  };
-                });
-
-                await axios.post(
-                  `${REPOSITORY_SERVICE_URL}/repos/${fullReview.repo_id}/reviews`,
-                  {
-                    prNumber: fullReview.pull_request_number,
-                    commitSha: fullReview.commit_sha,
-                    comments: githubComments,
-                  },
-                  { headers: { 'x-user-id': fullReview.user_id } }
-                );
-                logger.info({ reviewId: result.reviewId }, 'Successfully posted PR review to GitHub');
-              } catch (githubErr: any) {
-                logger.error({ err: githubErr.response?.data || githubErr.message, reviewId: result.reviewId }, 'Failed to post review to GitHub');
-              }
-            }
-
             if (io) {
               io.to(`review:${result.reviewId}`).emit(WS_EVENTS.REVIEW_COMPLETED, {
                 reviewId: result.reviewId,

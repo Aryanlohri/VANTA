@@ -6,6 +6,7 @@ const router = Router();
 router.post('/', ReviewController.create);
 router.get('/', ReviewController.list);
 router.get('/:id', ReviewController.getById);
+router.post('/:id/github', ReviewController.postToGitHub);
 router.delete('/:id', ReviewController.deleteReview);
 
 export default router;

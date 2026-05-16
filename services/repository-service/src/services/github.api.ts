@@ -284,6 +284,30 @@ export const GitHubApi = {
       return response.data;
     } catch (error: any) {
       logger.error({ err: error.response?.data || error.message }, 'Failed to create PR review');
+      
+      // Fallback mechanism: 422 Unprocessable Entity often means invalid line numbers for inline comments.
+      if (error.response?.status === 422) {
+        logger.warn({ prNumber, owner, repo }, 'GitHub rejected inline comments (likely due to line numbers outside the diff). Falling back to general PR comment.');
+        
+        try {
+          // Construct a single markdown string with all comments
+          let fallbackBody = '✨ **VANTA AI Code Review**\nHere are some suggestions to improve your code quality, security, and performance.\n\n';
+          validComments.forEach(c => {
+            fallbackBody += `**File:** \`${c.path}\` (Line ${c.line})\n${c.body}\n\n---\n\n`;
+          });
+
+          const fallbackResponse = await client.post(`/repos/${owner}/${repo}/issues/${prNumber}/comments`, {
+            body: fallbackBody
+          });
+          
+          logger.info({ prNumber, commentId: fallbackResponse.data.id }, 'Successfully posted fallback general PR comment');
+          return fallbackResponse.data;
+        } catch (fallbackError: any) {
+          logger.error({ err: fallbackError.response?.data || fallbackError.message }, 'Failed to post fallback PR comment');
+          throw new AppError('Failed to post review to GitHub even after fallback', 500);
+        }
+      }
+
       throw new AppError('Failed to post review to GitHub', 500);
     }
   },
