@@ -1,17 +1,23 @@
 
-![VANTA Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=220&section=header&text=VANTA&fontSize=90&fontColor=e8e8e8&animation=fadeIn&fontAlignY=38&desc=AI-Powered%20Code%20Intelligence%20Platform&descAlignY=58&descSize=18&descColor=898989)
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=220&section=header&text=VANTA&fontSize=90&fontColor=e8e8e8&animation=fadeIn&fontAlignY=38&desc=AI-Powered%20Code%20Intelligence%20Platform&descAlignY=58&descSize=18&descColor=898989" alt="VANTA Banner" width="100%" />
+</p>
 
-[![Node.js](https://img.shields.io/badge/Node.js-≥20-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+<p align="center">
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-≥20-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" /></a>
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" /></a>
+  <a href="https://ai.google.dev/"><img src="https://img.shields.io/badge/Gemini-2.5_Flash-8E75B2?style=for-the-badge&logo=google&logoColor=white" alt="Gemini" /></a>
+  <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" /></a>
+  <a href="https://redis.io/"><img src="https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License" /></a>
+</p>
 
-> **Push code. Get expert-level feedback in seconds.**
-> Detect bugs, security vulnerabilities, and performance issues — before they reach production. One platform, zero friction.
+<p align="center">
+  <strong>Push code. Get expert-level feedback in seconds.</strong><br/>
+  <sub>Detect bugs, security vulnerabilities, and performance issues — before they reach production. One platform, zero friction.</sub>
+</p>
 
 ---
 
@@ -446,6 +452,10 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ---
 
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=120&section=footer)
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=120&section=footer" alt="Footer" width="100%" />
+</p>
 
-**Shipped by [Aryan Lohri](https://github.com/Aryanlohri). Tested in production. Survived.**
+<p align="center">
+  <strong>Shipped by <a href="https://github.com/Aryanlohri">Aryan Lohri</a>. Tested in production. Survived.</strong>
+</p>
