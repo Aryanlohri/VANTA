@@ -448,8 +448,4 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0a,50:1a1a1a,100:0a0a0a&height=120&section=footer)
 
-**Built with obsessive attention to detail** by [Aryan Lohri](https://github.com/Aryanlohri)
-
-<br/>
-
-> *"I built an AI to review my code so I don't have to mass dm senior devs at 3 AM anymore. You're welcome."*
+**Shipped by [Aryan Lohri](https://github.com/Aryanlohri). Tested in production. Survived.**
