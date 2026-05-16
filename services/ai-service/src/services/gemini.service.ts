@@ -3,17 +3,22 @@ import { createLogger } from '@aicr/shared';
 import type { AIReviewResponse } from '@aicr/shared';
 import { buildReviewPrompt } from '../prompts/base';
 import { JAVASCRIPT_HINTS } from '../prompts/javascript';
+import { TYPESCRIPT_HINTS } from '../prompts/typescript';
 import { PYTHON_HINTS } from '../prompts/python';
 import { JAVA_HINTS } from '../prompts/java';
+import { GO_HINTS } from '../prompts/go';
+import { RUST_HINTS } from '../prompts/rust';
 import { GENERAL_HINTS } from '../prompts/general';
 
 const logger = createLogger('ai-service:gemini');
 
 const LANGUAGE_HINTS: Record<string, string> = {
   javascript: JAVASCRIPT_HINTS,
-  typescript: JAVASCRIPT_HINTS,
+  typescript: TYPESCRIPT_HINTS,
   python: PYTHON_HINTS,
   java: JAVA_HINTS,
+  go: GO_HINTS,
+  rust: RUST_HINTS,
 };
 
 function getLanguageHints(language: string | null): string {
