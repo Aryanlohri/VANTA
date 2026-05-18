@@ -27,6 +27,13 @@ export enum Severity {
   INFO = 'info',
 }
 
+export enum ReviewMode {
+  STANDARD = 'standard',
+  SECURITY = 'security',
+  PERFORMANCE = 'performance',
+  STYLE = 'style',
+}
+
 // ---- User ----
 
 export interface User {
@@ -36,6 +43,7 @@ export interface User {
   email: string | null;
   avatar_url: string;
   access_token_encrypted: string;
+  role?: 'admin' | 'user';
   created_at: Date;
   updated_at: Date;
 }
@@ -45,6 +53,7 @@ export interface UserPublic {
   username: string;
   email: string | null;
   avatar_url: string;
+  role?: 'admin' | 'user';
   created_at: Date;
 }
 
@@ -102,6 +111,7 @@ export interface Review {
   repo_id: string;
   user_id: string;
   title: string;
+  mode: ReviewMode;
   status: ReviewStatus;
   overall_score: number | null;
   summary: string | null;
@@ -189,6 +199,7 @@ export interface AuthTokens {
 export interface JwtPayload {
   userId: string;
   username: string;
+  role?: 'admin' | 'user';
   iat?: number;
   exp?: number;
 }
@@ -201,6 +212,7 @@ export interface ReviewJobData {
   filePath: string;
   content: string;
   language: string | null;
+  mode?: string;
 }
 
 export interface ReviewJobResult {
