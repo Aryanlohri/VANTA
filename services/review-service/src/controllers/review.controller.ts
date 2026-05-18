@@ -84,7 +84,7 @@ export const ReviewController = {
       const userId = req.headers['x-user-id'] as string;
       if (!userId) throw new AppError('User ID required', 401, ERROR_CODES.UNAUTHORIZED);
 
-      const { repo_id, title, files, pull_request_number, commit_sha } = req.body;
+      const { repo_id, title, mode, files, pull_request_number, commit_sha } = req.body;
       if (!repo_id || !title || !files || !Array.isArray(files) || files.length === 0) {
         throw new ValidationError('Required: repo_id, title, files[]');
       }
@@ -115,6 +115,7 @@ export const ReviewController = {
         repo_id,
         user_id: userId,
         title,
+        mode: mode || 'standard',
         pull_request_number,
         commit_sha,
       });
@@ -134,6 +135,7 @@ export const ReviewController = {
           filePath: file.path,
           content: file.content,
           language: file.language || null,
+          mode: mode || 'standard',
         });
       }
 
@@ -279,6 +281,33 @@ export const ReviewController = {
       res.json({ success: true, data: response.data });
     } catch (error: any) {
       logger.error({ err: error.response?.data || error.message }, 'Failed to post manual review to GitHub');
+      next(error);
+    }
+  },
+
+  /**
+   * GET /reviews/admin/metrics
+   * Returns review platform metrics.
+   * Protected: requires admin role.
+   */
+  async getAdminMetrics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const db = require('../config/database').getDb();
+      
+      const totalReviews = await db('reviews.reviews').count('id as count').first();
+      const recentReviews = await db('reviews.reviews')
+        .where('created_at', '>=', db.raw("now() - interval '24 hours'"))
+        .count('id as count')
+        .first();
+
+      res.json({
+        success: true,
+        data: {
+          totalReviews: parseInt(totalReviews.count, 10),
+          recentReviews: parseInt(recentReviews.count, 10),
+        }
+      });
+    } catch (error) {
       next(error);
     }
   },

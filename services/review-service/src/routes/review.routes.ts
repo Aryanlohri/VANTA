@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { ReviewController } from '../controllers/review.controller';
+import { isAdmin } from '../middleware/isAdmin.middleware';
 
 const router = Router();
 
+router.get('/admin/metrics', isAdmin, ReviewController.getAdminMetrics);
 router.post('/', ReviewController.create);
 router.get('/', ReviewController.list);
 router.get('/:id', ReviewController.getById);
