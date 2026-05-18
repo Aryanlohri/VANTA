@@ -111,7 +111,7 @@ export const AuthController = {
       logger.info({ userId: user.id, username: user.username }, 'User authenticated');
 
       // Generate JWT
-      const tokens = TokenService.generateTokens(user.id, user.username);
+      const tokens = TokenService.generateTokens(user.id, user.username, user.role);
 
       // Generate a one-time code and store the JWT in Redis under it.
       // The actual JWT NEVER touches the URL — only this opaque code does.
@@ -219,6 +219,7 @@ export const AuthController = {
         data: {
           userId: user.id,
           username: user.username,
+          role: user.role,
         },
       });
     } catch (error) {
@@ -252,6 +253,36 @@ export const AuthController = {
       res.json({
         success: true,
         data: { token },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  /**
+   * GET /auth/admin/metrics
+   * Returns auth platform metrics.
+   * Protected: requires admin role.
+   */
+  async getMetrics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const db = require('../config/database').getDb();
+      
+      const totalUsers = await db('auth.users').count('id as count').first();
+      const subscriptions = await db('auth.subscriptions')
+        .select('plan')
+        .count('id as count')
+        .groupBy('plan');
+
+      res.json({
+        success: true,
+        data: {
+          totalUsers: parseInt(totalUsers.count, 10),
+          subscriptions: subscriptions.reduce((acc: any, curr: any) => {
+            acc[curr.plan] = parseInt(curr.count, 10);
+            return acc;
+          }, {})
+        }
       });
     } catch (error) {
       next(error);

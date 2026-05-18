@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { AuthController } from '../controllers/auth.controller';
 import { authMiddleware } from '../middleware/auth.middleware';
 import { requireInternalSecret } from '../middleware/internalAuth.middleware';
+import { isAdmin } from '../middleware/isAdmin.middleware';
 
 const router = Router();
 
@@ -36,5 +37,8 @@ router.get('/token/:userId', requireInternalSecret, AuthController.getGitHubToke
 
 // Get current user profile
 router.get('/me', authMiddleware, AuthController.getProfile);
+
+// Get platform metrics (Admin only)
+router.get('/admin/metrics', authMiddleware, isAdmin, AuthController.getMetrics);
 
 export default router;

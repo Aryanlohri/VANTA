@@ -48,24 +48,28 @@ export const UserModel = {
   }): Promise<User> {
     const existing = await UserModel.findByGitHubId(data.github_id);
 
-    if (existing) {
-      // Update existing user
-      const [updated] = await getDb()(TABLE)
-        .where({ id: existing.id })
-        .update({
-          username: data.username,
-          email: data.email,
-          avatar_url: data.avatar_url,
-          access_token_encrypted: data.access_token_encrypted,
-          updated_at: getDb().fn.now(),
-        })
-        .returning('*');
-      return updated;
-    }
+      const adminUsernames = (process.env.ADMIN_GITHUB_USERNAMES || '').split(',').map(s => s.trim().toLowerCase());
+      const role = adminUsernames.includes(data.username.toLowerCase()) ? 'admin' : 'user';
 
-    // Create new user
-    const [user] = await getDb()(TABLE).insert(data).returning('*');
-    return user;
+      if (existing) {
+        // Update existing user
+        const [updated] = await getDb()(TABLE)
+          .where({ id: existing.id })
+          .update({
+            username: data.username,
+            email: data.email,
+            avatar_url: data.avatar_url,
+            access_token_encrypted: data.access_token_encrypted,
+            role,
+            updated_at: getDb().fn.now(),
+          })
+          .returning('*');
+        return updated;
+      }
+
+      // Create new user
+      const [user] = await getDb()(TABLE).insert({ ...data, role }).returning('*');
+      return user;
   },
 
   /**
@@ -98,6 +102,7 @@ export const UserModel = {
       username: user.username,
       email: user.email,
       avatar_url: user.avatar_url,
+      role: user.role,
       created_at: user.created_at,
     };
   },

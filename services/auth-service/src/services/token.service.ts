@@ -25,12 +25,12 @@ export const TokenService = {
   /**
    * Generate a JWT access token for a user.
    */
-  generateTokens(userId: string, username: string): AuthTokens {
+  generateTokens(userId: string, username: string, role?: 'admin' | 'user'): AuthTokens {
     const secret = getJwtSecret();
     const expiresInString = getExpiresIn();
     const expiresInSeconds = parseExpiresIn(expiresInString);
 
-    const payload: JwtPayload = { userId, username };
+    const payload: JwtPayload = { userId, username, role };
 
     const accessToken = jwt.sign(payload, secret, {
       expiresIn: expiresInSeconds,
