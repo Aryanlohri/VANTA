@@ -30,7 +30,7 @@ const PUBLIC_ROUTES = [
  * We strip these BEFORE auth runs — even on public routes — so that no
  * downstream service can be tricked by a client-supplied value.
  */
-const PROTECTED_HEADERS = ['x-user-id', 'x-username', 'x-internal-secret'];
+const PROTECTED_HEADERS = ['x-user-id', 'x-username', 'x-user-role', 'x-internal-secret'];
 
 /**
  * Lazily load and cache the INTERNAL_SERVICE_SECRET.
@@ -118,6 +118,7 @@ export async function gatewayAuthMiddleware(
       // is this line — not the client.
       req.headers['x-user-id'] = response.data.data.userId;
       req.headers['x-username'] = response.data.data.username;
+      req.headers['x-user-role'] = response.data.data.role;
       next();
     } else {
       throw new AuthError('Invalid token', ERROR_CODES.INVALID_TOKEN);
