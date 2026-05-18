@@ -192,6 +192,16 @@ export default function ReviewDetailPage() {
               <span className="text-xs font-medium" style={{ color: '#22c55e' }}>Review Complete</span>
             </div>
           ) : null}
+
+          {/* Mode badge */}
+          {review.mode && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl"
+              style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
+                {review.mode.replace('_', ' ')}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

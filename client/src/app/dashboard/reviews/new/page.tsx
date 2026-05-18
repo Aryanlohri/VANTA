@@ -14,6 +14,7 @@ export default function NewReviewPage() {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [fileContents, setFileContents] = useState<Record<string, { content: string; language: string | null }>>({});
   const [title, setTitle] = useState('');
+  const [mode, setMode] = useState('standard');
   const [loading, setLoading] = useState(true);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -86,6 +87,7 @@ export default function NewReviewPage() {
       const res = await reviewApi.create({
         repo_id: selectedRepo.id,
         title,
+        mode,
         files: reviewFiles,
       });
 
@@ -217,6 +219,18 @@ export default function NewReviewPage() {
                 className="w-full px-4 py-2.5 rounded-lg text-sm outline-none"
                 style={{ background: 'var(--color-bg-input)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }}
               />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--color-text-secondary)' }}>Review Goal</label>
+              <select value={mode} onChange={(e) => setMode(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: 'var(--color-bg-input)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }}>
+                <option value="standard">Standard Review</option>
+                <option value="security">Strict Security Audit</option>
+                <option value="performance">Performance Optimization</option>
+                <option value="style">Style Enforcer</option>
+              </select>
             </div>
 
             <div>

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   LayoutDashboard, GitBranch, FileCode, Plus, LogOut,
-  ChevronRight
+  ChevronRight, Shield
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 
@@ -14,6 +14,8 @@ const NAV_ITEMS = [
   { href: '/dashboard/repositories', icon: GitBranch, label: 'Repositories' },
   { href: '/dashboard/reviews', icon: FileCode, label: 'Reviews' },
 ];
+
+const ADMIN_NAV_ITEM = { href: '/dashboard/admin', icon: Shield, label: 'Admin Panel' };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -82,6 +84,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             );
           })}
+          
+          {/* Admin Panel Link */}
+          {user?.role === 'admin' && (() => {
+            const isActive = pathname === ADMIN_NAV_ITEM.href;
+            return (
+              <div className="pt-2 mt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
+                <Link href={ADMIN_NAV_ITEM.href}
+                  className="flex items-center gap-3 rounded-lg text-[13px] tracking-wide transition-all duration-300"
+                  style={{
+                    padding: '9px 20px',
+                    background: isActive ? 'rgba(34,197,94,0.1)' : 'transparent',
+                    color: isActive ? '#4ade80' : '#898989',
+                    borderLeft: isActive ? '2px solid #22c55e' : '2px solid transparent',
+                    fontWeight: isActive ? 500 : 400,
+                  }}>
+                  <ADMIN_NAV_ITEM.icon size={16} strokeWidth={isActive ? 2 : 1.5} />
+                  {ADMIN_NAV_ITEM.label}
+                  {isActive && <ChevronRight size={14} className="ml-auto" style={{ color: '#4ade80' }} />}
+                </Link>
+              </div>
+            );
+          })()}
         </nav>
 
         {/* User Footer */}

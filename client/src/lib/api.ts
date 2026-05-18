@@ -56,7 +56,7 @@ export const repoApi = {
 };
 
 export const reviewApi = {
-  create: (data: { repo_id: string; title: string; files: any[] }) =>
+  create: (data: { repo_id: string; title: string; mode: string; files: any[] }) =>
     api.post('/reviews', data),
   list: (page = 1) => api.get(`/reviews?page=${page}`),
   getById: (id: string) => api.get(`/reviews/${id}`),
@@ -76,4 +76,9 @@ export const paymentApi = {
     billing_cycle: string;
   }) => api.post('/payment/verify', data),
   getUsage: () => api.get('/payment/usage'),
+};
+
+export const adminApi = {
+  getAuthMetrics: () => api.get('/auth/admin/metrics'),
+  getReviewMetrics: () => api.get('/reviews/admin/metrics'),
 };
