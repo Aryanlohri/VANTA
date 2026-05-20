@@ -5,6 +5,7 @@
 import axios from 'axios';
 import { createLogger, AppError, SERVICE_PORTS } from '@aicr/shared';
 import type { GitHubRepo, FileTreeItem, FileContent } from '@aicr/shared';
+import { redis } from './redis';
 
 const logger = createLogger('repository-service:github-api');
 
@@ -79,6 +80,16 @@ export const GitHubApi = {
     repos: GitHubRepo[];
     hasMore: boolean;
   }> {
+    const cacheKey = `github:repos:${userId}:${page}:${perPage}`;
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (e) {
+      logger.warn({ err: e }, 'Failed to read from Redis cache');
+    }
+
     const token = await getGitHubToken(userId);
     const client = createGitHubClient(token);
 
@@ -109,13 +120,31 @@ export const GitHubApi = {
     const linkHeader = response.headers.link || '';
     const hasMore = linkHeader.includes('rel="next"');
 
-    return { repos, hasMore };
+    const result = { repos, hasMore };
+    
+    try {
+      await redis.set(cacheKey, JSON.stringify(result), 'EX', 300); // 5 mins cache
+    } catch (e) {
+      logger.warn({ err: e }, 'Failed to write to Redis cache');
+    }
+
+    return result;
   },
 
   /**
    * Get the file tree of a repository.
    */
   async getRepoTree(userId: string, owner: string, repo: string, branch?: string): Promise<FileTreeItem[]> {
+    const cacheKey = `github:tree:${userId}:${owner}:${repo}:${branch || 'default'}`;
+    try {
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (e) {
+      logger.warn({ err: e }, 'Failed to read from Redis cache');
+    }
+
     const token = await getGitHubToken(userId);
     const client = createGitHubClient(token);
 
@@ -137,6 +166,12 @@ export const GitHubApi = {
         size: item.size,
         sha: item.sha,
       }));
+
+    try {
+      await redis.set(cacheKey, JSON.stringify(items), 'EX', 600); // 10 mins cache
+    } catch (e) {
+      logger.warn({ err: e }, 'Failed to write to Redis cache');
+    }
 
     return items;
   },
