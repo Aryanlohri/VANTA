@@ -123,10 +123,49 @@ export default function DashboardPage() {
               {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 w-full" />)}
             </div>
           ) : reviews.length === 0 ? (
-            <div className="text-center py-8">
-              <FileCode size={32} className="mx-auto mb-3" style={{ color: 'var(--color-text-muted)' }} />
-              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>No reviews yet</p>
-              <p className="text-[12px] mt-2" style={{ color: 'var(--color-text-muted)' }}>No other reviews yet — start a new one above.</p>
+            <div className="text-center py-12 px-6">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: 'var(--color-bg-hover)', border: '1px solid var(--color-border)' }}>
+                <FileCode size={28} style={{ color: 'var(--color-text-primary)' }} />
+              </div>
+              <h4 className="text-lg font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Welcome to VANTA</h4>
+              <p className="text-sm mb-8 max-w-sm mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
+                You're just a few clicks away from AI-powered code reviews. Follow these steps to get started.
+              </p>
+              
+              <div className="text-left space-y-3 max-w-sm mx-auto">
+                <div className="flex items-center gap-3 p-3 rounded-lg border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}>
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: '#22c55e20', color: '#22c55e' }}>✓</div>
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Create an account</span>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 rounded-lg border transition-all" style={{ borderColor: repos.length === 0 ? 'var(--color-accent-start)' : 'var(--color-border)', background: repos.length === 0 ? 'var(--color-accent-glow)' : 'var(--color-bg-input)' }}>
+                  {repos.length === 0 ? (
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: 'var(--color-accent-start)', color: 'white' }}>2</div>
+                  ) : (
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: '#22c55e20', color: '#22c55e' }}>✓</div>
+                  )}
+                  <div className="flex-1">
+                    <span className="text-sm font-medium block" style={{ color: 'var(--color-text-primary)' }}>Connect a Repository</span>
+                    {repos.length === 0 && (
+                      <Link href="/dashboard/repositories" className="text-xs hover:underline mt-0.5 inline-block" style={{ color: 'var(--color-accent-start)' }}>Go to repositories ›</Link>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-lg border transition-all" style={{ borderColor: repos.length > 0 ? 'var(--color-accent-start)' : 'var(--color-border)', background: repos.length > 0 ? 'var(--color-accent-glow)' : 'transparent', opacity: repos.length > 0 ? 1 : 0.6 }}>
+                  <div className="w-6 h-6 rounded-full border flex items-center justify-center shrink-0 text-xs font-bold" style={{ 
+                    borderColor: repos.length > 0 ? 'transparent' : 'var(--color-text-muted)', 
+                    color: repos.length > 0 ? 'white' : 'var(--color-text-muted)',
+                    background: repos.length > 0 ? 'var(--color-accent-start)' : 'transparent'
+                  }}>3</div>
+                  <div className="flex-1">
+                    <span className="text-sm font-medium block" style={{ color: repos.length > 0 ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>Run your first review</span>
+                    {repos.length > 0 && (
+                      <Link href="/dashboard/reviews/new" className="text-xs hover:underline mt-0.5 inline-block" style={{ color: 'var(--color-accent-start)' }}>Start a new review ›</Link>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="space-y-2">
