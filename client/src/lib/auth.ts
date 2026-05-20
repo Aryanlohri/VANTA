@@ -8,6 +8,7 @@ interface User {
   username: string;
   email: string | null;
   avatar_url: string;
+  role?: 'admin' | 'user';
   created_at: string;
 }
 
