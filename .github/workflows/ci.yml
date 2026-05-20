@@ -19,7 +19,9 @@ jobs:
         node-version: '20'
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        rm -f package-lock.json
+        npm install
 
     - name: Build shared package
       run: npm run build --workspace=packages/shared
