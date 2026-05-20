@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FileCode, FolderOpen, ChevronRight, Send, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { repoApi, reviewApi } from '@/lib/api';
+import { FileTree } from '@/components/FileTree';
 
 export default function NewReviewPage() {
   const router = useRouter();
@@ -174,23 +175,11 @@ export default function NewReviewPage() {
             ) : files.length === 0 ? (
               <p className="text-center py-8 text-sm" style={{ color: 'var(--color-text-muted)' }}>No reviewable code files found</p>
             ) : (
-              <div className="space-y-1">
-                {files.map((file: any) => {
-                  const selected = selectedFiles.includes(file.path);
-                  return (
-                    <button key={file.path} onClick={() => toggleFile(file.path)}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-sm"
-                      style={{
-                        background: selected ? 'var(--color-accent-glow)' : 'transparent',
-                        color: selected ? 'var(--color-accent-start)' : 'var(--color-text-secondary)',
-                      }}>
-                      <FileCode size={14} />
-                      <span className="truncate">{file.path}</span>
-                      {selected && <span className="ml-auto text-xs">✓</span>}
-                    </button>
-                  );
-                })}
-              </div>
+              <FileTree 
+                files={files} 
+                selectedFiles={selectedFiles} 
+                onToggleFile={toggleFile} 
+              />
             )}
           </div>
 
