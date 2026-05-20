@@ -104,30 +104,38 @@ export default function RepositoriesPage() {
       ) : (
         <div className="grid md:grid-cols-2 gap-4 stagger">
           {connected.map((repo) => (
-            <div key={repo.id} className="glass-card p-5 transition-all duration-200 hover:scale-[1.01]">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <GitBranch size={18} style={{ color: 'var(--color-accent-start)' }} />
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>{repo.full_name}</p>
-                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{repo.description || 'No description'}</p>
+            <div key={repo.id} className="glass-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/5 flex flex-col h-full gap-4 relative group">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2.5 rounded-xl shrink-0 transition-transform duration-300 group-hover:rotate-12" style={{ background: 'var(--color-bg-hover)', border: '1px solid var(--color-border)' }}>
+                    <GitBranch size={18} style={{ color: 'var(--color-accent-start)' }} />
                   </div>
+                  <h3 className="text-[15px] font-semibold truncate tracking-tight" style={{ color: 'var(--color-text-primary)' }} title={repo.full_name}>
+                    {repo.full_name}
+                  </h3>
                 </div>
                 <button onClick={() => disconnectRepo(repo.id)}
-                  className="p-1.5 rounded-lg transition-all hover:opacity-80"
-                  style={{ color: 'var(--color-text-muted)' }} title="Disconnect">
-                  <Unplug size={14} />
+                  className="p-2 rounded-lg transition-all hover:bg-red-500/10 hover:text-red-400 shrink-0 opacity-40 group-hover:opacity-100"
+                  style={{ color: 'var(--color-text-muted)' }} title="Disconnect Repository">
+                  <Unplug size={16} />
                 </button>
               </div>
-              <div className="flex items-center gap-3 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+              
+              <p className="text-sm leading-relaxed line-clamp-2 flex-grow" style={{ color: 'var(--color-text-secondary)' }}>
+                {repo.description || 'No description provided.'}
+              </p>
+              
+              <div className="flex items-center gap-5 text-xs pt-4 mt-auto" style={{ borderTop: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
                 {repo.language && (
-                  <span className="flex items-center gap-1">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: LANG_COLORS[repo.language] || '#888' }} />
+                  <span className="flex items-center gap-2 font-medium">
+                    <span className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ background: LANG_COLORS[repo.language] || '#888' }} />
                     {repo.language}
                   </span>
                 )}
-                {repo.is_private ? <Lock size={10} /> : <Globe size={10} />}
-                <span>{repo.is_private ? 'Private' : 'Public'}</span>
+                <span className="flex items-center gap-1.5 font-medium">
+                  {repo.is_private ? <Lock size={14} /> : <Globe size={14} />}
+                  {repo.is_private ? 'Private' : 'Public'}
+                </span>
               </div>
             </div>
           ))}
