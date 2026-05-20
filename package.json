@@ -16,6 +16,8 @@
     "dev:review": "npm run dev -w services/review-service",
     "dev:ai": "npm run dev -w services/ai-service",
     "dev:client": "npm run dev -w client",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build": "npm run build --workspaces --if-present",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
@@ -28,7 +30,8 @@
   "devDependencies": {
     "concurrently": "^9.1.2",
     "rimraf": "^6.0.1",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.7"
   },
   "engines": {
     "node": ">=20.0.0",
