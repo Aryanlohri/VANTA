@@ -20,6 +20,7 @@ export default function NewReviewPage() {
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -93,8 +94,13 @@ export default function NewReviewPage() {
       });
 
       router.push(`/dashboard/reviews/${res.data.data.id}`);
-    } catch (error) {
-      console.error('Submit failed:', error);
+    } catch (error: any) {
+      const status = error?.response?.status;
+      const msg =
+        status === 429
+          ? error?.response?.data?.error?.message || 'You have reached your review quota for this billing period. Upgrade your plan to continue.'
+          : 'Failed to submit review. Please try again.';
+      setSubmitError(msg);
       setSubmitting(false);
     }
   }
@@ -246,6 +252,13 @@ export default function NewReviewPage() {
                 {submitting ? 'Submitting...' : 'Submit for AI Review'}
               </button>
             </div>
+
+            {submitError && (
+              <div className="mt-2 px-4 py-3 rounded-xl text-sm"
+                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#f87171' }}>
+                {submitError}
+              </div>
+            )}
           </div>
         </div>
       )}
