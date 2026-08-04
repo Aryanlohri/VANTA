@@ -39,6 +39,8 @@ RULES:
 3. Specific suggestions.
 4. Score based on: ${scoring}.
 5. 'improved_code' must be minimal snippet.
+6. 'type' field MUST be one of exactly these 5 values: bug, security, performance, style, best_practice. No other values are permitted.
+7. 'severity' field MUST be one of exactly these 4 values: critical, major, minor, info. No other values are permitted.
 ${modeRules}
 ${languageHints ? `HINTS:\n${languageHints}` : ''}
 

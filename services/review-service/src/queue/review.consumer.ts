@@ -36,12 +36,16 @@ export function initResultConsumer(socketIo: SocketServer) {
       logger.info({ reviewId: result.reviewId, fileId: result.fileId }, 'Processing review result');
 
       try {
+        // Allowed values — must match the DB CHECK constraint exactly.
+        const VALID_TYPES = new Set(['bug', 'security', 'performance', 'style', 'best_practice']);
+        const VALID_SEVERITIES = new Set(['critical', 'major', 'minor', 'info']);
+
         // Save AI comments to database
         const comments = result.result.issues.map((issue) => ({
           review_file_id: result.fileId,
           line_number: issue.line,
-          type: issue.type,
-          severity: issue.severity,
+          type: VALID_TYPES.has(issue.type) ? issue.type : 'best_practice',
+          severity: VALID_SEVERITIES.has(issue.severity) ? issue.severity : 'info',
           message: issue.message,
           suggestion: issue.suggestion || null,
           improved_code: issue.improved_code || null,
