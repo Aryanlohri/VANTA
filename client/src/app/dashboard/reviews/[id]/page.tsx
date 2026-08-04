@@ -41,6 +41,7 @@ export default function ReviewDetailPage() {
   const [postedToGithub, setPostedToGithub] = useState(false);
 
   const { onEvent } = useSocket(reviewId);
+  const [streamedRawText, setStreamedRawText] = useState('');
 
   // Load review data
   const loadReview = useCallback(async () => {
@@ -64,6 +65,35 @@ export default function ReviewDetailPage() {
     const unsub3 = onEvent('review:failed', () => loadReview());
     return () => { unsub1(); unsub2(); unsub3(); };
   }, [onEvent, loadReview]);
+
+  // Listen to SSE Stream if processing
+  useEffect(() => {
+    if (!review || review.status !== 'processing') return;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+    const token = localStorage.getItem('aicr_token');
+    const evtSource = new EventSource(`${apiUrl}/reviews/${reviewId}/stream${token ? `?token=${token}` : ''}`);
+
+    evtSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.text) {
+          setStreamedRawText((prev) => prev + data.text);
+        }
+      } catch (err) {
+        console.error('SSE Error parsing data:', err);
+      }
+    };
+
+    evtSource.onerror = (err) => {
+      console.error('SSE connection error:', err);
+      evtSource.close();
+    };
+
+    return () => {
+      evtSource.close();
+    };
+  }, [review?.status, reviewId]);
 
   const handlePostToGithub = async () => {
     if (!review || !review.pull_request_number) return;
@@ -204,6 +234,22 @@ export default function ReviewDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Live Stream Terminal */}
+      {review.status === 'processing' && (
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
+            <Loader2 size={14} className="animate-spin" /> Live AI Analysis Stream
+          </h3>
+          <pre className="p-4 rounded-xl text-xs shadow-inner h-[280px] overflow-y-auto whitespace-pre-wrap flex flex-col-reverse"
+            style={{ background: '#0a0a0a', color: '#4ade80', border: '1px solid #1f2937', fontFamily: 'var(--font-mono)' }}>
+            <div>
+              {streamedRawText || 'Connecting to AI stream...'}
+              <span className="animate-pulse">_</span>
+            </div>
+          </pre>
+        </div>
+      )}
 
       {/* Score + Summary Row */}
       {review.overall_score !== null && (
