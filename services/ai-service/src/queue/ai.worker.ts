@@ -25,7 +25,7 @@ export function startAIWorker() {
       logger.info({ jobId: job.id, reviewId: data.reviewId, file: data.filePath }, 'Processing AI review');
 
       try {
-        const result = await GeminiService.reviewCode(data.content, data.language, data.mode);
+        const result = await GeminiService.reviewCode(data.content, data.language, data.mode, data.reviewId);
 
         // Publish result back to review service
         const jobResult: ReviewJobResult = {

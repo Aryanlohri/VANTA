@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+import IORedis from 'ioredis';
 import { createLogger } from '@aicr/shared';
 import type { AIReviewResponse } from '@aicr/shared';
 import { buildReviewPrompt } from '../prompts/base';
@@ -11,6 +12,7 @@ import { RUST_HINTS } from '../prompts/rust';
 import { GENERAL_HINTS } from '../prompts/general';
 
 const logger = createLogger('ai-service:gemini');
+const redisPub = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 const LANGUAGE_HINTS: Record<string, string> = {
   javascript: JAVASCRIPT_HINTS,
@@ -82,7 +84,7 @@ const responseSchema: any = {
 };
 
 export const GeminiService = {
-  async reviewCode(code: string, language: string | null, mode?: string): Promise<AIReviewResponse> {
+  async reviewCode(code: string, language: string | null, mode?: string, reviewId?: string): Promise<AIReviewResponse> {
     const isMockMode = process.env.AI_MOCK_MODE === 'true';
 
     if (isMockMode) {
@@ -116,10 +118,18 @@ export const GeminiService = {
         },
       });
 
-      const result = await model.generateContent(prompt);
-      const resultText = result.response.text();
+      const resultStream = await model.generateContentStream(prompt);
+      
+      let fullText = '';
+      for await (const chunk of resultStream.stream) {
+        const chunkText = chunk.text();
+        fullText += chunkText;
+        if (reviewId) {
+          redisPub.publish(`review:${reviewId}:stream`, chunkText).catch((err: any) => logger.error({ err }, 'Failed to publish stream chunk'));
+        }
+      }
 
-      const parsed: AIReviewResponse = JSON.parse(resultText);
+      const parsed: AIReviewResponse = JSON.parse(fullText);
       
       // Data integrity: ensure score is an integer between 0-100
       parsed.overall_score = Math.max(0, Math.min(100, Math.floor(parsed.overall_score || 0)));
