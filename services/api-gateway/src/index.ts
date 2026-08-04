@@ -62,10 +62,7 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Rate limiting
-app.use(rateLimitMiddleware);
-
-// ---- Health Check ----
+// ---- Health Check (public, before auth) ----
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -77,6 +74,9 @@ app.get('/health', (_req, res) => {
 
 // ---- Auth Middleware ----
 app.use('/api', gatewayAuthMiddleware);
+
+// ---- Rate Limiting (after auth so x-user-role is available) ----
+app.use(rateLimitMiddleware);
 
 // ---- Service Routes ----
 app.use('/api', routes);

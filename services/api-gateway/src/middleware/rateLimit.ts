@@ -62,6 +62,18 @@ export async function rateLimitMiddleware(
   res: Response,
   next: NextFunction
 ) {
+  // SSE streaming connections are long-lived — exempt from rate limiting.
+  // They are already authenticated by the auth middleware; rate-limiting them
+  // causes EventSource to burn through limits on reconnects.
+  if (req.path.endsWith('/stream')) {
+    return next();
+  }
+
+  // Admins have no rate limit — they need unrestricted access for platform ops.
+  if (req.headers['x-user-role'] === 'admin') {
+    return next();
+  }
+
   const limiter = getLimiter(req);
   const key = (req as any).userId || req.ip || 'anonymous';
 
