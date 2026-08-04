@@ -93,20 +93,24 @@ export const ReviewController = {
       }
 
       // ── Subscription limit gate (atomic — prevents race conditions) ───────
-      const usageCheck = await checkAndIncrementUsage(userId);
+      // Admins are exempt — they have unrestricted review creation.
+      const userRole = req.headers['x-user-role'] as string;
+      if (userRole !== 'admin') {
+        const usageCheck = await checkAndIncrementUsage(userId);
 
-      if (!usageCheck.allowed) {
-        logger.warn(
-          { userId, used: usageCheck.used, limit: usageCheck.limit },
-          'Review creation rejected — subscription limit reached'
-        );
-        return res.status(429).json({
-          success: false,
-          error: {
-            code: 'USAGE_LIMIT_EXCEEDED',
-            message: `Quota exhausted. You have used ${usageCheck.used} of ${usageCheck.limit} reviews in this billing period.`,
-          },
-        });
+        if (!usageCheck.allowed) {
+          logger.warn(
+            { userId, used: usageCheck.used, limit: usageCheck.limit },
+            'Review creation rejected — subscription limit reached'
+          );
+          return res.status(429).json({
+            success: false,
+            error: {
+              code: 'USAGE_LIMIT_EXCEEDED',
+              message: `Quota exhausted. You have used ${usageCheck.used} of ${usageCheck.limit} reviews in this billing period.`,
+            },
+          });
+        }
       }
       // ─────────────────────────────────────────────────────────────────────
 
