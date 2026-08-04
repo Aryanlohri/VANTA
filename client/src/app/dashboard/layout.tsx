@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   LayoutDashboard, GitBranch, FileCode, Plus, LogOut,
-  ChevronRight, Shield
+  ChevronRight, Shield, Activity
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
   { href: '/dashboard/repositories', icon: GitBranch, label: 'Repositories' },
   { href: '/dashboard/reviews', icon: FileCode, label: 'Reviews' },
+  { href: '/dashboard/analytics', icon: Activity, label: 'Analytics' },
 ];
 
 const ADMIN_NAV_ITEM = { href: '/dashboard/admin', icon: Shield, label: 'Admin Panel' };
