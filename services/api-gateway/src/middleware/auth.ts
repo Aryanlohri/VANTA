@@ -92,12 +92,17 @@ export async function gatewayAuthMiddleware(
   }
 
   try {
+    let token: string | undefined;
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new AuthError('No token provided', ERROR_CODES.UNAUTHORIZED);
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else if (req.query.token && typeof req.query.token === 'string') {
+      token = req.query.token;
     }
 
-    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new AuthError('No token provided', ERROR_CODES.UNAUTHORIZED);
+    }
 
     // Verify token with auth service, presenting our internal secret
     // so the auth service knows this is a legitimate inter-service call.
