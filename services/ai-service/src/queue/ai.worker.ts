@@ -1,10 +1,12 @@
 import { Worker, Queue } from 'bullmq';
 import IORedis from 'ioredis';
+import { createHash } from 'crypto';
 import { QUEUE_NAMES, createLogger } from '@aicr/shared';
 import type { ReviewJobData, ReviewJobResult } from '@aicr/shared';
 import { GeminiService } from '../services/gemini.service';
 
 const logger = createLogger('ai-service:worker');
+const CACHE_TTL_SECONDS = 3600; // 1 hour
 
 let worker: Worker | null = null;
 let connection: IORedis | null = null;
@@ -25,6 +27,36 @@ export function startAIWorker() {
       logger.info({ jobId: job.id, reviewId: data.reviewId, file: data.filePath }, 'Processing AI review');
 
       try {
+        // ── Cache layer: hash content+language+mode to deduplicate reviews ──
+        const cacheKey = `review_cache:${createHash('sha256').update(`${data.content}|${data.language || ''}|${data.mode || 'standard'}`).digest('hex')}`;
+
+        const cached = await connection!.get(cacheKey);
+        if (cached) {
+          logger.info({ reviewId: data.reviewId, file: data.filePath }, 'Cache HIT — skipping Gemini call');
+          const result = JSON.parse(cached);
+
+          const jobResult: ReviewJobResult = {
+            reviewId: data.reviewId,
+            fileId: data.fileId,
+            result,
+          };
+
+          await resultsQueue!.add('review-result', jobResult, {
+            removeOnComplete: 100,
+            removeOnFail: 50,
+          });
+
+          logger.info({
+            jobId: job.id,
+            reviewId: data.reviewId,
+            score: result.overall_score,
+            issueCount: result.issues.length,
+          }, 'AI review completed (cached)');
+
+          return jobResult;
+        }
+
+        // ── Cache MISS — call Gemini ────────────────────────────────────────
         const result = await GeminiService.reviewCode(data.content, data.language, data.mode, data.reviewId);
 
         // Publish result back to review service
@@ -45,6 +77,11 @@ export function startAIWorker() {
           score: result.overall_score,
           issueCount: result.issues.length,
         }, 'AI review completed');
+
+        // Store in cache for future deduplication
+        await connection!.set(cacheKey, JSON.stringify(result), 'EX', CACHE_TTL_SECONDS).catch(
+          (err: any) => logger.warn({ err }, 'Failed to write review cache')
+        );
 
         return jobResult;
       } catch (error: any) {
