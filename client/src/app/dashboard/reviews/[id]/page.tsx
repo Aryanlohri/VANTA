@@ -6,10 +6,12 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import {
   ArrowLeft, FileCode, Shield, Bug, Zap, Palette, CheckCircle,
-  AlertTriangle, Info, ChevronDown, ChevronRight, Lightbulb, Loader2, GitPullRequest
+  AlertTriangle, Info, ChevronDown, ChevronRight, Lightbulb, Loader2, GitPullRequest,
+  Copy, Check, Download
 } from 'lucide-react';
 import { reviewApi } from '@/lib/api';
 import { useSocket } from '@/lib/socket';
+import { timeAgo } from '@/lib/timeAgo';
 
 // Dynamic import Monaco to avoid SSR issues
 const Editor = dynamic(() => import('@monaco-editor/react'), { ssr: false });
@@ -42,6 +44,7 @@ export default function ReviewDetailPage() {
 
   const { onEvent } = useSocket(reviewId);
   const [streamedRawText, setStreamedRawText] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Load review data
   const loadReview = useCallback(async () => {
@@ -108,6 +111,43 @@ export default function ReviewDetailPage() {
       setPostingToGithub(false);
     }
   };
+
+  function handleCopyCode(code: string, commentId: string) {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedId(commentId);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  }
+
+  function handleExportMarkdown() {
+    if (!review) return;
+    const allFiles = review.files || [];
+    let md = `# VANTA Code Review — ${review.title}\n\n`;
+    md += `**Score:** ${review.overall_score ?? 'N/A'}/100  \n`;
+    md += `**Status:** ${review.status}  \n`;
+    md += `**Date:** ${new Date(review.created_at).toLocaleString()}  \n`;
+    md += `**Files:** ${allFiles.length}  \n\n`;
+    if (review.summary) md += `## Summary\n\n${review.summary}\n\n`;
+    if (review.positives?.length > 0) {
+      md += `## Positives\n\n${review.positives.map((p: string) => `- ${p}`).join('\n')}\n\n`;
+    }
+    allFiles.forEach((file: any) => {
+      md += `---\n\n## ${file.file_path}\n\n`;
+      (file.comments || []).forEach((c: any) => {
+        md += `### [${c.severity.toUpperCase()}] ${c.type} — Line ${c.line_number}\n\n`;
+        md += `${c.message}\n\n`;
+        if (c.suggestion) md += `> **Suggestion:** ${c.suggestion}\n\n`;
+        if (c.improved_code) md += `\`\`\`\n${c.improved_code}\n\`\`\`\n\n`;
+      });
+    });
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VANTA-Review-${review.title.replace(/[^a-zA-Z0-9]/g, '_')}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   if (loading) {
     return (
@@ -176,11 +216,21 @@ export default function ReviewDetailPage() {
         <div>
           <h1 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{review.title}</h1>
           <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
-            {new Date(review.created_at).toLocaleString()} · {review.files?.length || 0} files
+            {timeAgo(review.created_at)} · {review.files?.length || 0} files
           </p>
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Download Report */}
+          {review.status === 'completed' && (
+            <button onClick={handleExportMarkdown}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
+              style={{ background: 'var(--color-bg-hover)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }}>
+              <Download size={16} />
+              <span className="text-sm font-medium">Download Report</span>
+            </button>
+          )}
+
           {/* Post to GitHub button for PRs */}
           {review.status === 'completed' && review.pull_request_number && (
             <button
@@ -424,10 +474,19 @@ export default function ReviewDetailPage() {
                           </div>
                         )}
                         {comment.improved_code && (
-                          <pre className="p-3 rounded-lg text-sm overflow-x-auto mt-2 shadow-inner"
-                            style={{ background: '#000000', color: '#4ade80', border: '1px solid #1f2937', fontFamily: 'var(--font-mono)' }}>
-                            {comment.improved_code}
-                          </pre>
+                          <div className="relative mt-2">
+                            <button
+                              onClick={() => handleCopyCode(comment.improved_code, comment.id)}
+                              className="absolute top-2 right-2 p-1.5 rounded-md transition-all z-10"
+                              style={{ background: 'rgba(255,255,255,0.08)', color: copiedId === comment.id ? '#4ade80' : '#9ca3af' }}
+                              title={copiedId === comment.id ? 'Copied!' : 'Copy code'}>
+                              {copiedId === comment.id ? <Check size={14} /> : <Copy size={14} />}
+                            </button>
+                            <pre className="p-3 rounded-lg text-sm overflow-x-auto shadow-inner"
+                              style={{ background: '#000000', color: '#4ade80', border: '1px solid #1f2937', fontFamily: 'var(--font-mono)' }}>
+                              {comment.improved_code}
+                            </pre>
+                          </div>
                         )}
                       </div>
                     )}
