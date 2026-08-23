@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FileCode, Plus, Clock, Trash2, Filter } from 'lucide-react';
+import { FileCode, Plus, Clock, Trash2, Search } from 'lucide-react';
 import { reviewApi } from '@/lib/api';
+import { timeAgo } from '@/lib/timeAgo';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#f59e0b', processing: '#3b82f6', completed: '#22c55e', failed: '#ef4444',
@@ -13,6 +14,7 @@ export default function ReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -25,7 +27,11 @@ export default function ReviewsPage() {
     load();
   }, []);
 
-  const filtered = filter === 'all' ? reviews : reviews.filter((r: any) => r.status === filter);
+  const filtered = reviews.filter((r: any) => {
+    const matchesStatus = filter === 'all' || r.status === filter;
+    const matchesSearch = !search || r.title.toLowerCase().includes(search.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
 
   async function deleteReview(id: string) {
     try {
@@ -52,19 +58,31 @@ export default function ReviewsPage() {
         </Link>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 mb-6">
-        {['all', 'pending', 'processing', 'completed', 'failed'].map((f) => (
-          <button key={f} onClick={() => setFilter(f)}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all"
-            style={{
-              background: filter === f ? 'var(--color-accent-glow)' : 'var(--color-bg-hover)',
-              color: filter === f ? 'var(--color-accent-start)' : 'var(--color-text-secondary)',
-              border: `1px solid ${filter === f ? 'rgba(99,102,241,0.3)' : 'var(--color-border)'}`,
-            }}>
-            {f}
-          </button>
-        ))}
+      {/* Search + Filters */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="relative flex-1 max-w-xs">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-text-muted)' }} />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search reviews..."
+            className="w-full pl-9 pr-3 py-1.5 rounded-lg text-xs outline-none transition-all"
+            style={{ background: 'var(--color-bg-hover)', color: 'var(--color-text-primary)', border: '1px solid var(--color-border)' }}
+          />
+        </div>
+        <div className="flex gap-2">
+          {['all', 'pending', 'processing', 'completed', 'failed'].map((f) => (
+            <button key={f} onClick={() => setFilter(f)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all"
+              style={{
+                background: filter === f ? 'var(--color-accent-glow)' : 'var(--color-bg-hover)',
+                color: filter === f ? 'var(--color-accent-start)' : 'var(--color-text-secondary)',
+                border: `1px solid ${filter === f ? 'rgba(99,102,241,0.3)' : 'var(--color-border)'}`,
+              }}>
+              {f}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Reviews list */}
@@ -93,7 +111,7 @@ export default function ReviewsPage() {
                 <p className="text-sm font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>{review.title}</p>
                 <div className="flex items-center gap-3 mt-1">
                   <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                    <Clock size={10} /> {new Date(review.created_at).toLocaleDateString()}
+                    <Clock size={10} /> {timeAgo(review.created_at)}
                   </span>
                   <span className="text-xs px-2 py-0.5 rounded-full capitalize"
                     style={{ background: `${STATUS_COLORS[review.status]}20`, color: STATUS_COLORS[review.status] }}>
