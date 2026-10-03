@@ -33,7 +33,10 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
   const { user, logout } = useAuthStore();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
   
+  const isExpanded = !collapsed || isHovered;
+
   // Close popover on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -67,196 +70,203 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
     <motion.aside
       initial={false}
       animate={{ 
-        width: collapsed ? 64 : 240,
+        width: isExpanded ? 240 : 64,
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setPopoverOpen(false); // Close popover when mouse leaves sidebar
       }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={cn(
-        "shrink-0 flex flex-col h-screen sticky top-0 z-40 overflow-visible",
+        "shrink-0 flex flex-col h-screen sticky top-0 z-40 overflow-hidden",
         "border-r border-[var(--color-border)]",
-        "bg-[#0a0a0a]" // One step off from the content background
+        "bg-[#0a0a0a]"
       )}
     >
-      {/* Header */}
-      <div className="h-14 flex items-center px-4 border-b border-[var(--color-border)] justify-between overflow-hidden">
-        <div className="flex items-center gap-3">
-          {/* Logo / Wordmark */}
-          <Link href="/dashboard" className="flex items-center justify-center shrink-0 w-8 h-8">
-            {collapsed ? (
-              <span className="text-sm font-bold text-[#e8e8e8]">V</span>
-            ) : (
+      {/* Header Container (Fixed width to prevent squishing during animation) */}
+      <div className="w-[240px] flex flex-col flex-1">
+        {/* Header */}
+        <div className="h-14 flex items-center px-4 border-b border-[var(--color-border)] justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className={cn("flex items-center shrink-0 h-8", !isExpanded ? "justify-center w-8" : "justify-start")}>
+              {!isExpanded ? (
+                <span className="text-sm font-bold text-[#e8e8e8]">V</span>
+              ) : (
+                <motion.span
+                  initial={{ opacity: 0, x: -4 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -4 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-sm tracking-[0.3em] font-light text-[#898989]"
+                >
+                  VANTA
+                </motion.span>
+              )}
+            </Link>
+          </div>
+          
+          <button
+            onClick={toggleSidebar}
+            aria-label="Toggle Sidebar"
+            aria-expanded={isExpanded}
+            className="p-1.5 rounded-md hover:bg-white/5 transition-colors hidden md:block text-[#616161] hover:text-[#898989] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent-start)]"
+          >
+            <Menu size={16} strokeWidth={1.5} />
+          </button>
+        </div>
+
+        {/* New Review Button */}
+        <div className="p-3 shrink-0">
+          <Link href="/dashboard/reviews/new"
+            className={cn(
+              "btn-metal flex items-center justify-center rounded-lg text-xs font-medium tracking-wider uppercase transition-all overflow-hidden",
+              !isExpanded ? "w-10 h-10 p-0 mx-auto" : "w-full h-10 gap-2 px-4"
+            )}>
+            <Plus size={16} strokeWidth={1.5} className="shrink-0" />
+            {isExpanded && (
               <motion.span
-                initial={{ opacity: 0, x: -4 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -4 }}
-                transition={{ delay: 0.1 }}
-                className="text-sm tracking-[0.3em] font-light text-[#898989]"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="whitespace-nowrap"
               >
-                VANTA
+                New Review
               </motion.span>
             )}
           </Link>
         </div>
-        
-        <button
-          onClick={toggleSidebar}
-          aria-label="Toggle Sidebar"
-          aria-expanded={!collapsed}
-          className="p-1.5 rounded-md hover:bg-white/5 transition-colors hidden md:block text-[#616161] hover:text-[#898989] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent-start)]"
-        >
-          <Menu size={16} strokeWidth={1.5} />
-        </button>
-      </div>
 
-      {/* New Review Button */}
-      <div className="p-3">
-        <Link href="/dashboard/reviews/new"
-          className={cn(
-            "btn-metal flex items-center justify-center rounded-lg text-xs font-medium tracking-wider uppercase transition-all overflow-hidden",
-            collapsed ? "w-10 h-10 p-0 mx-auto" : "w-full h-10 gap-2 px-4"
-          )}>
-          <Plus size={16} strokeWidth={1.5} className="shrink-0" />
-          {!collapsed && (
-            <motion.span
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: 'auto' }}
-              exit={{ opacity: 0, width: 0 }}
-              className="whitespace-nowrap"
-            >
-              New Review
-            </motion.span>
-          )}
-        </Link>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-2 space-y-1 overflow-x-hidden flex flex-col">
-        {allNavItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
-          const isAdminItem = item.href === '/dashboard/admin';
-          
-          return (
-            <div key={item.href} className={cn("relative group", isAdminItem && "mt-auto pt-2 border-t border-[var(--color-border)]")}>
-              <Link href={item.href}
-                className={cn(
-                  "flex items-center rounded-lg text-[13px] tracking-wide transition-all duration-300 relative z-10",
-                  collapsed ? "justify-center h-10 w-10 mx-auto" : "px-4 h-10 gap-3 w-full",
-                  isActive ? (isAdminItem ? "text-[#4ade80]" : "text-[#e8e8e8]") : "text-[#616161] hover:text-[#898989]",
-                )}>
-                <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} className="shrink-0 relative z-10" />
-                
-                {!collapsed && (
-                  <motion.span 
-                    initial={{ opacity: 0, x: -4 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 }}
-                    className="whitespace-nowrap relative z-10 font-medium"
-                  >
-                    {item.label}
-                  </motion.span>
-                )}
-                
-                {/* Active Layout ID Pill */}
-                {isActive && (
-                  <motion.div
-                    layoutId="active-nav-pill"
-                    className={cn(
-                      "absolute inset-0 rounded-lg",
-                      isAdminItem ? "bg-[#4ade80]/10" : "bg-white/5"
-                    )}
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  />
-                )}
-                
-                {/* Active left border indicator */}
-                {isActive && !collapsed && (
-                  <motion.div
-                    layoutId="active-nav-indicator"
-                    className={cn(
-                      "absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-r-full",
-                      isAdminItem ? "bg-[#4ade80]" : "bg-[#898989]"
-                    )}
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  />
-                )}
-              </Link>
-              
-              {/* Tooltip for collapsed state */}
-              {collapsed && (
-                <div className="absolute left-14 top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1.5 bg-black border border-[var(--color-border)] rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 flex items-center gap-2 whitespace-nowrap shadow-xl">
-                  <span className="text-[10px] tracking-widest uppercase text-[#e8e8e8] font-medium">{item.label}</span>
-                  {item.label === 'Overview' && (
-                    <span className="text-[9px] text-[#616161] bg-white/5 px-1 py-0.5 rounded leading-none border border-white/5">⌘B</span>
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-2 space-y-1 overflow-x-hidden flex flex-col">
+          {allNavItems.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            const isAdminItem = item.href === '/dashboard/admin';
+            
+            return (
+              <div key={item.href} className={cn("relative group", isAdminItem && "mt-auto pt-2 border-t border-[var(--color-border)]")}>
+                <Link href={item.href}
+                  className={cn(
+                    "flex items-center rounded-lg text-[13px] tracking-wide transition-all duration-300 relative z-10",
+                    !isExpanded ? "justify-center h-10 w-10 mx-auto" : "px-4 h-10 gap-3 w-full",
+                    isActive ? (isAdminItem ? "text-[#4ade80]" : "text-[#e8e8e8]") : "text-[#616161] hover:text-[#898989]",
+                  )}>
+                  <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} className="shrink-0 relative z-10" />
+                  
+                  {isExpanded && (
+                    <motion.span 
+                      initial={{ opacity: 0, x: -4 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 }}
+                      className="whitespace-nowrap relative z-10 font-medium"
+                    >
+                      {item.label}
+                    </motion.span>
                   )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
-
-      {/* User Footer */}
-      <div className="relative border-t border-[var(--color-border)] p-3" ref={popoverRef}>
-        <button 
-          onClick={() => setPopoverOpen(!popoverOpen)}
-          className={cn(
-            "flex items-center gap-3 w-full rounded-lg transition-colors hover:bg-white/5",
-            collapsed ? "justify-center p-1" : "p-2 text-left"
-          )}
-          aria-expanded={popoverOpen}
-          aria-label="User menu"
-        >
-          {user?.avatar_url ? (
-            <img src={user.avatar_url} alt={user.username} className="w-8 h-8 rounded-full opacity-90 shrink-0" />
-          ) : (
-            <div className="w-8 h-8 rounded-full shrink-0 bg-[#1a1a1a] flex items-center justify-center text-xs text-[#898989]">
-              {user?.username?.charAt(0).toUpperCase()}
-            </div>
-          )}
-          
-          {!collapsed && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex-1 min-w-0 flex flex-col"
-            >
-              <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || user?.username}</p>
-              <p className="text-[11px] truncate text-[#616161]">{user?.email || 'No email'}</p>
-            </motion.div>
-          )}
-        </button>
-
-        {/* Popover */}
-        <AnimatePresence>
-          {popoverOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className={cn(
-                "absolute bottom-full mb-2 bg-[#0a0a0a] border border-[var(--color-border)] rounded-xl shadow-2xl py-1 z-50",
-                collapsed ? "left-3 w-48" : "left-3 right-3"
-              )}
-            >
-              <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1">
-                <p className="text-xs font-medium text-[#e8e8e8] truncate">{(user as any)?.display_name || user?.username}</p>
-                <p className="text-[10px] text-[#616161] truncate">{user?.email}</p>
+                  
+                  {/* Active Layout ID Pill */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className={cn(
+                        "absolute inset-0 rounded-lg",
+                        isAdminItem ? "bg-[#4ade80]/10" : "bg-white/5"
+                      )}
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  
+                  {/* Active left border indicator */}
+                  {isActive && isExpanded && (
+                    <motion.div
+                      layoutId="active-nav-indicator"
+                      className={cn(
+                        "absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-r-full",
+                        isAdminItem ? "bg-[#4ade80]" : "bg-[#898989]"
+                      )}
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </Link>
+                
+                {/* Tooltip for collapsed state */}
+                {!isExpanded && (
+                  <div className="absolute left-14 top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1.5 bg-black border border-[var(--color-border)] rounded-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50 flex items-center gap-2 whitespace-nowrap shadow-xl">
+                    <span className="text-[10px] tracking-widest uppercase text-[#e8e8e8] font-medium">{item.label}</span>
+                    {item.label === 'Overview' && (
+                      <span className="text-[9px] text-[#616161] bg-white/5 px-1 py-0.5 rounded leading-none border border-white/5">⌘B</span>
+                    )}
+                  </div>
+                )}
               </div>
-              <button className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2">
-                <Settings size={14} /> Settings
-              </button>
-              <button className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2">
-                <User size={14} /> Profile
-              </button>
-              <button 
-                onClick={logout}
-                className="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors flex items-center gap-2 mt-1 border-t border-[var(--color-border)] pt-2"
+            );
+          })}
+        </nav>
+
+        {/* User Footer */}
+        <div className="relative border-t border-[var(--color-border)] p-3 shrink-0" ref={popoverRef}>
+          <button 
+            onClick={() => setPopoverOpen(!popoverOpen)}
+            className={cn(
+              "flex items-center gap-3 w-full rounded-lg transition-colors hover:bg-white/5",
+              !isExpanded ? "justify-center p-1" : "p-2 text-left"
+            )}
+            aria-expanded={popoverOpen}
+            aria-label="User menu"
+          >
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt={user.username} className="w-8 h-8 rounded-full opacity-90 shrink-0" />
+            ) : (
+              <div className="w-8 h-8 rounded-full shrink-0 bg-[#1a1a1a] flex items-center justify-center text-xs text-[#898989]">
+                {user?.username?.charAt(0).toUpperCase()}
+              </div>
+            )}
+            
+            {isExpanded && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex-1 min-w-0 flex flex-col"
               >
-                <LogOut size={14} /> Sign Out
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || user?.username}</p>
+                <p className="text-[11px] truncate text-[#616161]">{user?.email || 'No email'}</p>
+              </motion.div>
+            )}
+          </button>
+
+          {/* Popover */}
+          <AnimatePresence>
+            {popoverOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className={cn(
+                  "absolute bottom-full mb-2 bg-[#0a0a0a] border border-[var(--color-border)] rounded-xl shadow-2xl py-1 z-50",
+                  !isExpanded ? "left-3 w-48" : "left-3 right-3"
+                )}
+              >
+                <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1">
+                  <p className="text-xs font-medium text-[#e8e8e8] truncate">{(user as any)?.display_name || user?.username}</p>
+                  <p className="text-[10px] text-[#616161] truncate">{user?.email}</p>
+                </div>
+                <button className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2">
+                  <Settings size={14} /> Settings
+                </button>
+                <button className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2">
+                  <User size={14} /> Profile
+                </button>
+                <button 
+                  onClick={logout}
+                  className="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors flex items-center gap-2 mt-1 border-t border-[var(--color-border)] pt-2"
+                >
+                  <LogOut size={14} /> Sign Out
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </motion.aside>
   );
