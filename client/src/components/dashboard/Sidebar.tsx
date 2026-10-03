@@ -28,6 +28,8 @@ interface SidebarProps {
   setMobileOpen: (o: boolean) => void;
 }
 
+import { VantaLogo } from '@/components/ui/VantaLogo';
+
 export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
@@ -84,40 +86,14 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
         "bg-[#0a0a0a]"
       )}
     >
-      <style>{`
-        @keyframes powerup {
-          0% { background-position: 50% 200%; }
-          100% { background-position: 50% -100%; }
-        }
-        .animate-powerup {
-          background: linear-gradient(to top, #494949 0%, #ffffff 30%, #494949 60%);
-          background-size: 100% 300%;
-          -webkit-background-clip: text;
-          color: transparent;
-          animation: powerup 3s ease-in-out infinite;
-        }
-      `}</style>
-
       {/* Header Container (Fixed width to prevent squishing during animation) */}
       <div className="w-[240px] flex flex-col flex-1">
         {/* Header */}
         <div className="h-14 flex items-center px-4 border-b border-[var(--color-border)] justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className={cn("flex items-center shrink-0 h-8", !isExpanded ? "w-8 justify-center" : "justify-start")}>
-              {!isExpanded ? (
-                <span className="text-[16px] font-bold animate-powerup">V</span>
-              ) : (
-                <motion.span
-                  initial={{ opacity: 0, x: -4 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -4 }}
-                  transition={{ delay: 0.1 }}
-                  className="text-sm tracking-[0.3em] font-light text-[#898989]"
-                >
-                  VANTA
-                </motion.span>
-              )}
-            </Link>
+            <div className={cn("flex items-center shrink-0 h-8", !isExpanded ? "w-8 justify-center" : "justify-start")}>
+              <VantaLogo collapsed={!isExpanded} />
+            </div>
           </div>
           
           <button
