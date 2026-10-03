@@ -11,6 +11,8 @@ import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
 import { CountUp } from '@/components/dashboard/CountUp';
 import { Sparkline } from '@/components/dashboard/Sparkline';
+import { useLiveReviews, useReviewProgress } from '@/components/dashboard/useLiveReviews';
+import { cn } from '@/lib/utils';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#f59e0b',
@@ -22,9 +24,11 @@ const STATUS_COLORS: Record<string, string> = {
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const [repos, setRepos] = useState<any[]>([]);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [initialReviews, setInitialReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [cmdOpen, setCmdOpen] = useState(false);
+
+  const reviews = useLiveReviews(initialReviews);
 
   useEffect(() => {
     async function loadData() {
@@ -34,7 +38,7 @@ export default function DashboardPage() {
           reviewApi.list().catch(() => ({ data: { data: [] } })),
         ]);
         setRepos(repoRes.data.data || []);
-        setReviews(reviewRes.data.data || []);
+        setInitialReviews(reviewRes.data.data || []);
       } catch {
         // Services may not be running yet
       }
@@ -223,8 +227,8 @@ export default function DashboardPage() {
                       {review.status === 'completed' && typeof review.overall_score === 'number' ? (
                         <ScoreRing score={review.overall_score} size={36} strokeWidth={2.5} />
                       ) : (
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border border-[var(--color-border)]">
-                          <div className="w-2 h-2 rounded-full shrink-0" style={{ background: STATUS_COLORS[review.status] || '#888' }} />
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border border-[var(--color-border)] relative">
+                          <div className={cn("w-2 h-2 rounded-full shrink-0", review.status === 'processing' ? 'animate-pulse' : '')} style={{ background: STATUS_COLORS[review.status] || '#888' }} />
                         </div>
                       )}
 
@@ -236,7 +240,6 @@ export default function DashboardPage() {
                           <Clock size={10} />
                           {new Date(review.created_at).toLocaleDateString()}
                           
-                          {/* Optional PR branch or commit ref could go here */}
                           {review.commit_sha && (
                             <>
                               <span>•</span>
@@ -248,7 +251,6 @@ export default function DashboardPage() {
                       
                       {isFailed ? (
                         <div className="flex items-center gap-3">
-                          {/* Tooltip for error */}
                           <div className="group relative flex items-center">
                             <span className="text-[11px] px-2 py-0.5 rounded-full capitalize bg-[#ef4444]/10 text-[#ef4444] cursor-help">
                               {review.status}
@@ -260,8 +262,6 @@ export default function DashboardPage() {
                           
                           <button 
                             onClick={() => {
-                              // TODO: Implement actual retry endpoint in backend.
-                              // Stubbed retry action.
                               console.log('Retry review:', review.id);
                             }}
                             className="text-[11px] font-medium tracking-wider uppercase px-3 py-1.5 rounded border border-[var(--color-border)] text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors opacity-0 group-hover:opacity-100"
@@ -269,6 +269,8 @@ export default function DashboardPage() {
                             Retry
                           </button>
                         </div>
+                      ) : review.status === 'processing' ? (
+                        <ProgressStage review={review} />
                       ) : (
                         <span className="text-[11px] px-2 py-0.5 rounded-full capitalize"
                           style={{ background: `${STATUS_COLORS[review.status]}15`, color: STATUS_COLORS[review.status] }}>
@@ -280,7 +282,7 @@ export default function DashboardPage() {
                 );
               })}
               
-              {reviews.length > 5 && (
+              {initialReviews.length > 5 && (
                 <div className="pt-4 text-center">
                   <Link href="/dashboard/reviews" className="text-[12px] text-[#898989] hover:text-[#e8e8e8] transition-colors">
                     View all reviews ›
@@ -292,5 +294,23 @@ export default function DashboardPage() {
         </div>
       </div>
     </>
+  );
+}
+
+function ProgressStage({ review }: { review: any }) {
+  const progress = useReviewProgress(review);
+  
+  return (
+    <div className="flex flex-col items-end gap-1 w-24">
+      <span className="text-[10px] uppercase tracking-wider text-[#3b82f6] font-medium animate-pulse">
+        {progress.stage}
+      </span>
+      <div className="w-full h-0.5 bg-[#333333] rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-[#3b82f6] transition-all duration-1000 ease-linear rounded-full"
+          style={{ width: `${progress.percent}%` }}
+        />
+      </div>
+    </div>
   );
 }
