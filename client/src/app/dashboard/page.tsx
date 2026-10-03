@@ -7,6 +7,8 @@ import { repoApi, reviewApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 
 import { CommandPalette } from '@/components/dashboard/CommandPalette';
+import { GlowCard } from '@/components/dashboard/GlowCard';
+import { ScoreRing } from '@/components/dashboard/ScoreRing';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#f59e0b',
@@ -123,48 +125,44 @@ export default function DashboardPage() {
 
           {loading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 w-full" />)}
+              {[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 w-full rounded-xl" />)}
             </div>
           ) : reviews.length === 0 ? (
             <div className="text-center py-12 px-6">
-              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: 'var(--color-bg-hover)', border: '1px solid var(--color-border)' }}>
-                <FileCode size={28} style={{ color: 'var(--color-text-primary)' }} />
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center border border-[var(--color-border)] bg-white/5">
+                <FileCode size={28} className="text-[#898989]" />
               </div>
-              <h4 className="text-lg font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Welcome to VANTA</h4>
-              <p className="text-sm mb-8 max-w-sm mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
+              <h4 className="text-lg font-bold mb-2 text-[#e8e8e8]">Welcome to VANTA</h4>
+              <p className="text-sm mb-8 max-w-sm mx-auto text-[#616161]">
                 You're just a few clicks away from AI-powered code reviews. Follow these steps to get started.
               </p>
               
               <div className="text-left space-y-3 max-w-sm mx-auto">
-                <div className="flex items-center gap-3 p-3 rounded-lg border" style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-input)' }}>
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: '#22c55e20', color: '#22c55e' }}>✓</div>
-                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Create an account</span>
+                <div className="flex items-center gap-3 p-3 rounded-lg border border-[var(--color-border)] bg-[#0a0a0a]">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-[#22c55e]/20 text-[#22c55e]">✓</div>
+                  <span className="text-sm font-medium text-[#e8e8e8]">Create an account</span>
                 </div>
                 
-                <div className="flex items-center gap-3 p-3 rounded-lg border transition-all" style={{ borderColor: repos.length === 0 ? 'var(--color-accent-start)' : 'var(--color-border)', background: repos.length === 0 ? 'var(--color-accent-glow)' : 'var(--color-bg-input)' }}>
+                <div className="flex items-center gap-3 p-3 rounded-lg border transition-all border-[var(--color-border)] bg-[#0a0a0a]">
                   {repos.length === 0 ? (
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: 'var(--color-accent-start)', color: 'white' }}>2</div>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold bg-[#898989] text-white">2</div>
                   ) : (
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: '#22c55e20', color: '#22c55e' }}>✓</div>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-[#22c55e]/20 text-[#22c55e]">✓</div>
                   )}
                   <div className="flex-1">
-                    <span className="text-sm font-medium block" style={{ color: 'var(--color-text-primary)' }}>Connect a Repository</span>
+                    <span className="text-sm font-medium block text-[#e8e8e8]">Connect a Repository</span>
                     {repos.length === 0 && (
-                      <Link href="/dashboard/repositories" className="text-xs hover:underline mt-0.5 inline-block" style={{ color: 'var(--color-accent-start)' }}>Go to repositories ›</Link>
+                      <Link href="/dashboard/repositories" className="text-xs hover:underline mt-0.5 inline-block text-[#898989]">Go to repositories ›</Link>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-lg border transition-all" style={{ borderColor: repos.length > 0 ? 'var(--color-accent-start)' : 'var(--color-border)', background: repos.length > 0 ? 'var(--color-accent-glow)' : 'transparent', opacity: repos.length > 0 ? 1 : 0.6 }}>
-                  <div className="w-6 h-6 rounded-full border flex items-center justify-center shrink-0 text-xs font-bold" style={{ 
-                    borderColor: repos.length > 0 ? 'transparent' : 'var(--color-text-muted)', 
-                    color: repos.length > 0 ? 'white' : 'var(--color-text-muted)',
-                    background: repos.length > 0 ? 'var(--color-accent-start)' : 'transparent'
-                  }}>3</div>
+                <div className="flex items-center gap-3 p-3 rounded-lg border transition-all" style={{ borderColor: repos.length > 0 ? 'var(--color-border)' : 'var(--color-border)', background: repos.length > 0 ? 'rgba(255,255,255,0.02)' : 'transparent', opacity: repos.length > 0 ? 1 : 0.6 }}>
+                  <div className="w-6 h-6 rounded-full border border-[#494949] flex items-center justify-center shrink-0 text-xs font-bold text-[#898989]">3</div>
                   <div className="flex-1">
                     <span className="text-sm font-medium block" style={{ color: repos.length > 0 ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>Run your first review</span>
                     {repos.length > 0 && (
-                      <Link href="/dashboard/reviews/new" className="text-xs hover:underline mt-0.5 inline-block" style={{ color: 'var(--color-accent-start)' }}>Start a new review ›</Link>
+                      <Link href="/dashboard/reviews/new" className="text-xs hover:underline mt-0.5 inline-block text-[#898989]">Start a new review ›</Link>
                     )}
                   </div>
                 </div>
@@ -172,37 +170,92 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {reviews.slice(0, 5).map((review: any) => (
-                <Link key={review.id} href={`/dashboard/reviews/${review.id}`}
-                  className="flex items-center gap-4 py-3 px-3 -mx-3 rounded-lg transition-all duration-200 hover:bg-[var(--color-bg-hover)]">
-                  <div className="w-2 h-2 rounded-full shrink-0" style={{ background: review.status === 'completed' ? '#22c55e' : STATUS_COLORS[review.status] || '#888' }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{review.title}</p>
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                      <Clock size={10} />
-                      {new Date(review.created_at).toLocaleDateString()}
+              {reviews.slice(0, 5).map((review: any) => {
+                // Title fallback
+                let displayTitle = review.title;
+                if (!displayTitle || !isNaN(Number(displayTitle))) {
+                  const repo = repos.find(r => r.id === review.repo_id);
+                  const repoName = repo ? repo.name : 'Unknown Repo';
+                  const shortCommit = review.commit_sha ? review.commit_sha.substring(0, 7) : new Date(review.created_at).toLocaleDateString();
+                  displayTitle = `${repoName} · ${shortCommit}`;
+                }
+
+                const isFailed = review.status === 'failed';
+
+                return (
+                  <GlowCard key={review.id} className={isFailed ? "border-l-2 border-l-[#ef4444]/50" : ""}>
+                    <div className="flex items-center gap-4 p-4">
+                      {review.status === 'completed' && typeof review.overall_score === 'number' ? (
+                        <ScoreRing score={review.overall_score} size={36} strokeWidth={2.5} />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border border-[var(--color-border)]">
+                          <div className="w-2 h-2 rounded-full shrink-0" style={{ background: STATUS_COLORS[review.status] || '#888' }} />
+                        </div>
+                      )}
+
+                      <div className="flex-1 min-w-0">
+                        <Link href={`/dashboard/reviews/${review.id}`} className="hover:underline">
+                          <p className="text-sm font-medium truncate text-[#e8e8e8]">{displayTitle}</p>
+                        </Link>
+                        <div className="flex items-center gap-2 text-[11px] text-[#616161] mt-1">
+                          <Clock size={10} />
+                          {new Date(review.created_at).toLocaleDateString()}
+                          
+                          {/* Optional PR branch or commit ref could go here */}
+                          {review.commit_sha && (
+                            <>
+                              <span>•</span>
+                              <span className="font-mono">{review.commit_sha.substring(0, 7)}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {isFailed ? (
+                        <div className="flex items-center gap-3">
+                          {/* Tooltip for error */}
+                          <div className="group relative flex items-center">
+                            <span className="text-[11px] px-2 py-0.5 rounded-full capitalize bg-[#ef4444]/10 text-[#ef4444] cursor-help">
+                              {review.status}
+                            </span>
+                            <div className="absolute right-full mr-2 px-2 py-1 bg-black border border-[var(--color-border)] rounded text-[10px] text-white opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-xl z-50">
+                              {review.error_message || 'Internal analysis error'}
+                            </div>
+                          </div>
+                          
+                          <button 
+                            onClick={() => {
+                              // TODO: Implement actual retry endpoint in backend.
+                              // Stubbed retry action.
+                              console.log('Retry review:', review.id);
+                            }}
+                            className="text-[11px] font-medium tracking-wider uppercase px-3 py-1.5 rounded border border-[var(--color-border)] text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors opacity-0 group-hover:opacity-100"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[11px] px-2 py-0.5 rounded-full capitalize"
+                          style={{ background: `${STATUS_COLORS[review.status]}15`, color: STATUS_COLORS[review.status] }}>
+                          {review.status}
+                        </span>
+                      )}
                     </div>
-                  </div>
-                  {review.overall_score && (
-                    <span className="text-sm font-bold" style={{
-                      color: review.overall_score >= 80 ? '#22c55e' : review.overall_score >= 60 ? '#f59e0b' : '#ef4444'
-                    }}>
-                      {review.overall_score}/100
-                    </span>
-                  )}
-                  <span className="text-xs px-2 py-0.5 rounded-full capitalize"
-                    style={{ background: `${STATUS_COLORS[review.status]}20`, color: STATUS_COLORS[review.status] }}>
-                    {review.status}
-                  </span>
-                </Link>
-              ))}
-              <div className="pt-3 text-center">
-                <p className="text-[12px]" style={{ color: 'var(--color-text-muted)' }}>No other reviews yet — start a new one above.</p>
-              </div>
+                  </GlowCard>
+                );
+              })}
+              
+              {reviews.length > 5 && (
+                <div className="pt-4 text-center">
+                  <Link href="/dashboard/reviews" className="text-[12px] text-[#898989] hover:text-[#e8e8e8] transition-colors">
+                    View all reviews ›
+                  </Link>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
