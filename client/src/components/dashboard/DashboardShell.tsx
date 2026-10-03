@@ -63,7 +63,7 @@ export function DashboardShell({ children, defaultCollapsed }: DashboardShellPro
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen flex font-sans bg-[#050505] text-[#e8e8e8] relative overflow-hidden">
+      <div className="h-screen flex font-sans bg-[#050505] text-[#e8e8e8] relative overflow-hidden">
         <GrainOverlay />
         <Sidebar 
           collapsed={collapsed} 

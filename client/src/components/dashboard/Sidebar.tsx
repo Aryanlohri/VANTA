@@ -84,14 +84,28 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
         "bg-[#0a0a0a]"
       )}
     >
+      <style>{`
+        @keyframes powerup {
+          0% { background-position: 50% 200%; }
+          100% { background-position: 50% -100%; }
+        }
+        .animate-powerup {
+          background: linear-gradient(to top, #494949 0%, #ffffff 30%, #494949 60%);
+          background-size: 100% 300%;
+          -webkit-background-clip: text;
+          color: transparent;
+          animation: powerup 3s ease-in-out infinite;
+        }
+      `}</style>
+
       {/* Header Container (Fixed width to prevent squishing during animation) */}
       <div className="w-[240px] flex flex-col flex-1">
         {/* Header */}
         <div className="h-14 flex items-center px-4 border-b border-[var(--color-border)] justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <Link href="/dashboard" className={cn("flex items-center shrink-0 h-8", !isExpanded ? "justify-center w-8" : "justify-start")}>
+            <Link href="/dashboard" className={cn("flex items-center shrink-0 h-8", !isExpanded ? "w-8 justify-center" : "justify-start")}>
               {!isExpanded ? (
-                <span className="text-sm font-bold text-[#e8e8e8]">V</span>
+                <span className="text-[16px] font-bold animate-powerup">V</span>
               ) : (
                 <motion.span
                   initial={{ opacity: 0, x: -4 }}
@@ -121,7 +135,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
           <Link href="/dashboard/reviews/new"
             className={cn(
               "btn-metal flex items-center justify-center rounded-lg text-xs font-medium tracking-wider uppercase transition-all overflow-hidden",
-              !isExpanded ? "w-10 h-10 p-0 mx-auto" : "w-full h-10 gap-2 px-4"
+              !isExpanded ? "w-10 h-10 p-0" : "w-full h-10 gap-2 px-4"
             )}>
             <Plus size={16} strokeWidth={1.5} className="shrink-0" />
             {isExpanded && (
@@ -148,7 +162,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                 <Link href={item.href}
                   className={cn(
                     "flex items-center rounded-lg text-[13px] tracking-wide transition-all duration-300 relative z-10",
-                    !isExpanded ? "justify-center h-10 w-10 mx-auto" : "px-4 h-10 gap-3 w-full",
+                    !isExpanded ? "justify-center h-10 w-10" : "px-4 h-10 gap-3 w-full",
                     isActive ? (isAdminItem ? "text-[#4ade80]" : "text-[#e8e8e8]") : "text-[#616161] hover:text-[#898989]",
                   )}>
                   <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} className="shrink-0 relative z-10" />
@@ -170,6 +184,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                       layoutId="active-nav-pill"
                       className={cn(
                         "absolute inset-0 rounded-lg",
+                        !isExpanded && "w-10",
                         isAdminItem ? "bg-[#4ade80]/10" : "bg-white/5"
                       )}
                       transition={{ type: "spring", stiffness: 350, damping: 30 }}
@@ -208,8 +223,8 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
           <button 
             onClick={() => setPopoverOpen(!popoverOpen)}
             className={cn(
-              "flex items-center gap-3 w-full rounded-lg transition-colors hover:bg-white/5",
-              !isExpanded ? "justify-center p-1" : "p-2 text-left"
+              "flex items-center gap-3 rounded-lg transition-colors hover:bg-white/5",
+              !isExpanded ? "justify-center p-1 w-10" : "p-2 text-left w-full"
             )}
             aria-expanded={popoverOpen}
             aria-label="User menu"
