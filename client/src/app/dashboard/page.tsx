@@ -9,6 +9,8 @@ import { useAuthStore } from '@/lib/auth';
 import { CommandPalette } from '@/components/dashboard/CommandPalette';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
+import { CountUp } from '@/components/dashboard/CountUp';
+import { Sparkline } from '@/components/dashboard/Sparkline';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#f59e0b',
@@ -41,13 +43,17 @@ export default function DashboardPage() {
     loadData();
   }, []);
 
+  const avgScore = reviews.length > 0
+    ? Math.round(reviews.filter((r: any) => r.overall_score).reduce((a: number, r: any) => a + r.overall_score, 0) / (reviews.filter((r: any) => r.overall_score).length || 1))
+    : null;
+    
+  const thisWeekCount = reviews.filter((r: any) => new Date(r.created_at) > new Date(Date.now() - 7 * 86400000)).length;
+
   const stats = [
-    { icon: GitBranch, label: 'Connected Repos', value: repos.length, color: '#6366f1' },
-    { icon: FileCode, label: 'Total Reviews', value: reviews.length, color: '#22c55e' },
-    { icon: BarChart3, label: 'Avg Score', value: reviews.length > 0
-      ? Math.round(reviews.filter((r: any) => r.overall_score).reduce((a: number, r: any) => a + r.overall_score, 0) / reviews.filter((r: any) => r.overall_score).length) || '—'
-      : '—', color: '#f59e0b' },
-    { icon: TrendingUp, label: 'This Week', value: reviews.filter((r: any) => new Date(r.created_at) > new Date(Date.now() - 7 * 86400000)).length, color: '#ec4899' },
+    { id: 'repos', icon: GitBranch, label: 'Connected Repos', value: repos.length, color: '#6366f1', delta: '+1' },
+    { id: 'reviews', icon: FileCode, label: 'Total Reviews', value: reviews.length, color: '#22c55e', delta: '+12%' },
+    { id: 'score', icon: BarChart3, label: 'Avg Score', value: avgScore, color: '#f59e0b', delta: '+2.4' },
+    { id: 'week', icon: TrendingUp, label: 'This Week', value: thisWeekCount, color: '#ec4899', delta: null },
   ];
 
   const displayName = user?.display_name || user?.username || 'Developer';
@@ -96,19 +102,48 @@ export default function DashboardPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-[12px] mb-8 stagger">
-          {stats.map((stat) => (
-            <div key={stat.label} className="glass-card p-5 transition-all duration-200 hover:border-[var(--color-border-hover)]">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-[32px] h-[32px] rounded-[8px] flex items-center justify-center"
-                  style={{ background: 'var(--color-bg-hover)', color: stat.color }}>
-                  <stat.icon size={18} />
+          {stats.map((stat, i) => (
+            <GlowCard key={stat.label} className="p-5" glowOpacity={0.06}>
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 text-[#898989]">
+                  <stat.icon size={16} />
+                </div>
+                {/* Sparkline (stubbed with mock data since backend doesn't provide time-series yet) */}
+                <div className="mt-1">
+                  <Sparkline color={stat.color} />
                 </div>
               </div>
-              <p className="text-[28px] font-bold mb-0.5 tabular-nums" style={{ color: 'var(--color-text-primary)' }}>
-                {loading ? <span className="skeleton inline-block w-12 h-7" /> : stat.value}
-              </p>
-              <p className="text-[11px] uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>{stat.label}</p>
-            </div>
+              
+              <div className="flex items-baseline gap-2 mb-0.5">
+                <div className="text-2xl font-bold tabular-nums text-[#e8e8e8] min-h-[32px]">
+                  {loading ? (
+                    <span className="skeleton inline-block w-12 h-7 rounded-md" />
+                  ) : stat.value === null ? (
+                    <span className="text-[#616161] font-medium text-xl">—</span>
+                  ) : stat.id === 'week' && stat.value === 0 ? (
+                    <span className="text-[#616161]">0</span>
+                  ) : (
+                    <CountUp value={stat.value as number} duration={0.6 + i * 0.1} />
+                  )}
+                </div>
+                {/* Delta stub */}
+                {!loading && stat.delta && stat.value !== 0 && stat.value !== null && (
+                  <span className="text-[10px] font-medium text-[#22c55e] bg-[#22c55e]/10 px-1 py-0.5 rounded">
+                    {stat.delta}
+                  </span>
+                )}
+              </div>
+              
+              <div className="flex items-center justify-between group/week">
+                <p className="text-[10px] uppercase tracking-wider text-[#616161]">{stat.label}</p>
+                {/* Zero state hover action for This Week */}
+                {!loading && stat.id === 'week' && stat.value === 0 && (
+                  <Link href="/dashboard/reviews/new" className="text-[10px] text-[#898989] hover:text-[#e8e8e8] opacity-0 group-hover/week:opacity-100 transition-opacity">
+                    Start one ›
+                  </Link>
+                )}
+              </div>
+            </GlowCard>
           ))}
         </div>
 
