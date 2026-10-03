@@ -60,7 +60,7 @@ export default function DashboardPage() {
     { id: 'week', icon: TrendingUp, label: 'This Week', value: thisWeekCount, color: '#ec4899', delta: null },
   ];
 
-  const displayName = user?.display_name || user?.username || 'Developer';
+  const displayName = (user as any)?.display_name || user?.username || 'Developer';
 
   return (
     <>

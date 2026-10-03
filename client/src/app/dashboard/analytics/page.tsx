@@ -127,7 +127,7 @@ export default function AnalyticsPage() {
             {pieData.map((entry, i) => (
               <div key={i} className="flex items-center gap-1.5 text-xs text-gray-300 capitalize">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: TYPE_COLORS[entry.name] || '#6b7280' }} />
-                {entry.name}: {entry.value}
+                {entry.name}: {String(entry.value)}
               </div>
             ))}
           </div>
