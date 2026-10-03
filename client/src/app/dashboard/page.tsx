@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { GitBranch, FileCode, Plus, BarChart3, Clock, ArrowRight, TrendingUp } from 'lucide-react';
+import { GitBranch, FileCode, Plus, BarChart3, Clock, ArrowRight, TrendingUp, Search } from 'lucide-react';
 import { repoApi, reviewApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
+
+import { CommandPalette } from '@/components/dashboard/CommandPalette';
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#f59e0b',
@@ -18,6 +20,7 @@ export default function DashboardPage() {
   const [repos, setRepos] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cmdOpen, setCmdOpen] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -45,77 +48,77 @@ export default function DashboardPage() {
     { icon: TrendingUp, label: 'This Week', value: reviews.filter((r: any) => new Date(r.created_at) > new Date(Date.now() - 7 * 86400000)).length, color: '#ec4899' },
   ];
 
+  const displayName = user?.display_name || user?.username || 'Developer';
+
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>
-          Welcome back, <span className="gradient-text">{user?.username}</span>
-        </h1>
-        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          Here&apos;s an overview of your code review activity.
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-[12px] mb-8 stagger">
-        {stats.map((stat) => (
-          <div key={stat.label} className="glass-card p-5 transition-all duration-200 hover:border-[var(--color-border-hover)]">
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-[32px] h-[32px] rounded-[8px] flex items-center justify-center"
-                style={{ background: 'var(--color-bg-hover)', color: stat.color }}>
-                <stat.icon size={18} />
+    <>
+      <CommandPalette open={cmdOpen} setOpen={setCmdOpen} />
+      <div>
+        {/* Command Strip */}
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <div className="flex-1 max-w-md">
+            <button
+              onClick={() => setCmdOpen(true)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 bg-[#0a0a0a] hover:bg-white/5 border border-[var(--color-border)] rounded-xl text-left transition-colors group"
+            >
+              <Search size={16} className="text-[#616161] group-hover:text-[#898989]" />
+              <span className="flex-1 text-sm text-[#616161] group-hover:text-[#e8e8e8]">Search or jump to...</span>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] tracking-widest text-[#616161] px-1.5 py-0.5 border border-[var(--color-border)] rounded bg-white/5">⌘</span>
+                <span className="text-[10px] tracking-widest text-[#616161] px-1.5 py-0.5 border border-[var(--color-border)] rounded bg-white/5">K</span>
               </div>
-            </div>
-            <p className="text-[28px] font-bold mb-0.5" style={{ color: 'var(--color-text-primary)' }}>
-              {loading ? <span className="skeleton inline-block w-12 h-7" /> : stat.value}
-            </p>
-            <p className="text-[11px] uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>{stat.label}</p>
+            </button>
           </div>
-        ))}
-      </div>
-
-      {/* Quick Actions & Recent Reviews */}
-      <div className="grid grid-cols-[1fr_1.6fr] gap-[14px]">
-        {/* Quick Actions */}
-        <div className="glass-card p-6">
-          <h3 className="text-[12px] uppercase tracking-[0.08em] mb-4" style={{ color: 'var(--color-text-muted)' }}>Quick Actions</h3>
-          <div className="space-y-3">
-            <Link href="/dashboard/reviews/new"
-              className="flex items-center gap-3 py-3 px-3 -mx-3 rounded-lg transition-all duration-200 hover:bg-[var(--color-bg-hover)] hover:translate-x-[2px]">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))', color: 'white' }}>
-                <Plus size={14} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>New Review</p>
-                <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>Submit code for AI analysis</p>
-              </div>
-              <span className="text-[16px] leading-none shrink-0" style={{ color: 'var(--color-text-muted)' }}>›</span>
-            </Link>
-
+          
+          <div className="flex items-center gap-3">
             <Link href="/dashboard/repositories"
-              className="flex items-center gap-3 py-3 px-3 -mx-3 rounded-lg transition-all duration-200 hover:bg-[var(--color-bg-hover)] hover:translate-x-[2px]">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: '#6366f115', color: '#6366f1' }}>
-                <GitBranch size={14} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Connect Repo</p>
-                <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>Link a GitHub repository</p>
-              </div>
-              <span className="text-[16px] leading-none shrink-0" style={{ color: 'var(--color-text-muted)' }}>›</span>
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--color-border)] bg-transparent text-[#e8e8e8] hover:bg-white/5 transition-colors">
+              <GitBranch size={14} /> Connect Repo
+            </Link>
+            <Link href="/dashboard/reviews/new"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium btn-metal transition-transform hover:scale-[1.02]">
+              <Plus size={14} /> New Review
             </Link>
           </div>
         </div>
 
-        {/* Recent Reviews */}
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+            Welcome back, <span className="gradient-text">{displayName}</span>
+          </h1>
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            Here&apos;s an overview of your code review activity.
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-[12px] mb-8 stagger">
+          {stats.map((stat) => (
+            <div key={stat.label} className="glass-card p-5 transition-all duration-200 hover:border-[var(--color-border-hover)]">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-[32px] h-[32px] rounded-[8px] flex items-center justify-center"
+                  style={{ background: 'var(--color-bg-hover)', color: stat.color }}>
+                  <stat.icon size={18} />
+                </div>
+              </div>
+              <p className="text-[28px] font-bold mb-0.5 tabular-nums" style={{ color: 'var(--color-text-primary)' }}>
+                {loading ? <span className="skeleton inline-block w-12 h-7" /> : stat.value}
+              </p>
+              <p className="text-[11px] uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>{stat.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Recent Reviews (Full Width) */}
         <div className="glass-card p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <h3 className="text-[12px] uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-muted)' }}>Recent Reviews</h3>
-            <Link href="/dashboard/reviews" className="text-xs font-medium transition-colors" style={{ color: 'var(--color-accent-start)' }}>
-              View All ›
-            </Link>
+            {reviews.length > 0 && (
+              <Link href="/dashboard/reviews" className="text-[11px] font-medium tracking-wider uppercase transition-colors" style={{ color: 'var(--color-accent-start)' }}>
+                View All ›
+              </Link>
+            )}
           </div>
 
           {loading ? (
