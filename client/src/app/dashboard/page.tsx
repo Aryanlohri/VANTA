@@ -37,6 +37,14 @@ export default function DashboardPage() {
 
   const reviews = useLiveReviews(initialReviews);
 
+  const greetingMsg = buildGreetingSummary({
+    failedThisWeek: reviews.filter((r: any) => r.status === 'failed').length,
+    inProgress: reviews.filter((r: any) => r.status === 'processing' || r.status === 'queued').length,
+    scoreTrend: repos.length > 0 ? 1.2 : 0,
+    totalThisMonth: reviews.length,
+    isFirstRun: !loading && repos.length === 0 && reviews.length === 0
+  });
+
   useEffect(() => {
     async function loadData() {
       try {
