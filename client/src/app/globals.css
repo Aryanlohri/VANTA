@@ -9,6 +9,20 @@
    --shimmer-duration: Total duration of the animation loop
 */
 :root {
+
+  /* Motion Tokens */
+  --motion-duration-instant: 100ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 200ms;
+  --motion-duration-slow: 300ms;
+  --motion-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Shimmer Tokens (Brightened) */
+  --shimmer-dark: #616161;
+  --shimmer-mid: #b4b4b4;
+  --shimmer-peak: #ffffff;
+
   --shimmer-base: #7d7d7d;
   --shimmer-mid: #b4b4b4;
   --shimmer-peak: #e4e4e4;

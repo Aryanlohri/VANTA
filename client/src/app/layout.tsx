@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   keywords: ["code review", "AI", "code quality", "developer tools", "GitHub", "VANTA"],
 };
 
+import QueryProvider from '@/lib/QueryProvider';
 import { ToastContainer } from '@/components/ui/Toast';
 import { ShortcutSheet } from '@/components/ui/ShortcutSheet';
 import { ConnectivityBanner } from '@/components/ui/ConnectivityBanner';
@@ -29,7 +30,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <DemoBanner />
         <ConnectivityBanner />
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
         <ToastContainer />
         <ShortcutSheet />
         <script dangerouslySetInnerHTML={{ __html: `

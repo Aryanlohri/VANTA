@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useReviews } from '@/lib/queries/useReviews';
+import { useConnectedRepos } from '@/lib/queries/useRepos';
 import Link from 'next/link';
 import { GitBranch, FileCode, Plus, BarChart3, Clock, ArrowRight, TrendingUp, Search } from 'lucide-react';
 import { repoApi, reviewApi } from '@/lib/api';
