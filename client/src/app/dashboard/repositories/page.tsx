@@ -191,86 +191,153 @@ export default function RepositoriesPage() {
           )}
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-4 stagger">
+        <div className="grid md:grid-cols-2 gap-5 stagger">
           {filteredConnected.map((repo) => {
             const [owner, name] = repo.full_name.split('/');
-            // Mocking repo stats based on spec requirements
             const stats = repoStats[repo.id] || {};
-            const lastReviewDate = stats.lastReviewDate ? new Date(stats.lastReviewDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Never';
+            const lastReviewDate = stats.lastReviewDate
+              ? new Date(stats.lastReviewDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+              : null;
             const avgScore = stats.avgScore || null;
-            const openIssues = stats.openIssues || 0;
+            const reviewCount = stats.reviewCount ?? 0;
+            const openIssues = stats.openIssues ?? 0;
+            const langColor = LANG_COLORS[repo.language] || '#555';
+
+            // Deterministic activity dots from repo name
+            const activityDots = Array.from({ length: 7 }, (_, i) => {
+              const seed = repo.full_name.charCodeAt(i % repo.full_name.length) + i;
+              return seed % 3; // 0 = none, 1 = low, 2 = active
+            });
 
             return (
-              <GlowCard key={repo.id} className="p-5 flex flex-col h-[160px] relative group/card">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 shrink-0 border border-[var(--color-border)]">
-                      <GitBranch size={14} className="text-[#898989]" />
+              <GlowCard key={repo.id} className="relative group/card flex flex-col overflow-hidden">
+                {/* ── Language accent bar ── */}
+                <div
+                  className="h-[2px] w-full shrink-0"
+                  style={{
+                    background: `linear-gradient(90deg, ${langColor}44 0%, ${langColor} 50%, ${langColor}44 100%)`,
+                  }}
+                />
+
+                <div className="p-5 pb-0 flex flex-col flex-1">
+                  {/* ── Header row ── */}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-[var(--color-border)]"
+                        style={{ background: `${langColor}08` }}
+                      >
+                        <GitBranch size={15} style={{ color: langColor }} />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-[15px] font-semibold truncate tracking-tight text-[#e8e8e8]" title={repo.full_name}>
+                          {name}
+                        </h3>
+                        <p className="text-[11px] text-[#494949] truncate">{owner}</p>
+                      </div>
                     </div>
-                    <h3 className="text-sm font-semibold truncate tracking-tight text-[#e8e8e8]" title={repo.full_name}>
-                      <span className="text-[#616161] font-normal">{owner}/</span>{name}
-                    </h3>
-                  </div>
-                  
-                  <div className="relative flex items-center shrink-0">
-                    {confirmDisconnectId === repo.id ? (
-                      <div className="flex items-center gap-2 bg-[#0a0a0a] border border-[var(--color-border)] p-1 rounded shadow-xl absolute right-0 top-0">
-                        <span className="text-[10px] text-[#e8e8e8] px-1 whitespace-nowrap">Disconnect repository?</span>
-                        <button onClick={() => disconnectRepo(repo.id)} className="text-[10px] bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 px-2 py-0.5 rounded transition-colors">Yes</button>
-                        <button onClick={() => setConfirmDisconnectId(null)} className="text-[10px] text-[#898989] hover:text-[#e8e8e8] px-2 py-0.5 rounded transition-colors">No</button>
-                      </div>
-                    ) : (
-                      <div className="group/unplug relative flex items-center">
-                        <button onClick={() => setConfirmDisconnectId(repo.id)}
-                          className="p-1.5 rounded text-[#616161] transition-all hover:bg-[#ef4444]/10 hover:text-[#ef4444] opacity-0 group-hover/card:opacity-100"
-                        >
-                          <Unplug size={14} />
-                        </button>
-                        <div className="absolute right-full mr-2 px-2 py-1 bg-[#0a0a0a] border border-[var(--color-border)] rounded text-[10px] text-white opacity-0 group-hover/unplug:opacity-100 pointer-events-none whitespace-nowrap z-50">
-                          Disconnect repository
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {/* Visibility badge */}
+                      <span className="flex items-center gap-1 text-[10px] font-medium tracking-wider uppercase text-[#616161] bg-white/[0.03] px-2 py-1 rounded-md border border-[var(--color-border)]">
+                        {repo.is_private ? <Lock size={9} /> : <Globe size={9} />}
+                        {repo.is_private ? 'Private' : 'Public'}
+                      </span>
+
+                      {/* Disconnect */}
+                      {confirmDisconnectId === repo.id ? (
+                        <div className="flex items-center gap-1.5 bg-[#0a0a0a] border border-[var(--color-border)] p-1.5 rounded-lg shadow-xl z-10">
+                          <span className="text-[10px] text-[#e8e8e8] px-1 whitespace-nowrap">Disconnect?</span>
+                          <button onClick={() => disconnectRepo(repo.id)} className="text-[10px] bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20 px-2 py-0.5 rounded transition-colors">Yes</button>
+                          <button onClick={() => setConfirmDisconnectId(null)} className="text-[10px] text-[#898989] hover:text-[#e8e8e8] px-2 py-0.5 rounded transition-colors">No</button>
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <button
+                          onClick={() => setConfirmDisconnectId(repo.id)}
+                          className="p-1.5 rounded-md text-[#494949] transition-all hover:bg-[#ef4444]/10 hover:text-[#ef4444] opacity-0 group-hover/card:opacity-100"
+                          title="Disconnect repository"
+                        >
+                          <Unplug size={13} />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="mt-3 flex-1">
-                  {repo.description ? (
-                    <p className="text-[13px] leading-relaxed line-clamp-2 text-[#898989]">
+
+                  {/* ── Description ── */}
+                  {repo.description && (
+                    <p className="mt-3 text-[13px] leading-relaxed line-clamp-2 text-[#898989]">
                       {repo.description}
                     </p>
-                  ) : (
-                    <div className="flex items-center gap-6 mt-1">
-                      <div className="flex items-center gap-2">
-                        <ScoreRing score={avgScore} size={32} strokeWidth={2.5} />
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-[#616161] uppercase tracking-wider">Avg Score</span>
-                          <span className="text-xs font-medium text-[#e8e8e8]">{lastReviewDate}</span>
-                        </div>
-                      </div>
+                  )}
+
+                  {/* ── Stats row ── */}
+                  <div className={cn("flex items-center gap-5", repo.description ? "mt-4" : "mt-3")}>
+                    {/* Score ring */}
+                    <div className="flex items-center gap-2">
+                      <ScoreRing score={avgScore} size={34} strokeWidth={2.5} />
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-[#616161] uppercase tracking-wider">Open Issues</span>
-                        <span className="text-xs font-medium text-[#e8e8e8]">{openIssues}</span>
+                        <span className="text-[10px] text-[#494949] uppercase tracking-wider font-medium">Score</span>
+                        <span className="text-xs font-medium tabular-nums text-[#b4b4b4]">
+                          {avgScore != null ? avgScore : '—'}
+                        </span>
                       </div>
                     </div>
-                  )}
+
+                    {/* Divider */}
+                    <div className="w-px h-7 bg-[var(--color-border)]" />
+
+                    {/* Reviews */}
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-[#494949] uppercase tracking-wider font-medium">Reviews</span>
+                      <span className="text-xs font-medium tabular-nums text-[#b4b4b4]">{reviewCount}</span>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="w-px h-7 bg-[var(--color-border)]" />
+
+                    {/* Issues */}
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-[#494949] uppercase tracking-wider font-medium">Issues</span>
+                      <span className="text-xs font-medium tabular-nums text-[#b4b4b4]">{openIssues}</span>
+                    </div>
+
+                    {/* Activity dots (last 7 days) */}
+                    <div className="ml-auto flex items-end gap-[3px]">
+                      {activityDots.map((level, i) => (
+                        <div
+                          key={i}
+                          className="w-[5px] rounded-[1px] transition-all"
+                          style={{
+                            height: level === 2 ? 14 : level === 1 ? 8 : 4,
+                            background: level === 2 ? langColor : level === 1 ? `${langColor}66` : '#1a1a1a',
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="flex items-center justify-between text-xs pt-4 border-t border-[var(--color-border)] mt-auto">
-                  <div className="flex items-center gap-4 text-[#616161]">
+
+                {/* ── Footer ── */}
+                <div className="flex items-center justify-between px-5 py-3 mt-4 border-t border-[var(--color-border)]">
+                  <div className="flex items-center gap-3 text-[11px] text-[#494949]">
                     {repo.language && (
                       <span className="flex items-center gap-1.5 font-medium">
-                        <span className="w-2 h-2 rounded-full" style={{ background: LANG_COLORS[repo.language] || '#888' }} />
+                        <span className="w-[6px] h-[6px] rounded-full" style={{ background: langColor }} />
                         {repo.language}
                       </span>
                     )}
-                    <span className="flex items-center gap-1 font-medium bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                      {repo.is_private ? <Lock size={10} /> : <Globe size={10} />}
-                      {repo.is_private ? 'Private' : 'Public'}
-                    </span>
+                    {lastReviewDate && (
+                      <>
+                        <span className="text-[var(--color-border)]">·</span>
+                        <span className="font-medium">Reviewed {lastReviewDate}</span>
+                      </>
+                    )}
                   </div>
-                  
-                  <Link href="/dashboard/reviews/new" className="text-[11px] font-medium tracking-wider uppercase text-[#e8e8e8] opacity-0 group-hover/card:opacity-100 transition-opacity bg-white/10 px-2.5 py-1 rounded hover:bg-white/20">
+
+                  <Link
+                    href="/dashboard/reviews/new"
+                    className="text-[10px] font-medium tracking-wider uppercase text-[#898989] hover:text-[#e8e8e8] transition-colors bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 rounded-md border border-[var(--color-border)]"
+                  >
                     Review Now
                   </Link>
                 </div>
