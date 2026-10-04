@@ -107,7 +107,7 @@ export default function DashboardPage() {
             Welcome back, <ShimmerText delay={600}>{displayName}</ShimmerText>
           </h1>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            Here&apos;s an overview of your code review activity.
+            {greetingMsg}
           </p>
         </div>
 
