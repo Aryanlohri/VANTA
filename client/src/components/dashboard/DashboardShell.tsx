@@ -72,10 +72,13 @@ export function DashboardShell({ children, defaultCollapsed }: DashboardShellPro
           setMobileOpen={setMobileOpen} 
         />
 
-        <main className={cn(
-          "flex-1 overflow-y-auto relative transition-all duration-300",
-          "pt-14 md:pt-0" // Add padding top for mobile header
-        )}>
+        <main 
+          className={cn(
+            "flex-1 overflow-y-auto relative transition-all duration-400 ease-out origin-center",
+            "pt-14 md:pt-0", // Add padding top for mobile header
+            isMobileOpen && "scale-[0.985] opacity-60 pointer-events-none"
+          )}
+        >
           <div className="max-w-6xl mx-auto px-6 py-8 md:px-8 relative z-10">
             {children}
           </div>

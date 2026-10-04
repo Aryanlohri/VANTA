@@ -107,29 +107,33 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
         </div>
 
         {/* New Review Button */}
-        <div className="p-3 shrink-0">
+        <div className="p-3 shrink-0 overflow-hidden">
           <Link href="/dashboard/reviews/new"
             className={cn(
-              "btn-metal flex items-center justify-center rounded-lg text-xs font-medium tracking-wider uppercase transition-all overflow-hidden",
+              "btn-metal flex items-center justify-center rounded-lg text-xs font-medium tracking-wider uppercase transition-all duration-400 ease-out overflow-hidden",
               !isExpanded ? "w-10 h-10 p-0" : "w-full h-10 gap-2 px-4"
             )}>
             <Plus size={16} strokeWidth={1.5} className="shrink-0" />
-            {isExpanded && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                className="whitespace-nowrap"
-              >
-                New Review
-              </motion.span>
-            )}
+            <motion.span
+              initial={false}
+              animate={{ 
+                opacity: isExpanded ? 1 : 0, 
+                x: isExpanded ? 0 : -6
+              }}
+              transition={{
+                opacity: isExpanded ? { duration: 0.26, delay: 0.12, ease: "easeOut" } : { duration: 0.15, ease: "linear" },
+                x: isExpanded ? { duration: 0.26, delay: 0.12, ease: "easeOut" } : { duration: 0.15, ease: "linear" },
+              }}
+              className="whitespace-nowrap"
+            >
+              New Review
+            </motion.span>
           </Link>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-2 space-y-1 overflow-x-hidden flex flex-col">
-          {allNavItems.map((item) => {
+          {allNavItems.map((item, index) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
             const isAdminItem = item.href === '/dashboard/admin';
             
@@ -137,22 +141,26 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
               <div key={item.href} className={cn("relative group", isAdminItem && "mt-auto pt-2 border-t border-[var(--color-border)]")}>
                 <Link href={item.href}
                   className={cn(
-                    "flex items-center rounded-lg text-[13px] tracking-wide transition-all duration-300 relative z-10",
+                    "flex items-center rounded-lg text-[13px] tracking-wide transition-all duration-400 relative z-10",
                     !isExpanded ? "justify-center h-10 w-10" : "px-4 h-10 gap-3 w-full",
                     isActive ? (isAdminItem ? "text-[#4ade80]" : "text-[#e8e8e8]") : "text-[#616161] hover:text-[#898989]",
                   )}>
                   <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} className="shrink-0 relative z-10" />
                   
-                  {isExpanded && (
-                    <motion.span 
-                      initial={{ opacity: 0, x: -4 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.05 }}
-                      className="whitespace-nowrap relative z-10 font-medium"
-                    >
-                      {item.label}
-                    </motion.span>
-                  )}
+                  <motion.span 
+                    initial={false}
+                    animate={{ 
+                      opacity: isExpanded ? 1 : 0, 
+                      x: isExpanded ? 0 : -6
+                    }}
+                    transition={{
+                      opacity: isExpanded ? { duration: 0.26, delay: 0.12 + (index * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
+                      x: isExpanded ? { duration: 0.26, delay: 0.12 + (index * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
+                    }}
+                    className="whitespace-nowrap relative z-10 font-medium"
+                  >
+                    {item.label}
+                  </motion.span>
                   
                   {/* Active Layout ID Pill */}
                   {isActive && (
@@ -213,16 +221,21 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
               </div>
             )}
             
-            {isExpanded && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex-1 min-w-0 flex flex-col"
-              >
-                <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || user?.username}</p>
-                <p className="text-[11px] truncate text-[#616161]">{user?.email || 'No email'}</p>
-              </motion.div>
-            )}
+            <motion.div 
+              initial={false}
+              animate={{ 
+                opacity: isExpanded ? 1 : 0, 
+                x: isExpanded ? 0 : -6
+              }}
+              transition={{
+                opacity: isExpanded ? { duration: 0.26, delay: 0.12 + (allNavItems.length * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
+                x: isExpanded ? { duration: 0.26, delay: 0.12 + (allNavItems.length * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
+              }}
+              className="flex-1 min-w-0 flex flex-col whitespace-nowrap"
+            >
+              <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || user?.username}</p>
+              <p className="text-[11px] truncate text-[#616161]">{user?.email || 'No email'}</p>
+            </motion.div>
           </button>
 
           {/* Popover */}
