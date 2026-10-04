@@ -13,7 +13,7 @@ export function PageHeader({ title, subtitle, action, className }: PageHeaderPro
   return (
     <div className={cn("mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4", className)}>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[#e8e8e8]">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-[#e8e8e8]"><ShimmerText delay={false}>{title}</ShimmerText></h1>
         {subtitle && (
           <p className="text-sm text-[#898989] mt-1">{subtitle}</p>
         )}
