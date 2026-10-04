@@ -73,8 +73,12 @@ export default function ReviewsPage() {
   }
   
   async function retryReview(id: string) {
-    console.log('Retry review stub:', id);
-    // TODO: implement retry API endpoint
+    try {
+      await reviewApi.retryReview(id);
+      setReviews(prev => prev.map(r => r.id === id ? { ...r, status: 'processing' } : r));
+    } catch (error) {
+      console.error('Retry failed:', error);
+    }
   }
 
   return (

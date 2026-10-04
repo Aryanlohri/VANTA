@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { GitBranch, Plus, Search, Star, Loader2, Globe, Lock, Unplug } from 'lucide-react';
-import { repoApi } from '@/lib/api';
+import { repoApi, reviewApi } from '@/lib/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
@@ -21,6 +21,7 @@ export default function RepositoriesPage() {
   const [showConnect, setShowConnect] = useState(false);
   const [githubRepos, setGithubRepos] = useState<any[]>([]);
   const [connecting, setConnecting] = useState<string | null>(null);
+  const [repoStats, setRepoStats] = useState<Record<string, any>>({});
   
   // Toolbar state
   const [search, setSearch] = useState('');
@@ -33,8 +34,12 @@ export default function RepositoriesPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await repoApi.list();
-        setConnected(res.data.data || []);
+        const [reposRes, statsRes] = await Promise.all([
+          repoApi.list(),
+          reviewApi.getRepoStats().catch(() => ({ data: { data: {} } }))
+        ]);
+        setConnected(reposRes.data.data || []);
+        setRepoStats(statsRes.data?.data || {});
       } catch { /* ignore */ }
       setLoading(false);
     }
@@ -181,9 +186,10 @@ export default function RepositoriesPage() {
           {filteredConnected.map((repo) => {
             const [owner, name] = repo.full_name.split('/');
             // Mocking repo stats based on spec requirements
-            const lastReviewDate = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); // TODO: replace with real backend data
-            const avgScore = repo.id.length > 5 ? 85 : 62; // TODO: replace with real backend data
-            const openIssues = repo.id.length % 5; // TODO: replace with real backend data
+            const stats = repoStats[repo.id] || {};
+            const lastReviewDate = stats.lastReviewDate ? new Date(stats.lastReviewDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Never';
+            const avgScore = stats.avgScore || null;
+            const openIssues = stats.openIssues || 0;
 
             return (
               <GlowCard key={repo.id} className="p-5 flex flex-col h-[160px] relative group/card">

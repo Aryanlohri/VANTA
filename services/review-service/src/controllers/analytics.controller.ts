@@ -56,5 +56,51 @@ export const AnalyticsController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  async getRepoStats(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.headers['x-user-id'] as string;
+      if (!userId) throw new AppError('User ID required', 401, ERROR_CODES.UNAUTHORIZED);
+
+      const db = require('../config/database').getDb();
+
+      // Get stats grouped by repo_id
+      const stats = await db('reviews.reviews')
+        .where('user_id', userId)
+        .select('repo_id')
+        .max('created_at as last_review_date')
+        .avg('overall_score as avg_score')
+        .count('id as review_count')
+        .groupBy('repo_id');
+
+      // Get open issues grouped by repo_id (just counting all comments as "issues" for now)
+      const issues = await db('reviews.review_comments')
+        .join('reviews.review_files', 'reviews.review_comments.review_file_id', 'reviews.review_files.id')
+        .join('reviews.reviews', 'reviews.review_files.review_id', 'reviews.reviews.id')
+        .where('reviews.reviews.user_id', userId)
+        .select('reviews.reviews.repo_id')
+        .count('* as issues_count')
+        .groupBy('reviews.reviews.repo_id');
+
+      const issuesMap = issues.reduce((acc: any, row: any) => {
+        acc[row.repo_id] = parseInt(row.issues_count, 10);
+        return acc;
+      }, {});
+
+      const formattedStats = stats.reduce((acc: any, row: any) => {
+        acc[row.repo_id] = {
+          lastReviewDate: row.last_review_date,
+          avgScore: Math.round(row.avg_score || 0),
+          reviewCount: parseInt(row.review_count, 10),
+          openIssues: issuesMap[row.repo_id] || 0
+        };
+        return acc;
+      }, {});
+
+      res.json({ success: true, data: formattedStats });
+    } catch (error) {
+      next(error);
+    }
   }
 };

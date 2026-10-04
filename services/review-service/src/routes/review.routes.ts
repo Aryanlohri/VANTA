@@ -7,10 +7,12 @@ const router = Router();
 
 router.get('/admin/metrics', isAdmin, ReviewController.getAdminMetrics);
 router.get('/analytics/dashboard', AnalyticsController.getDashboard);
+router.get('/analytics/repos', AnalyticsController.getRepoStats);
 router.post('/', ReviewController.create);
 router.get('/', ReviewController.list);
 router.get('/:id', ReviewController.getById);
 router.post('/:id/github', ReviewController.postToGitHub);
+router.post('/:id/retry', ReviewController.retryReview);
 router.delete('/:id', ReviewController.deleteReview);
 
 export default router;

@@ -315,4 +315,46 @@ export const ReviewController = {
       next(error);
     }
   },
+
+  /**
+   * POST /reviews/:id/retry
+   * Retry a failed review.
+   */
+  async retryReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.headers['x-user-id'] as string;
+      if (!userId) throw new AppError('User ID required', 401, ERROR_CODES.UNAUTHORIZED);
+
+      const id = req.params.id as string;
+      const fullReview = await ReviewModel.getFullReview(id);
+
+      if (!fullReview || fullReview.user_id !== userId) {
+        throw new NotFoundError('Review', id);
+      }
+
+      if (fullReview.status !== ReviewStatus.FAILED) {
+        throw new ValidationError('Only failed reviews can be retried');
+      }
+
+      // Reset review status to processing
+      await ReviewModel.updateStatus(id, ReviewStatus.PROCESSING);
+
+      // Re-enqueue all files
+      for (const file of fullReview.files) {
+        await ReviewProducer.enqueueFileReview({
+          reviewId: fullReview.id,
+          fileId: file.id,
+          filePath: file.file_path,
+          content: file.content,
+          language: file.language || null,
+          mode: fullReview.mode || 'standard',
+        });
+      }
+
+      logger.info({ reviewId: id, userId }, 'Review retried successfully');
+      res.json({ success: true, data: { ...fullReview, status: 'processing' } });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
