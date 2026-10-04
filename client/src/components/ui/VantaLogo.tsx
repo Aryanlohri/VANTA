@@ -19,28 +19,26 @@ export function VantaLogo({ collapsed, className = '' }: VantaLogoProps) {
       aria-label="VANTA home" 
       className={`flex items-center shrink-0 ${className}`}
     >
-      <VantaMark size={28} />
+      <div className="w-[64px] flex items-center justify-center shrink-0">
+        <VantaMark size={28} />
+      </div>
       <AnimatePresence initial={false}>
         {!collapsed && (
           <motion.span
-            initial={{ maxWidth: 0, opacity: 0, marginLeft: 0 }}
+            initial={{ maxWidth: 0, opacity: 0 }}
             animate={{ 
               maxWidth: 120, 
               opacity: 1, 
-              marginLeft: 8,
               transition: {
                 maxWidth: { duration: 0.45, ease: [0.4, 0, 0.2, 1] },
-                marginLeft: { duration: 0.45, ease: [0.4, 0, 0.2, 1] },
                 opacity: { duration: 0.3, ease: 'easeOut' }
               }
             }}
             exit={{ 
               maxWidth: 0, 
               opacity: 0, 
-              marginLeft: 0,
               transition: {
                 maxWidth: { duration: 0.45, ease: [0.4, 0, 0.2, 1] },
-                marginLeft: { duration: 0.45, ease: [0.4, 0, 0.2, 1] },
                 opacity: { duration: 0.2, ease: 'easeIn' }
               }
             }}

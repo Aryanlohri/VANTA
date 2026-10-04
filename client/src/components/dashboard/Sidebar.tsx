@@ -110,10 +110,12 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
         <div className="p-3 shrink-0 overflow-hidden">
           <Link href="/dashboard/reviews/new"
             className={cn(
-              "btn-metal flex items-center justify-center rounded-lg text-xs font-medium tracking-wider uppercase transition-all duration-400 ease-out overflow-hidden",
-              !isExpanded ? "w-10 h-10 p-0" : "w-full h-10 gap-2 px-4"
+              "btn-metal flex items-center rounded-lg text-xs font-medium tracking-wider uppercase transition-all duration-400 ease-out overflow-hidden relative",
+              !isExpanded ? "w-10 h-10" : "w-full h-10"
             )}>
-            <Plus size={16} strokeWidth={1.5} className="shrink-0" />
+            <div className="w-10 h-10 shrink-0 flex items-center justify-center">
+              <Plus size={16} strokeWidth={1.5} />
+            </div>
             <motion.span
               initial={false}
               animate={{ 
@@ -124,7 +126,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                 opacity: isExpanded ? { duration: 0.26, delay: 0.12, ease: "easeOut" } : { duration: 0.15, ease: "linear" },
                 x: isExpanded ? { duration: 0.26, delay: 0.12, ease: "easeOut" } : { duration: 0.15, ease: "linear" },
               }}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap absolute left-10"
             >
               New Review
             </motion.span>
@@ -141,11 +143,13 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
               <div key={item.href} className={cn("relative group", isAdminItem && "mt-auto pt-2 border-t border-[var(--color-border)]")}>
                 <Link href={item.href}
                   className={cn(
-                    "flex items-center rounded-lg text-[13px] tracking-wide transition-all duration-400 relative z-10",
-                    !isExpanded ? "justify-center h-10 w-10" : "px-4 h-10 gap-3 w-full",
+                    "flex items-center rounded-lg text-[13px] tracking-wide transition-all duration-400 relative z-10 overflow-hidden",
+                    !isExpanded ? "w-10 h-10" : "w-full h-10",
                     isActive ? (isAdminItem ? "text-[#4ade80]" : "text-[#e8e8e8]") : "text-[#616161] hover:text-[#898989]",
                   )}>
-                  <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} className="shrink-0 relative z-10" />
+                  <div className="w-10 h-10 shrink-0 flex items-center justify-center relative z-10">
+                    <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} />
+                  </div>
                   
                   <motion.span 
                     initial={false}
@@ -157,7 +161,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                       opacity: isExpanded ? { duration: 0.26, delay: 0.12 + (index * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
                       x: isExpanded ? { duration: 0.26, delay: 0.12 + (index * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
                     }}
-                    className="whitespace-nowrap relative z-10 font-medium"
+                    className="whitespace-nowrap absolute left-10 z-10 font-medium"
                   >
                     {item.label}
                   </motion.span>
@@ -168,7 +172,6 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                       layoutId="active-nav-pill"
                       className={cn(
                         "absolute inset-0 rounded-lg",
-                        !isExpanded && "w-10",
                         isAdminItem ? "bg-[#4ade80]/10" : "bg-white/5"
                       )}
                       transition={{ type: "spring", stiffness: 350, damping: 30 }}
@@ -207,19 +210,21 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
           <button 
             onClick={() => setPopoverOpen(!popoverOpen)}
             className={cn(
-              "flex items-center gap-3 rounded-lg transition-colors hover:bg-white/5",
-              !isExpanded ? "justify-center p-1 w-10" : "p-2 text-left w-full"
+              "flex items-center rounded-lg transition-colors hover:bg-white/5 relative overflow-hidden",
+              !isExpanded ? "w-10 h-10" : "w-full h-12"
             )}
             aria-expanded={popoverOpen}
             aria-label="User menu"
           >
-            {user?.avatar_url ? (
-              <img src={user.avatar_url} alt={user.username} className="w-8 h-8 rounded-full opacity-90 shrink-0" />
-            ) : (
-              <div className="w-8 h-8 rounded-full shrink-0 bg-[#1a1a1a] flex items-center justify-center text-xs text-[#898989]">
-                {user?.username?.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <div className="w-10 shrink-0 flex items-center justify-center">
+              {user?.avatar_url ? (
+                <img src={user.avatar_url} alt={user.username} className="w-8 h-8 rounded-full opacity-90 shrink-0" />
+              ) : (
+                <div className="w-8 h-8 rounded-full shrink-0 bg-[#1a1a1a] flex items-center justify-center text-xs text-[#898989]">
+                  {user?.username?.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
             
             <motion.div 
               initial={false}
@@ -231,7 +236,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                 opacity: isExpanded ? { duration: 0.26, delay: 0.12 + (allNavItems.length * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
                 x: isExpanded ? { duration: 0.26, delay: 0.12 + (allNavItems.length * 0.035), ease: "easeOut" } : { duration: 0.15, ease: "linear" },
               }}
-              className="flex-1 min-w-0 flex flex-col whitespace-nowrap"
+              className="flex-1 min-w-0 flex flex-col whitespace-nowrap absolute left-10 text-left"
             >
               <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || user?.username}</p>
               <p className="text-[11px] truncate text-[#616161]">{user?.email || 'No email'}</p>
