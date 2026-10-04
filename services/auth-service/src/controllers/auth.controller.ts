@@ -288,4 +288,39 @@ export const AuthController = {
       next(error);
     }
   },
+
+  /**
+   * Update user settings.
+   */
+  async updateSettings(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).userId;
+      if (!userId) {
+        throw new AppError('Not authenticated', 401, ERROR_CODES.UNAUTHORIZED);
+      }
+
+      const { settings } = req.body;
+      if (!settings) {
+        throw new AppError('Settings payload is required', 400, ERROR_CODES.VALIDATION_ERROR);
+      }
+
+      // Merge existing settings with new ones
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new AppError('User not found', 404, ERROR_CODES.NOT_FOUND);
+      }
+
+      const currentSettings = typeof user.settings === 'string' ? JSON.parse(user.settings) : (user.settings || {});
+      const newSettings = { ...currentSettings, ...settings };
+      
+      await UserModel.updateSettings(userId, newSettings);
+
+      res.json({
+        success: true,
+        data: newSettings,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
