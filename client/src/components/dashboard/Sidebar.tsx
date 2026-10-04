@@ -260,9 +260,13 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                   <p className="text-xs font-medium text-[#e8e8e8] truncate">{(user as any)?.display_name || (user as any)?.first_name || user?.username}</p>
                   <p className="text-[10px] text-[#616161] truncate">{user?.email}</p>
                 </div>
-                <button className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2">
+                <Link 
+                  href="/dashboard/settings"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2"
+                >
                   <Settings size={14} /> Settings
-                </button>
+                </Link>
                 <button className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2">
                   <User size={14} /> Profile
                 </button>
