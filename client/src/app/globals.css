@@ -26,7 +26,7 @@
   --shimmer-base: #7d7d7d;
   --shimmer-mid: #b4b4b4;
   --shimmer-peak: #e4e4e4;
-  --shimmer-duration: 8s;
+  --shimmer-duration: 4.5s;
 }
 
 /* ============================================
@@ -577,14 +577,13 @@ body {
   -webkit-text-fill-color: transparent;
   
   /* Animation (starts paused, managed by JS) */
-  animation: metallic-shimmer var(--shimmer-duration) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: metallic-shimmer var(--shimmer-duration) linear infinite;
   animation-play-state: paused;
 }
 
 @keyframes metallic-shimmer {
-  0% { background-position: 0% 0; }
-  45% { background-position: 100% 0; }
-  100% { background-position: 100% 0; }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
