@@ -85,6 +85,11 @@ export const UserModel = {
   /**
    * Get the encrypted access token for a user.
    */
+  async updateSettings(id: string, settings: any): Promise<void> {
+    const db = getDb();
+    await db(TABLE).where({ id }).update({ settings: JSON.stringify(settings), updated_at: db.fn.now() });
+  },
+
   async getAccessToken(userId: string): Promise<string | null> {
     const row = await getDb()(TABLE)
       .where({ id: userId })

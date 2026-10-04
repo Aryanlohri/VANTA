@@ -310,7 +310,7 @@ export const AuthController = {
         throw new AppError('User not found', 404, ERROR_CODES.NOT_FOUND);
       }
 
-      const currentSettings = typeof user.settings === 'string' ? JSON.parse(user.settings) : (user.settings || {});
+      const currentSettings = typeof (user as any).settings === 'string' ? JSON.parse((user as any).settings) : ((user as any).settings || {});
       const newSettings = { ...currentSettings, ...settings };
       
       await UserModel.updateSettings(userId, newSettings);
