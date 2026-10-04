@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 import { ToastContainer } from '@/components/ui/Toast';
+import { ConnectivityBanner } from '@/components/ui/ConnectivityBanner';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div id="vanta-loader" suppressHydrationWarning>
           <canvas id="loader-canvas" suppressHydrationWarning></canvas>
         </div>
+        <ConnectivityBanner />
         {children}
         <ToastContainer />
         <script dangerouslySetInnerHTML={{ __html: `

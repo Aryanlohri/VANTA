@@ -9,6 +9,7 @@ import { useAuthStore } from '@/lib/auth';
 import { CommandPalette } from '@/components/dashboard/CommandPalette';
 import { ReviewRow } from '@/components/dashboard/ReviewRow';
 import { ShimmerText } from '@/components/ui/ShimmerText';
+import { buildGreetingSummary, GreetingStats } from '@/lib/utils'; from '@/components/ui/ShimmerText';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
 import { CountUp } from '@/components/dashboard/CountUp';

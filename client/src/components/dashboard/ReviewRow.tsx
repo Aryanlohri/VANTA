@@ -127,3 +127,16 @@ export function ReviewRow({ review, allReviews = [], showDelete = false, onDelet
     </GlowCard>
   );
 }
+
+function mapErrorCode(errorData?: any) {
+  if (!errorData) return 'An unknown error occurred during analysis.';
+  const code = typeof errorData === 'string' ? errorData : errorData.code;
+  switch (code) {
+    case 'REPO_UNREACHABLE': return 'Repository is unreachable or private.';
+    case 'NO_CODE_CHANGED': return 'No supported code files found to review.';
+    case 'API_RATE_LIMIT': return 'GitHub API rate limit exceeded. Try again later.';
+    case 'AI_SERVICE_UNAVAILABLE': return 'Analysis engine is temporarily unavailable.';
+    case 'USAGE_LIMIT_EXCEEDED': return 'Subscription quota exhausted.';
+    default: return typeof errorData === 'string' ? errorData : (errorData.message || 'An unknown error occurred.');
+  }
+}
