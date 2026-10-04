@@ -19,8 +19,8 @@ export function VantaLogo({ collapsed, className = '' }: VantaLogoProps) {
       aria-label="VANTA home" 
       className={`flex items-center shrink-0 ${className}`}
     >
-      <div className="w-[64px] flex items-center justify-center shrink-0">
-        <VantaMark size={28} />
+      <div className="w-[64px] flex items-center justify-center shrink-0 relative z-20">
+        <VantaMark size={20} />
       </div>
       <AnimatePresence initial={false}>
         {!collapsed && (
@@ -42,7 +42,8 @@ export function VantaLogo({ collapsed, className = '' }: VantaLogoProps) {
                 opacity: { duration: 0.2, ease: 'easeIn' }
               }
             }}
-            className="overflow-hidden whitespace-nowrap text-[#e8e8e8] tracking-[0.38em] uppercase font-medium text-lg leading-none pt-[2px]"
+            // Adjusted text size and padding to perfectly align baselines with the 20px SVG
+            className="overflow-hidden whitespace-nowrap text-[#e8e8e8] tracking-[0.38em] uppercase font-medium text-[17px] leading-none pt-[3px] -ml-[16px] relative z-10"
             aria-hidden={collapsed}
           >
             ANTA
