@@ -28,7 +28,7 @@ export function startAIWorker() {
 
       try {
         // ── Cache layer: hash content+language+mode to deduplicate reviews ──
-        const cacheKey = `review_cache:${createHash('sha256').update(`${data.content}|${data.language || ''}|${data.mode || 'standard'}`).digest('hex')}`;
+        const cacheKey = `review_cache:${createHash('sha256').update(`${data.content}|${data.language || ''}|${data.mode || 'standard'}|${data.customInstructions || ''}`).digest('hex')}`;
 
         const cached = await connection!.get(cacheKey);
         if (cached) {
@@ -57,7 +57,7 @@ export function startAIWorker() {
         }
 
         // ── Cache MISS — call Gemini ────────────────────────────────────────
-        const result = await GeminiService.reviewCode(data.content, data.language, data.mode, data.reviewId);
+        const result = await GeminiService.reviewCode(data.content, data.language, data.mode, data.reviewId, data.customInstructions);
 
         // Publish result back to review service
         const jobResult: ReviewJobResult = {

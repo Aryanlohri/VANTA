@@ -213,6 +213,7 @@ export interface ReviewJobData {
   content: string;
   language: string | null;
   mode?: string;
+  customInstructions?: string;
 }
 
 export interface ReviewJobResult {

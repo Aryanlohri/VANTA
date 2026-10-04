@@ -84,7 +84,7 @@ const responseSchema: any = {
 };
 
 export const GeminiService = {
-  async reviewCode(code: string, language: string | null, mode?: string, reviewId?: string): Promise<AIReviewResponse> {
+  async reviewCode(code: string, language: string | null, mode?: string, reviewId?: string, customInstructions?: string): Promise<AIReviewResponse> {
     const isMockMode = process.env.AI_MOCK_MODE === 'true';
 
     if (isMockMode) {
@@ -105,7 +105,7 @@ export const GeminiService = {
     
     try {
       const hints = getLanguageHints(language);
-      const prompt = buildReviewPrompt(language, code, hints, mode);
+      const prompt = buildReviewPrompt(language, code, hints, mode, customInstructions);
 
       logger.info({ modelName }, 'Calling Google AI Studio Gemini API');
       

@@ -62,6 +62,7 @@ api.interceptors.response.use(
 export const authApi = {
   getLoginUrl: () => api.get('/auth/github'),
   getProfile: () => api.get('/auth/me'),
+  updateSettings: (settings: any) => api.patch('/auth/me/settings', { settings }),
 };
 
 export const repoApi = {

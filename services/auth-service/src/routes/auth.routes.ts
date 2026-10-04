@@ -37,6 +37,7 @@ router.get('/token/:userId', requireInternalSecret, AuthController.getGitHubToke
 
 // Get current user profile
 router.get('/me', authMiddleware, AuthController.getProfile);
+router.patch('/me/settings', authMiddleware, AuthController.updateSettings);
 
 // Get platform metrics (Admin only)
 router.get('/admin/metrics', authMiddleware, isAdmin, AuthController.getMetrics);

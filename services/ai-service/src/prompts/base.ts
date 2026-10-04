@@ -7,7 +7,7 @@ import type { SupportedLanguage } from '@aicr/shared';
 /**
  * Build the complete review prompt for a given language and code.
  */
-export function buildReviewPrompt(language: string | null, code: string, languageHints?: string, mode?: string): string {
+export function buildReviewPrompt(language: string | null, code: string, languageHints?: string, mode?: string, customInstructions?: string): string {
   const lang = language || 'general';
   
   let modeRules = '';
@@ -43,6 +43,7 @@ RULES:
 7. 'severity' field MUST be one of exactly these 4 values: critical, major, minor, info. No other values are permitted.
 ${modeRules}
 ${languageHints ? `HINTS:\n${languageHints}` : ''}
+${customInstructions ? `CUSTOM INSTRUCTIONS:\n${customInstructions}` : ''}
 
 CODE:
 \`\`\`${lang}

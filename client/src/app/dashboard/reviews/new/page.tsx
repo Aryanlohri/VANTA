@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FileCode, FolderOpen, ChevronRight, Send, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { repoApi, reviewApi } from '@/lib/api';
+import { useAuthStore } from '@/lib/auth';
 import { FileTree } from '@/components/FileTree';
 
 export default function NewReviewPage() {
@@ -15,7 +16,8 @@ export default function NewReviewPage() {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [fileContents, setFileContents] = useState<Record<string, { content: string; language: string | null }>>({});
   const [title, setTitle] = useState('');
-  const [mode, setMode] = useState('standard');
+  const { user } = useAuthStore();
+  const [mode, setMode] = useState((user as any)?.settings?.reviewMode || 'standard');
   const [loading, setLoading] = useState(true);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [submitting, setSubmitting] = useState(false);
