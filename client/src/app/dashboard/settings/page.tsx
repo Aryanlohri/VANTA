@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { Save, Bot, Shield, Zap, Sliders, Check, FileCode, Github, Bell, AlertTriangle } from 'lucide-react';
+import { Save, Bot, Shield, Zap, Sliders, Check, FileCode, GitBranch, Bell, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { toast } from '@/lib/toast';
 
@@ -158,7 +158,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-[var(--color-border)]">
-                    <Github size={20} className="text-[#e8e8e8]" />
+                    <GitBranch size={20} className="text-[#e8e8e8]" />
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-[#e8e8e8]">GitHub</h4>

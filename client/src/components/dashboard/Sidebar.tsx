@@ -262,7 +262,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                 </div>
                 <Link 
                   href="/dashboard/settings"
-                  onClick={() => setShowProfileMenu(false)}
+                  onClick={() => setPopoverOpen(false)}
                   className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2"
                 >
                   <Settings size={14} /> Settings
