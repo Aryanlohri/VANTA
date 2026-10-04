@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 import { ToastContainer } from '@/components/ui/Toast';
+import { ShortcutSheet } from '@/components/ui/ShortcutSheet';
 import { ConnectivityBanner } from '@/components/ui/ConnectivityBanner';
 import { DemoBanner } from '@/components/ui/DemoBanner';
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ConnectivityBanner />
         {children}
         <ToastContainer />
+        <ShortcutSheet />
         <script dangerouslySetInnerHTML={{ __html: `
           (function () {
             if (sessionStorage.getItem('vanta_loaded')) {
