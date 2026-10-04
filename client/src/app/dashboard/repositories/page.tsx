@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { GitBranch, Plus, Search, Star, Loader2, Globe, Lock, Unplug } from 'lucide-react';
+import { GitBranch, Plus, Search, Star, Loader2, Globe, Lock, Unplug, X, Check } from 'lucide-react';
 import { repoApi, reviewApi } from '@/lib/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -21,6 +21,7 @@ export default function RepositoriesPage() {
   const [loading, setLoading] = useState(true);
   const [showConnect, setShowConnect] = useState(false);
   const [githubRepos, setGithubRepos] = useState<any[]>([]);
+  const [isFetchingGitHub, setIsFetchingGitHub] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
   const [repoStats, setRepoStats] = useState<Record<string, any>>({});
   
@@ -50,10 +51,13 @@ export default function RepositoriesPage() {
   async function loadGithubRepos() {
     setShowConnect(true);
     if (githubRepos.length > 0) return;
+    setIsFetchingGitHub(true);
     try {
       const res = await repoApi.listGitHub();
       setGithubRepos(res.data.data || []);
-    } catch { /* ignore */ }
+    } catch { /* ignore */ } finally {
+      setIsFetchingGitHub(false);
+    }
   }
 
   async function connectRepo(repo: any) {
@@ -341,52 +345,141 @@ export default function RepositoriesPage() {
 
       {/* Connect modal */}
       {showConnect && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
           onClick={() => setShowConnect(false)}>
-          <div className="w-full max-w-lg bg-[#050505] border border-[var(--color-border)] rounded-[20px] p-6 mx-4 max-h-[70vh] flex flex-col shadow-2xl animate-fade-in-up"
-            onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold mb-4 text-[#e8e8e8]">Connect Repository</h3>
-
-            <div className="relative mb-4">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#616161]" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search GitHub repositories..."
-                className="w-full pl-9 pr-4 py-2.5 rounded-lg text-[13px] outline-none transition-colors bg-[#0a0a0a] border border-[var(--color-border)] focus:border-[#494949] text-[#e8e8e8]"
-              />
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-2 pr-2 hide-scrollbar">
-              {filteredGithub.length === 0 ? (
-                <p className="text-center py-8 text-[13px] text-[#616161]">
-                  {githubRepos.length === 0 ? 'Loading repositories...' : 'No matching repositories'}
-                </p>
-              ) : filteredGithub.map((repo) => (
-                <div key={repo.id} className="flex items-center justify-between p-3 rounded-lg bg-[#0a0a0a] border border-[var(--color-border)] hover:border-[#333] transition-colors">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: LANG_COLORS[repo.language] || '#888' }} />
-                    <div className="min-w-0">
-                      <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{repo.full_name}</p>
-                      <div className="flex items-center gap-2 text-[11px] text-[#616161] mt-0.5">
-                        {repo.language || 'Unknown'} • <Star size={10} className="ml-1" /> {repo.stargazers_count}
-                      </div>
-                    </div>
-                  </div>
-                  {repo.is_connected ? (
-                    <span className="text-[10px] px-2.5 py-1 rounded bg-[#22c55e]/10 text-[#22c55e] font-medium tracking-wider uppercase border border-[#22c55e]/20">Connected</span>
-                  ) : (
-                    <button onClick={() => connectRepo(repo)} disabled={connecting === repo.id}
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-medium tracking-wider uppercase transition-all bg-white/5 text-[#e8e8e8] hover:bg-white/10 disabled:opacity-50 border border-transparent">
-                      {connecting === repo.id ? <Loader2 size={12} className="animate-spin" /> : 'Connect'}
-                    </button>
-                  )}
+          
+          {/* Prevent clicks inside from closing */}
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg">
+            
+            <GlowCard className="bg-[#050505] p-0 flex flex-col shadow-2xl max-h-[75vh]">
+              {/* Header */}
+              <div className="flex items-center justify-between p-5 border-b border-[var(--color-border)]">
+                <div>
+                  <h3 className="text-lg font-bold text-[#e8e8e8]">Connect Repository</h3>
+                  <p className="text-[13px] text-[#616161] mt-0.5">Select a GitHub repository to begin AI reviews.</p>
                 </div>
-              ))}
-            </div>
+                <button 
+                  onClick={() => setShowConnect(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg text-[#616161] hover:bg-white/5 hover:text-[#e8e8e8] transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
 
-            <button onClick={() => setShowConnect(false)}
-              className="mt-4 w-full py-2.5 rounded-lg text-[13px] font-medium tracking-wide bg-[#0a0a0a] text-[#898989] border border-[var(--color-border)] hover:bg-white/5 hover:text-[#e8e8e8] transition-colors">
-              Cancel
-            </button>
+              {/* Search */}
+              <div className="p-5 pb-3">
+                <div className="relative group/search">
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#616161] group-focus-within/search:text-[#e8e8e8] transition-colors" />
+                  <input 
+                    value={search} 
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search GitHub repositories..."
+                    autoFocus
+                    className="w-full pl-10 pr-4 h-11 rounded-xl text-[13px] outline-none transition-all bg-[#0a0a0a] border border-[var(--color-border)] focus:border-[#494949] focus:bg-[#0f0f0f] text-[#e8e8e8] placeholder:text-[#494949]"
+                  />
+                </div>
+              </div>
+
+              {/* List */}
+              <div className="flex-1 overflow-y-auto px-5 pb-5 space-y-2 hide-scrollbar min-h-[300px]">
+                {isFetchingGitHub ? (
+                  // Skeleton state
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 rounded-xl border border-[var(--color-border)] bg-white/[0.01]">
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="w-8 h-8 rounded-lg" />
+                        <div className="space-y-2">
+                          <Skeleton className="w-32 h-3" />
+                          <Skeleton className="w-24 h-2" />
+                        </div>
+                      </div>
+                      <Skeleton className="w-20 h-8 rounded-lg" />
+                    </div>
+                  ))
+                ) : filteredGithub.length === 0 ? (
+                  // Empty state
+                  <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white/5 border border-[var(--color-border)] mb-4">
+                      <Search size={20} className="text-[#494949]" />
+                    </div>
+                    <p className="text-[14px] text-[#e8e8e8] font-medium">No repositories found</p>
+                    <p className="text-[12px] text-[#616161] mt-1 max-w-[200px]">We couldn't find any GitHub repositories matching that search.</p>
+                  </div>
+                ) : (
+                  // Real list
+                  filteredGithub.map((repo) => {
+                    const langColor = LANG_COLORS[repo.language] || '#555';
+                    const isConnected = repo.is_connected;
+                    
+                    return (
+                      <div 
+                        key={repo.id} 
+                        className={cn(
+                          "group/row flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
+                          isConnected 
+                            ? "bg-emerald-500/[0.02] border-emerald-500/20" 
+                            : "bg-[#0a0a0a] border-[var(--color-border)] hover:border-[#333] hover:bg-white/[0.02]"
+                        )}
+                      >
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                          {/* Repo Icon */}
+                          <div 
+                            className={cn(
+                              "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border transition-colors",
+                              isConnected ? "bg-emerald-500/10 border-emerald-500/20" : "bg-white/5 border-[var(--color-border)] group-hover/row:border-[#333]"
+                            )}
+                          >
+                            <GitBranch size={15} style={{ color: isConnected ? '#10b981' : langColor }} />
+                          </div>
+                          
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-medium truncate text-[#e8e8e8] group-hover/row:text-white transition-colors">
+                              {repo.full_name}
+                            </p>
+                            <div className="flex items-center gap-2 text-[11px] text-[#616161] mt-1">
+                              <span className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ background: langColor }} />
+                                {repo.language || 'Unknown'}
+                              </span>
+                              <span>·</span>
+                              <span className="flex items-center gap-1">
+                                <Star size={10} className="text-[#494949]" /> {repo.stargazers_count}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Action Button */}
+                        <div className="shrink-0 ml-4">
+                          {isConnected ? (
+                            <div className="flex items-center gap-1.5 text-[10px] px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 font-medium tracking-wider uppercase border border-emerald-500/20">
+                              <Check size={12} strokeWidth={2.5} /> Connected
+                            </div>
+                          ) : (
+                            <button 
+                              onClick={() => connectRepo(repo)} 
+                              disabled={connecting === repo.id}
+                              className={cn(
+                                "relative overflow-hidden px-4 py-1.5 rounded-lg text-[11px] font-medium tracking-wider uppercase transition-all duration-300",
+                                connecting === repo.id 
+                                  ? "bg-white/10 text-white border border-[var(--color-border)]"
+                                  : "bg-white/5 text-[#e8e8e8] hover:bg-white/10 hover:text-white hover:scale-[1.02] border border-transparent hover:border-[var(--color-border)]"
+                              )}
+                            >
+                              {connecting === repo.id ? (
+                                <Loader2 size={13} className="animate-spin" />
+                              ) : (
+                                'Connect'
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </GlowCard>
           </div>
         </div>
       )}
