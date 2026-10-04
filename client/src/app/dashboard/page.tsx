@@ -8,6 +8,7 @@ import { useAuthStore } from '@/lib/auth';
 
 import { CommandPalette } from '@/components/dashboard/CommandPalette';
 import { ReviewRow } from '@/components/dashboard/ReviewRow';
+import { ShimmerText } from '@/components/ui/ShimmerText';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
 import { CountUp } from '@/components/dashboard/CountUp';
@@ -98,7 +99,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-text-primary)' }}>
-            Welcome back, <span className="gradient-text">{displayName}</span>
+            Welcome back, <ShimmerText delay={600}>{displayName}</ShimmerText>
           </h1>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             Here&apos;s an overview of your code review activity.

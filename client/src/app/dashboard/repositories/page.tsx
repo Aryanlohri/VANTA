@@ -35,7 +35,7 @@ export default function RepositoriesPage() {
     async function load() {
       try {
         const [reposRes, statsRes] = await Promise.all([
-          repoApi.list(),
+          repoApi.listConnected(),
           reviewApi.getRepoStats().catch(() => ({ data: { data: {} } }))
         ]);
         setConnected(reposRes.data.data || []);
@@ -50,7 +50,7 @@ export default function RepositoriesPage() {
     setShowConnect(true);
     if (githubRepos.length > 0) return;
     try {
-      const res = await repoApi.listGithubRepos();
+      const res = await repoApi.listGitHub();
       setGithubRepos(res.data.data || []);
     } catch { /* ignore */ }
   }
@@ -58,7 +58,15 @@ export default function RepositoriesPage() {
   async function connectRepo(repo: any) {
     setConnecting(repo.id);
     try {
-      const res = await repoApi.connect(repo.owner?.login || repo.full_name.split('/')[0], repo.name);
+      const res = await repoApi.connect({
+        github_repo_id: repo.id,
+        name: repo.name,
+        full_name: repo.full_name,
+        description: repo.description,
+        language: repo.language,
+        default_branch: repo.default_branch,
+        is_private: repo.private
+      });
       const newRepo = res.data.data;
       setConnected(prev => [newRepo, ...prev]);
       setGithubRepos(prev => prev.map(r => r.id === repo.id ? { ...r, is_connected: true } : r));
@@ -70,7 +78,7 @@ export default function RepositoriesPage() {
 
   async function disconnectRepo(id: string) {
     try {
-      await repoApi.delete(id);
+      await repoApi.disconnect(id);
       setConnected(prev => prev.filter(r => r.id !== id));
       setConfirmDisconnectId(null);
     } catch (error) {
