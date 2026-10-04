@@ -78,11 +78,11 @@ export default function DashboardPage() {
               onClick={() => setCmdOpen(true)}
               className="w-full flex items-center gap-3 px-4 py-2.5 bg-[#0a0a0a] hover:bg-white/5 border border-[var(--color-border)] rounded-xl text-left transition-colors group"
             >
-              <Search size={16} className="text-[#616161] group-hover:text-[#898989]" />
-              <span className="flex-1 text-sm text-[#616161] group-hover:text-[#e8e8e8]">Search or jump to...</span>
+              <Search size={16} className="text-[#898989] group-hover:text-[#898989]" />
+              <span className="flex-1 text-sm text-[#898989] group-hover:text-[#e8e8e8]">Search or jump to...</span>
               <div className="flex items-center gap-1">
-                <span className="text-[10px] tracking-widest text-[#616161] px-1.5 py-0.5 border border-[var(--color-border)] rounded bg-white/5">⌘</span>
-                <span className="text-[10px] tracking-widest text-[#616161] px-1.5 py-0.5 border border-[var(--color-border)] rounded bg-white/5">K</span>
+                <span className="text-[10px] tracking-widest text-[#898989] px-1.5 py-0.5 border border-[var(--color-border)] rounded bg-white/5">⌘</span>
+                <span className="text-[10px] tracking-widest text-[#898989] px-1.5 py-0.5 border border-[var(--color-border)] rounded bg-white/5">K</span>
               </div>
             </button>
           </div>
@@ -124,9 +124,9 @@ export default function DashboardPage() {
                         {loading ? (
                           <Skeleton className="inline-block w-12 h-7 rounded-md" />
                         ) : stat.value === null ? (
-                          <span className="text-[#616161] font-medium text-xl">—</span>
+                          <span className="text-[#898989] font-medium text-xl">—</span>
                         ) : stat.id === 'week' && stat.value === 0 ? (
-                          <span className="text-[#616161]">0</span>
+                          <span className="text-[#898989]">0</span>
                         ) : (
                           <CountUp value={stat.value as number} duration={0.6 + i * 0.1} />
                         )}
@@ -140,7 +140,7 @@ export default function DashboardPage() {
                     </div>
                     
                     <div className="flex items-center justify-between group/week">
-                      <p className="text-[10px] uppercase tracking-wider text-[#616161]">{stat.label}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-[#898989]">{stat.label}</p>
                       {/* Zero state hover action for This Week */}
                       {!loading && stat.id === 'week' && stat.value === 0 && (
                         <Link href="/dashboard/reviews/new" className="text-[10px] text-[#898989] hover:text-[#e8e8e8] opacity-0 group-hover/week:opacity-100 transition-opacity">
@@ -182,7 +182,7 @@ export default function DashboardPage() {
                 <FileCode size={28} className="text-[#898989]" />
               </div>
               <h4 className="text-lg font-bold mb-2 text-[#e8e8e8]">Welcome to VANTA</h4>
-              <p className="text-sm mb-8 max-w-sm mx-auto text-[#616161]">
+              <p className="text-sm mb-8 max-w-sm mx-auto text-[#898989]">
                 You're just a few clicks away from AI-powered code reviews. Follow these steps to get started.
               </p>
               

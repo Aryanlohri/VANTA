@@ -73,7 +73,7 @@ export function ShortcutSheet() {
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-[15px] font-bold text-[#e8e8e8]">Keyboard Shortcuts</h2>
-              <button onClick={() => setIsOpen(false)} className="text-[#616161] hover:text-[#e8e8e8]">
+              <button onClick={() => setIsOpen(false)} className="text-[#898989] hover:text-[#e8e8e8]">
                 <X size={18} />
               </button>
             </div>
@@ -104,7 +104,7 @@ export function ShortcutSheet() {
 function ShortcutGroup({ title, items }: { title: string, items: { keys: string[], label: string }[] }) {
   return (
     <div>
-      <h3 className="text-[11px] font-medium tracking-widest uppercase text-[#616161] mb-3">{title}</h3>
+      <h3 className="text-[11px] font-medium tracking-widest uppercase text-[#898989] mb-3">{title}</h3>
       <div className="space-y-2">
         {items.map((item, i) => (
           <div key={i} className="flex justify-between items-center text-[13px]">

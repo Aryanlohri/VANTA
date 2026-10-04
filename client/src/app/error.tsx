@@ -11,7 +11,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
       <VantaMark size={40} className="mb-6 opacity-40 grayscale" />
       <h2 className="text-[15px] font-semibold text-[#e8e8e8] mb-2 tracking-wide">Something went wrong</h2>
-      <p className="text-[13px] text-[#616161] max-w-sm mx-auto mb-8">
+      <p className="text-[13px] text-[#898989] max-w-sm mx-auto mb-8">
         We encountered an error loading this page.
       </p>
       <div className="flex items-center gap-4">

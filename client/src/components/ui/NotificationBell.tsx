@@ -59,7 +59,7 @@ export function NotificationBell() {
             </div>
             <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
               {events.length === 0 ? (
-                <div className="px-4 py-8 text-center text-[#616161] text-[12px]">No notifications yet.</div>
+                <div className="px-4 py-8 text-center text-[#898989] text-[12px]">No notifications yet.</div>
               ) : (
                 events.slice(0, 10).map((event) => (
                   <div key={event.id} className="px-4 py-3 border-b border-[var(--color-border)]/50 last:border-0 hover:bg-white/5 transition-colors">
@@ -67,11 +67,11 @@ export function NotificationBell() {
                       <span className={`text-[13px] font-medium ${event.read ? 'text-[#898989]' : 'text-[#e8e8e8]'}`}>
                         {event.title}
                       </span>
-                      <span className="text-[10px] text-[#616161] tabular-nums shrink-0 ml-2">
+                      <span className="text-[10px] text-[#898989] tabular-nums shrink-0 ml-2">
                         {formatRelativeTime(event.timestamp)}
                       </span>
                     </div>
-                    <p className="text-[12px] text-[#616161] line-clamp-2">{event.message}</p>
+                    <p className="text-[12px] text-[#898989] line-clamp-2">{event.message}</p>
                     {event.link && (
                       <Link href={event.link} className="text-[11px] text-[#898989] hover:text-[#e8e8e8] mt-2 inline-block transition-colors" onClick={() => setIsOpen(false)}>
                         View details &rarr;

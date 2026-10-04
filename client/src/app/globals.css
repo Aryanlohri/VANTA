@@ -578,3 +578,61 @@ body {
     animation: none !important;
   }
 }
+
+
+/* ============================================
+   SELECTION & SCROLLBAR & CARET
+   ============================================ */
+::selection {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+* {
+  caret-color: #b4b4b4;
+}
+
+/* Base focus outline for interactive elements */
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   PRINT STYLESHEET (PDF Export)
+   ============================================ */
+@media print {
+  @page { margin: 1.5cm; size: A4 portrait; }
+  
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide navigation, sidebar, shell UI */
+  aside, nav, .vanta-sidebar, .command-strip, .vanta-footer, button {
+    display: none !important;
+  }
+
+  /* Invert main cards and text for print legibility */
+  .glow-card, .metal-card, .border {
+    background: transparent !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: none !important;
+    color: black !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    color: black !important;
+    text-shadow: none !important;
+  }
+
+  /* Adjust rings and metrics for print */
+  .score-ring-bg { stroke: #f3f4f6 !important; }
+  .score-ring-fg { stroke: #000 !important; }
+
+  /* Ensure page breaks make sense */
+  .glow-card { page-break-inside: avoid; margin-bottom: 20px; }
+  pre { page-break-inside: avoid; border: 1px solid #e5e7eb; background: #f9fafb !important; color: #111827 !important; }
+}

@@ -41,7 +41,7 @@ export function FirstRunGuide({ reposCount, reviewsCount }: FirstRunGuideProps) 
         <GlowCard className="p-6 relative overflow-hidden">
           <button 
             onClick={handleDismiss}
-            className="absolute top-4 right-4 text-[#616161] hover:text-[#e8e8e8] transition-colors"
+            className="absolute top-4 right-4 text-[#898989] hover:text-[#e8e8e8] transition-colors"
             aria-label="Dismiss guide"
           >
             <X size={16} />
@@ -63,7 +63,7 @@ export function FirstRunGuide({ reposCount, reviewsCount }: FirstRunGuideProps) 
                 {step1Done ? <CheckCircle2 className="text-[#22c55e]" size={24} /> : <GitFork className="text-[#e8e8e8]" size={24} />}
               </div>
               <h4 className="text-[13px] font-bold text-[#e8e8e8] mb-1">1. Connect a repository</h4>
-              <p className="text-[12px] text-[#616161] mb-3">Link your codebase</p>
+              <p className="text-[12px] text-[#898989] mb-3">Link your codebase</p>
               {!step1Done && (
                 <Link href="/dashboard/repositories" className="px-4 py-1.5 bg-white/10 hover:bg-white/15 text-[#e8e8e8] rounded-md text-[11px] font-medium tracking-wide uppercase transition-colors">
                   Connect
@@ -74,10 +74,10 @@ export function FirstRunGuide({ reposCount, reviewsCount }: FirstRunGuideProps) 
             {/* Step 2 */}
             <div className={`relative z-10 flex flex-col items-center text-center ${!step1Done ? 'opacity-50' : ''}`}>
               <div className="w-14 h-14 rounded-full bg-[#0a0a0a] border border-[var(--color-border)] flex items-center justify-center mb-4">
-                {step2Done ? <CheckCircle2 className="text-[#22c55e]" size={24} /> : <Bot className={step1Done ? "text-[#e8e8e8]" : "text-[#616161]"} size={24} />}
+                {step2Done ? <CheckCircle2 className="text-[#22c55e]" size={24} /> : <Bot className={step1Done ? "text-[#e8e8e8]" : "text-[#898989]"} size={24} />}
               </div>
               <h4 className="text-[13px] font-bold text-[#e8e8e8] mb-1">2. Run a review</h4>
-              <p className="text-[12px] text-[#616161] mb-3">Trigger the AI analysis</p>
+              <p className="text-[12px] text-[#898989] mb-3">Trigger the AI analysis</p>
               {step1Done && !step2Done && (
                 <Link href="/dashboard/reviews/new" className="px-4 py-1.5 bg-white/10 hover:bg-white/15 text-[#e8e8e8] rounded-md text-[11px] font-medium tracking-wide uppercase transition-colors">
                   New Review
@@ -88,10 +88,10 @@ export function FirstRunGuide({ reposCount, reviewsCount }: FirstRunGuideProps) 
             {/* Step 3 */}
             <div className={`relative z-10 flex flex-col items-center text-center ${!step2Done ? 'opacity-50' : ''}`}>
               <div className="w-14 h-14 rounded-full bg-[#0a0a0a] border border-[var(--color-border)] flex items-center justify-center mb-4">
-                <FileText className={step2Done ? "text-[#e8e8e8]" : "text-[#616161]"} size={24} />
+                <FileText className={step2Done ? "text-[#e8e8e8]" : "text-[#898989]"} size={24} />
               </div>
               <h4 className="text-[13px] font-bold text-[#e8e8e8] mb-1">3. Read the report</h4>
-              <p className="text-[12px] text-[#616161] mb-3">Review the findings</p>
+              <p className="text-[12px] text-[#898989] mb-3">Review the findings</p>
             </div>
           </div>
         </GlowCard>

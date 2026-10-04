@@ -46,7 +46,7 @@ export function ReviewRow({ review, allReviews = [], showDelete = false, onDelet
           <Link href={`/dashboard/reviews/${review.id}`} className="hover:underline">
             <p className={cn("font-medium truncate text-[#e8e8e8]", density === 'compact' ? "text-xs" : "text-sm")}>{displayTitle}</p>
           </Link>
-          <div className="flex items-center gap-2 text-[11px] text-[#616161] mt-1 group-hover:text-[#898989] transition-colors">
+          <div className="flex items-center gap-2 text-[11px] text-[#898989] mt-1 group-hover:text-[#898989] transition-colors">
             <Clock size={10} />
             <span className="relative cursor-help" title={new Date(review.created_at).toLocaleString()}>
               {/* Note: we should use timeAgo here ideally, but for now we fallback to standard date. */}
@@ -74,7 +74,7 @@ export function ReviewRow({ review, allReviews = [], showDelete = false, onDelet
               </div>
             </div>
           ) : (
-            <span className="text-[10px] font-medium tracking-widest uppercase text-[#616161] border border-transparent">
+            <span className="text-[10px] font-medium tracking-widest uppercase text-[#898989] border border-transparent">
               {review.status}
             </span>
           )}
@@ -97,7 +97,7 @@ export function ReviewRow({ review, allReviews = [], showDelete = false, onDelet
                 {!showConfirmDelete ? (
                   <button 
                     onClick={() => setShowConfirmDelete(true)}
-                    className="p-1.5 text-[#616161] hover:text-[#ef4444] rounded transition-colors opacity-0 group-hover:opacity-100"
+                    className="p-1.5 text-[#898989] hover:text-[#ef4444] rounded transition-colors opacity-0 group-hover:opacity-100"
                     aria-label="Delete review"
                   >
                     <Trash2 size={14} />
