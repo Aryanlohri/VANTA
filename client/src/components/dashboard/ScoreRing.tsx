@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn, getScoreBand } from '@/lib/utils';
 
 interface ScoreRingProps {
@@ -34,7 +34,7 @@ export function ScoreRing({ score, size = 40, strokeWidth = 2 }: ScoreRingProps)
           fill="none"
         />
         {/* Foreground animated ring */}
-        <motion.circle
+        <m.circle
           cx={size / 2}
           cy={size / 2}
           r={radius}

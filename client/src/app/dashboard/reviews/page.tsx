@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { useDebounce } from '@/lib/useDebounce';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FileCode, Plus, Search } from 'lucide-react';
@@ -53,11 +54,11 @@ export default function ReviewsPage() {
     router.replace(queryString ? `/dashboard/reviews?${queryString}` : '/dashboard/reviews', { scroll: false });
   }
 
-  const filtered = reviews.filter((r: any) => {
+  const filtered = useMemo(() => reviews.filter((r: any) => {
     const matchesStatus = filter === 'all' || r.status === filter;
     const matchesSearch = !search || (r.title || '').toLowerCase().includes(search.toLowerCase());
     return matchesStatus && matchesSearch;
-  });
+  }), [reviews, filter, search]);
 
   const getCount = (status: string) => {
     if (status === 'all') return reviews.length;

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { WifiOff, Wifi } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 export function ConnectivityBanner() {
   const [isOnline, setIsOnline] = useState(true);
@@ -36,7 +36,7 @@ export function ConnectivityBanner() {
   return (
     <AnimatePresence>
       {(!isOnline || showRestored) && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
@@ -57,7 +57,7 @@ export function ConnectivityBanner() {
               </>
             )}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

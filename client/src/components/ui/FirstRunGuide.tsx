@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { GlowCard } from '../dashboard/GlowCard';
 import { CheckCircle2, ChevronRight, X, GitFork, Bot, FileText } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { enableDemoMode } from '@/lib/demoData';
 
@@ -32,7 +32,7 @@ export function FirstRunGuide({ reposCount, reviewsCount }: FirstRunGuideProps) 
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0, height: 0 }}
         animate={{ opacity: 1, height: 'auto' }}
         exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
@@ -95,7 +95,7 @@ export function FirstRunGuide({ reposCount, reviewsCount }: FirstRunGuideProps) 
             </div>
           </div>
         </GlowCard>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

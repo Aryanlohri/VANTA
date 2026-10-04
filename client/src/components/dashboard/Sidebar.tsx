@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, GitBranch, FileCode, Plus, LogOut,
   Shield, Activity, Menu, Settings, User
@@ -69,7 +69,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
   const allNavItems = user?.role === 'admin' ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
 
   const sidebarContent = (
-    <motion.aside
+    <m.aside
       initial={false}
       animate={{ 
         width: isExpanded ? 240 : 64,
@@ -116,7 +116,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
             <div className="w-10 h-10 shrink-0 flex items-center justify-center">
               <Plus size={16} strokeWidth={1.5} />
             </div>
-            <motion.span
+            <m.span
               initial={false}
               animate={{ 
                 opacity: isExpanded ? 1 : 0, 
@@ -129,7 +129,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
               className="whitespace-nowrap absolute left-10"
             >
               New Review
-            </motion.span>
+            </m.span>
           </Link>
         </div>
 
@@ -151,7 +151,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                     <item.icon size={16} strokeWidth={isActive ? 2 : 1.5} />
                   </div>
                   
-                  <motion.span 
+                  <m.span 
                     initial={false}
                     animate={{ 
                       opacity: isExpanded ? 1 : 0, 
@@ -164,11 +164,11 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                     className="whitespace-nowrap absolute left-10 z-10 font-medium"
                   >
                     {item.label}
-                  </motion.span>
+                  </m.span>
                   
                   {/* Active Layout ID Pill */}
                   {isActive && (
-                    <motion.div
+                    <m.div
                       layoutId="active-nav-pill"
                       className={cn(
                         "absolute inset-0 rounded-lg",
@@ -180,7 +180,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                   
                   {/* Active left border indicator */}
                   {isActive && isExpanded && (
-                    <motion.div
+                    <m.div
                       layoutId="active-nav-indicator"
                       className={cn(
                         "absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-r-full",
@@ -226,7 +226,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
               )}
             </div>
             
-            <motion.div 
+            <m.div 
               initial={false}
               animate={{ 
                 opacity: isExpanded ? 1 : 0, 
@@ -240,13 +240,13 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
             >
               <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || (user as any)?.first_name || user?.username}</p>
               <p className="text-[11px] truncate text-[#616161]">{user?.email || 'No email'}</p>
-            </motion.div>
+            </m.div>
           </button>
 
           {/* Popover */}
           <AnimatePresence>
             {popoverOpen && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -272,12 +272,12 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                 >
                   <LogOut size={14} /> Sign Out
                 </button>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
       </div>
-    </motion.aside>
+    </m.aside>
   );
 
   return (
@@ -302,7 +302,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
         {/* Backdrop */}
         <AnimatePresence>
           {isMobileOpen && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -315,7 +315,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
         {/* Drawer */}
         <AnimatePresence>
           {isMobileOpen && (
-            <motion.div
+            <m.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
@@ -325,7 +325,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
               <div className="w-[240px] h-full shadow-2xl" onClick={e => e.stopPropagation()}>
                 {sidebarContent}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

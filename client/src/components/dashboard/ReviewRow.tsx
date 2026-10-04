@@ -1,6 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { preloadEditor } from '@/lib/preloadEditor';
+import { queryClient } from '@/lib/queryClient';
+import { reviewKeys, useReview } from '@/lib/queries/useReviews';
 import { GlowCard } from './GlowCard';
 import { ScoreRing } from './ScoreRing';
 import { Clock, Trash2, RotateCcw } from 'lucide-react';

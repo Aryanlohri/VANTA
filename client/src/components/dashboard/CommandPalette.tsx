@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Search, Plus, GitBranch, FileCode, Activity, Shield } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import { cn } from '@/lib/utils';
@@ -86,14 +86,14 @@ export function CommandPalette({ open, setOpen }: CommandPaletteProps) {
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
           />
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
@@ -135,7 +135,7 @@ export function CommandPalette({ open, setOpen }: CommandPaletteProps) {
                 </div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </AnimatePresence>

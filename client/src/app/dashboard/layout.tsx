@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -7,7 +8,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <DashboardShell defaultCollapsed={collapsed}>
-      {children}
+      <PageTransition>{children}</PageTransition>
     </DashboardShell>
   );
 }

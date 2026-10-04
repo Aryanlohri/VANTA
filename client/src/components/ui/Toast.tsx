@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Toast, toast as toastStore } from '@/lib/toast';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 export function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -17,7 +17,7 @@ export function ToastContainer() {
     >
       <AnimatePresence>
         {toasts.map(t => (
-          <motion.div
+          <m.div
             key={t.id}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -35,7 +35,7 @@ export function ToastContainer() {
                 {t.action.label}
               </button>
             )}
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
     </div>

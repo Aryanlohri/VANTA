@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { VantaMark } from './VantaMark';
 
 interface VantaLogoProps {
@@ -24,7 +24,7 @@ export function VantaLogo({ collapsed, className = '' }: VantaLogoProps) {
       </div>
       <AnimatePresence initial={false}>
         {!collapsed && (
-          <motion.span
+          <m.span
             initial={{ maxWidth: 0, opacity: 0 }}
             animate={{ 
               maxWidth: 120, 
@@ -47,7 +47,7 @@ export function VantaLogo({ collapsed, className = '' }: VantaLogoProps) {
             aria-hidden={collapsed}
           >
             ANTA
-          </motion.span>
+          </m.span>
         )}
       </AnimatePresence>
     </Link>

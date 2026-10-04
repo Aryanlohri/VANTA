@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface SparklineProps {
   data?: number[]; // If undefined, we mock it
@@ -48,7 +48,7 @@ export function Sparkline({ data, color = '#e8e8e8', width = 60, height = 20 }: 
   return (
     <svg width={width} height={height} className="overflow-visible">
       {/* Grayscale line */}
-      <motion.path
+      <m.path
         d={path}
         fill="none"
         stroke="#494949"
@@ -60,7 +60,7 @@ export function Sparkline({ data, color = '#e8e8e8', width = 60, height = 20 }: 
         transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
       />
       {/* Final dot in accent color */}
-      <motion.circle
+      <m.circle
         cx={lastPoint.x}
         cy={lastPoint.y}
         r="2"
