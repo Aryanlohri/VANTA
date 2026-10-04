@@ -238,7 +238,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
               }}
               className="flex-1 min-w-0 flex flex-col whitespace-nowrap absolute left-10 text-left"
             >
-              <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || user?.username}</p>
+              <p className="text-[13px] font-medium truncate text-[#e8e8e8]">{(user as any)?.display_name || (user as any)?.first_name || user?.username}</p>
               <p className="text-[11px] truncate text-[#616161]">{user?.email || 'No email'}</p>
             </motion.div>
           </button>
@@ -257,7 +257,7 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                 )}
               >
                 <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1">
-                  <p className="text-xs font-medium text-[#e8e8e8] truncate">{(user as any)?.display_name || user?.username}</p>
+                  <p className="text-xs font-medium text-[#e8e8e8] truncate">{(user as any)?.display_name || (user as any)?.first_name || user?.username}</p>
                   <p className="text-[10px] text-[#616161] truncate">{user?.email}</p>
                 </div>
                 <button className="w-full text-left px-3 py-1.5 text-xs text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors flex items-center gap-2">

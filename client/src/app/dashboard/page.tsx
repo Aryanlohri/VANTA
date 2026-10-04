@@ -7,6 +7,7 @@ import { repoApi, reviewApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 
 import { CommandPalette } from '@/components/dashboard/CommandPalette';
+import { ReviewRow } from '@/components/dashboard/ReviewRow';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
 import { CountUp } from '@/components/dashboard/CountUp';
@@ -60,7 +61,7 @@ export default function DashboardPage() {
     { id: 'week', icon: TrendingUp, label: 'This Week', value: thisWeekCount, color: '#ec4899', delta: null },
   ];
 
-  const displayName = (user as any)?.display_name || user?.username || 'Developer';
+  const displayName = (user as any)?.display_name || (user as any)?.first_name || user?.username || 'Developer';
 
   return (
     <>
@@ -215,79 +216,10 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-2">
               {reviews.slice(0, 5).map((review: any) => {
-                // Title fallback
-                let displayTitle = review.title;
-                if (!displayTitle || !isNaN(Number(displayTitle))) {
-                  const repo = repos.find(r => r.id === review.repo_id);
-                  const repoName = repo ? repo.name : 'Unknown Repo';
-                  const shortCommit = review.commit_sha ? review.commit_sha.substring(0, 7) : new Date(review.created_at).toLocaleDateString();
-                  displayTitle = `${repoName} · ${shortCommit}`;
-                }
-
-                const isFailed = review.status === 'failed';
-
-                return (
-                  <GlowCard key={review.id} className={isFailed ? "border-l-2 border-l-[#ef4444]/50" : ""}>
-                    <div className="flex items-center gap-4 p-4">
-                      {review.status === 'completed' && typeof review.overall_score === 'number' ? (
-                        <ScoreRing score={review.overall_score} size={36} strokeWidth={2.5} />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border border-[var(--color-border)] relative">
-                          <div className={cn("w-2 h-2 rounded-full shrink-0", review.status === 'processing' ? 'animate-pulse' : '')} style={{ background: STATUS_COLORS[review.status] || '#888' }} />
-                        </div>
-                      )}
-
-                      <div className="flex-1 min-w-0">
-                        <Link href={`/dashboard/reviews/${review.id}`} className="hover:underline">
-                          <p className="text-sm font-medium truncate text-[#e8e8e8]">{displayTitle}</p>
-                        </Link>
-                        <div className="flex items-center gap-2 text-[11px] text-[#616161] mt-1">
-                          <Clock size={10} />
-                          {new Date(review.created_at).toLocaleDateString()}
-                          
-                          {review.commit_sha && (
-                            <>
-                              <span>•</span>
-                              <span className="font-mono">{review.commit_sha.substring(0, 7)}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {isFailed ? (
-                        <div className="flex items-center gap-3">
-                          <div className="group relative flex items-center">
-                            <span className="text-[11px] px-2 py-0.5 rounded-full capitalize bg-[#ef4444]/10 text-[#ef4444] cursor-help">
-                              {review.status}
-                            </span>
-                            <div className="absolute right-full mr-2 px-2 py-1 bg-black border border-[var(--color-border)] rounded text-[10px] text-white opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap shadow-xl z-50">
-                              {review.error_message || 'Internal analysis error'}
-                            </div>
-                          </div>
-                          
-                          <button 
-                            onClick={() => {
-                              console.log('Retry review:', review.id);
-                            }}
-                            className="text-[11px] font-medium tracking-wider uppercase px-3 py-1.5 rounded border border-[var(--color-border)] text-[#898989] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors opacity-0 group-hover:opacity-100"
-                          >
-                            Retry
-                          </button>
-                        </div>
-                      ) : review.status === 'processing' ? (
-                        <ProgressStage review={review} />
-                      ) : (
-                        <span className="text-[11px] px-2 py-0.5 rounded-full capitalize"
-                          style={{ background: `${STATUS_COLORS[review.status]}15`, color: STATUS_COLORS[review.status] }}>
-                          {review.status}
-                        </span>
-                      )}
-                    </div>
-                  </GlowCard>
-                );
-              })}
-              
-              {initialReviews.length > 5 && (
+                return <ReviewRow key={review.id} review={review} allReviews={reviews} />;
+                })}
+                
+                {initialReviews.length > 5 && (
                 <div className="pt-4 text-center">
                   <Link href="/dashboard/reviews" className="text-[12px] text-[#898989] hover:text-[#e8e8e8] transition-colors">
                     View all reviews ›

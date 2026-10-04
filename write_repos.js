@@ -1,4 +1,6 @@
-'use client';
+const fs = require('fs');
+
+const code = `'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -92,7 +94,7 @@ export default function RepositoriesPage() {
     <div>
       <PageHeader
         title="Repositories"
-        subtitle={`${connected.length} connected ${connected.length === 1 ? 'repository' : 'repositories'}`}
+        subtitle={\`\${connected.length} connected \${connected.length === 1 ? 'repository' : 'repositories'}\`}
         action={
           <button onClick={loadGithubRepos}
             className="btn-metal flex items-center justify-center gap-2 px-5 h-10 rounded-lg text-[13px] font-medium tracking-wider uppercase"
@@ -319,3 +321,7 @@ export default function RepositoriesPage() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('client/src/app/dashboard/repositories/page.tsx', code);
+console.log("Rewrote repositories page!");

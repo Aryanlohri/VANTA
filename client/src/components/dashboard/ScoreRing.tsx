@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { cn, getScoreBand } from '@/lib/utils';
 
 interface ScoreRingProps {
   score: number | null | undefined;
@@ -17,9 +17,9 @@ export function ScoreRing({ score, size = 40, strokeWidth = 2 }: ScoreRingProps)
   const percent = score / 100;
   const offset = circumference - percent * circumference;
 
-  let color = '#22c55e'; // Green 80+
-  if (score < 60) color = '#ef4444'; // Red < 60
-  else if (score < 80) color = '#f59e0b'; // Amber 60-79
+  const band = getScoreBand(score);
+
+  const isReducedMotion = typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
@@ -38,17 +38,17 @@ export function ScoreRing({ score, size = 40, strokeWidth = 2 }: ScoreRingProps)
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={color}
+          stroke={band.color}
           strokeWidth={strokeWidth}
           fill="none"
           strokeLinecap="round"
           strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
+          initial={isReducedMotion ? { strokeDashoffset: offset } : { strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
         />
       </svg>
-      <span className="text-[11px] font-medium tabular-nums" style={{ color: '#e8e8e8' }}>
+      <span className="text-[11px] font-medium tabular-nums text-[#e8e8e8]">
         {score}
       </span>
     </div>

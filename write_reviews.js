@@ -1,4 +1,6 @@
-'use client';
+const fs = require('fs');
+
+const code = `'use client';
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
@@ -49,7 +51,7 @@ export default function ReviewsPage() {
     if (newSearch) params.set('q', newSearch);
     
     const queryString = params.toString();
-    router.replace(queryString ? `/dashboard/reviews?${queryString}` : '/dashboard/reviews', { scroll: false });
+    router.replace(queryString ? \`/dashboard/reviews?\${queryString}\` : '/dashboard/reviews', { scroll: false });
   }
 
   const filtered = reviews.filter((r: any) => {
@@ -81,7 +83,7 @@ export default function ReviewsPage() {
     <div>
       <PageHeader
         title="Reviews"
-        subtitle={`${filtered.length} total ${filtered.length === 1 ? 'review' : 'reviews'}`}
+        subtitle={\`\${filtered.length} total \${filtered.length === 1 ? 'review' : 'reviews'}\`}
         action={
           <Link href="/dashboard/reviews/new"
             className="btn-metal flex items-center justify-center gap-2 px-5 h-10 rounded-lg text-[13px] font-medium tracking-wider uppercase"
@@ -168,3 +170,7 @@ export default function ReviewsPage() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync('client/src/app/dashboard/reviews/page.tsx', code);
+console.log("Rewrote reviews page!");

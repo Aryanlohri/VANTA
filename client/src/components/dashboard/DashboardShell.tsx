@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/auth';
 import { Sidebar } from './Sidebar';
 import Cookies from 'js-cookie';
 import { cn } from '@/lib/utils';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -80,7 +81,7 @@ export function DashboardShell({ children, defaultCollapsed }: DashboardShellPro
           )}
         >
           <div className="max-w-6xl mx-auto px-6 py-8 md:px-8 relative z-10">
-            {children}
+            <PageTransition>{children}</PageTransition>
           </div>
         </main>
       </div>

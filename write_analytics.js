@@ -1,4 +1,5 @@
-'use client';
+const fs = require('fs');
+const content = `'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import { reviewApi } from '@/lib/api';
@@ -265,7 +266,7 @@ export default function AnalyticsPage() {
                         animationEasing="ease-out"
                       >
                         {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                          <Cell key={\`cell-\${index}\`} fill={entry.fill} />
                         ))}
                       </Pie>
                       <Tooltip content={<CustomTooltip />} />
@@ -303,3 +304,6 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+`;
+fs.writeFileSync('client/src/app/dashboard/analytics/page.tsx', content);
+console.log("Rewrote analytics page!");
