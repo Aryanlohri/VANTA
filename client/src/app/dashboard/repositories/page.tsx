@@ -211,14 +211,6 @@ export default function RepositoriesPage() {
 
             return (
               <GlowCard key={repo.id} className="relative group/card flex flex-col overflow-hidden">
-                {/* ── Language accent bar ── */}
-                <div
-                  className="h-[2px] w-full shrink-0"
-                  style={{
-                    background: `linear-gradient(90deg, ${langColor}44 0%, ${langColor} 50%, ${langColor}44 100%)`,
-                  }}
-                />
-
                 <div className="p-5 pb-0 flex flex-col flex-1">
                   {/* ── Header row ── */}
                   <div className="flex items-start justify-between gap-4">
