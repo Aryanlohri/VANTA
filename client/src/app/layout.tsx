@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   keywords: ["code review", "AI", "code quality", "developer tools", "GitHub", "VANTA"],
 };
 
+import { ToastContainer } from '@/components/ui/Toast';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
@@ -23,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <canvas id="loader-canvas" suppressHydrationWarning></canvas>
         </div>
         {children}
+        <ToastContainer />
         <script dangerouslySetInnerHTML={{ __html: `
           (function () {
             if (sessionStorage.getItem('vanta_loaded')) {
