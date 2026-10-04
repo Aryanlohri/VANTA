@@ -8,7 +8,28 @@ export const api = axios.create({
 });
 
 // Request interceptor — attach auth token
-api.interceptors.request.use((config) => {
+
+import { isDemoMode, demoMockData } from './demoData';
+import { toast } from './toast';
+
+api.interceptors.request.use(async (config) => {
+  if (isDemoMode()) {
+    // Intercept GET requests
+    if (config.method?.toLowerCase() === 'get') {
+      const url = config.url || '';
+      if (url.includes('/repos/github')) return { ...config, adapter: async () => ({ data: { data: [] }, status: 200, statusText: 'OK', headers: {}, config: config as any }) } as any;
+      if (url.includes('/repos')) return { ...config, adapter: async () => ({ data: { data: demoMockData.repos }, status: 200, statusText: 'OK', headers: {}, config: config as any }) } as any;
+      if (url.includes('/reviews/analytics/repos')) return { ...config, adapter: async () => ({ data: { data: demoMockData.stats }, status: 200, statusText: 'OK', headers: {}, config: config as any }) } as any;
+      if (url.includes('/reviews')) return { ...config, adapter: async () => ({ data: { data: demoMockData.reviews }, status: 200, statusText: 'OK', headers: {}, config: config as any }) } as any;
+      if (url.includes('/auth/me')) return { ...config, adapter: async () => ({ data: { data: { id: 'demo-user', username: 'demo', display_name: 'Demo User' } }, status: 200, statusText: 'OK', headers: {}, config: config as any }) } as any;
+    }
+    // Block write requests
+    if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase() || '')) {
+      toast.notify("Demo mode: write actions are disabled.", { label: "Dismiss", onClick: () => {} });
+      return { ...config, adapter: async () => ({ data: { data: {} }, status: 200, statusText: 'OK', headers: {}, config: config as any }) } as any;
+    }
+  }
+
   // Only set Content-Type for requests with a body
   if (config.method && ['post', 'put', 'patch'].includes(config.method)) {
     config.headers['Content-Type'] = 'application/json';

@@ -4,6 +4,7 @@ import { GlowCard } from '../dashboard/GlowCard';
 import { CheckCircle2, ChevronRight, X, GitFork, Bot, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { enableDemoMode } from '@/lib/demoData';
 
 interface FirstRunGuideProps {
   reposCount: number;
@@ -50,6 +51,7 @@ export function FirstRunGuide({ reposCount, reviewsCount }: FirstRunGuideProps) 
             <h3 className="text-[15px] font-bold text-[#e8e8e8] mb-1">Get started with VANTA</h3>
             <p className="text-[13px] text-[#898989]">Follow these steps to set up your AI code review pipeline.</p>
           </div>
+          <button onClick={enableDemoMode} className="absolute top-4 right-12 px-3 py-1 bg-white/5 hover:bg-white/10 text-[#898989] hover:text-[#e8e8e8] rounded text-[11px] font-medium tracking-wide transition-colors">Try with sample data</button>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
             {/* Connecting line on desktop */}

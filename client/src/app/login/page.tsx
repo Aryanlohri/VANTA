@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { GitBranch, Shield, Zap, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { authApi } from '@/lib/api';
+import { enableDemoMode } from '@/lib/demoData';
 import { useAuthStore } from '@/lib/auth';
 
 export default function LoginPage() {
@@ -67,10 +68,17 @@ export default function LoginPage() {
           <button
             onClick={handleGitHubLogin}
             disabled={loginLoading}
-            className="w-full btn-metal flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full btn-metal flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed mb-3"
           >
             <GitBranch size={18} strokeWidth={1.5} />
             {loginLoading ? 'Redirecting...' : 'Continue with GitHub'}
+          </button>
+          
+          <button
+            onClick={enableDemoMode}
+            className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium tracking-wider uppercase text-[#898989] border border-[var(--color-border)] hover:text-[#e8e8e8] hover:bg-white/5 transition-colors"
+          >
+            Try with sample data
           </button>
 
           {/* Divider */}
