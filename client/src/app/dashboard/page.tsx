@@ -9,7 +9,9 @@ import { useAuthStore } from '@/lib/auth';
 import { CommandPalette } from '@/components/dashboard/CommandPalette';
 import { ReviewRow } from '@/components/dashboard/ReviewRow';
 import { ShimmerText } from '@/components/ui/ShimmerText';
-import { buildGreetingSummary, GreetingStats } from '@/lib/utils'; from '@/components/ui/ShimmerText';
+import { buildGreetingSummary, GreetingStats } from '@/lib/utils';
+import { FirstRunGuide } from '@/components/ui/FirstRunGuide';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
 import { CountUp } from '@/components/dashboard/CountUp';
@@ -120,7 +122,7 @@ export default function DashboardPage() {
                     <div className="flex items-baseline gap-2 mb-0.5">
                       <div className="text-2xl font-bold tabular-nums text-[#e8e8e8] min-h-[32px]">
                         {loading ? (
-                          <span className="skeleton inline-block w-12 h-7 rounded-md" />
+                          <Skeleton className="inline-block w-12 h-7 rounded-md" />
                         ) : stat.value === null ? (
                           <span className="text-[#616161] font-medium text-xl">—</span>
                         ) : stat.id === 'week' && stat.value === 0 ? (
@@ -172,7 +174,7 @@ export default function DashboardPage() {
 
           {loading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => <div key={i} className="skeleton h-[68px] w-full rounded-2xl" />)}
+              {[1, 2, 3].map((i) => <Skeleton className="h-[68px] w-full rounded-2xl" />)}
             </div>
           ) : reviews.length === 0 ? (
             <div className="text-center py-12 px-6">

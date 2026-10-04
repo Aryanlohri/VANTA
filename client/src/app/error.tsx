@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from 'react';
-import { VantaMark } from '@/components/ui/VantaLogo';
+import { VantaMark } from '@/components/ui/VantaMark';
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {

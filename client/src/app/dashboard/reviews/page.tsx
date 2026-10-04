@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FileCode, Plus, Search } from 'lucide-react';
 import { reviewApi } from '@/lib/api';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { ReviewRow } from '@/components/dashboard/ReviewRow';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { cn } from '@/lib/utils';
@@ -139,7 +140,7 @@ export default function ReviewsPage() {
       {/* Reviews list */}
       {loading ? (
         <div className="space-y-[12px]">
-          {[1, 2, 3, 4, 5].map((i) => <div key={i} className="skeleton h-[68px] w-full rounded-[16px]" />)}
+          {[1, 2, 3, 4, 5].map((i) => <Skeleton className="h-[68px] w-full rounded-[16px]" />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 px-6">

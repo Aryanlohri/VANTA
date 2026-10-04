@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { GitBranch, Plus, Search, Star, Loader2, Globe, Lock, Unplug } from 'lucide-react';
 import { repoApi, reviewApi } from '@/lib/api';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { ScoreRing } from '@/components/dashboard/ScoreRing';
 import { cn } from '@/lib/utils';
@@ -168,7 +169,7 @@ export default function RepositoriesPage() {
       {/* Connected repos */}
       {loading ? (
         <div className="grid md:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="skeleton h-[160px] w-full rounded-[16px]" />)}
+          {[1, 2, 3, 4].map((i) => <Skeleton className="h-[160px] w-full rounded-[16px]" />)}
         </div>
       ) : filteredConnected.length === 0 ? (
         <div className="text-center py-16 px-6">

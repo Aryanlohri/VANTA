@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { VantaMark } from '@/components/ui/VantaLogo';
+import { VantaMark } from '@/components/ui/VantaMark';
 
 export default function NotFound() {
   return (

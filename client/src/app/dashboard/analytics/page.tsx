@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 import { Activity, Shield, Bug, Zap, Palette, CheckCircle, FileCode } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { GlowCard } from '@/components/dashboard/GlowCard';
 import { getScoreBand, cn } from '@/lib/utils';
 import { CountUp } from '@/components/dashboard/CountUp';
@@ -99,7 +100,7 @@ export default function AnalyticsPage() {
       {/* KPI Cards */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[12px] mb-8">
-          {[1,2,3].map(i => <div key={i} className="skeleton h-[124px] rounded-2xl" />)}
+          {[1,2,3].map(i => <Skeleton className="h-[124px] rounded-2xl" />)}
         </div>
       ) : !data ? (
         <div className="text-center py-20 text-[#616161]">Failed to load analytics data.</div>
