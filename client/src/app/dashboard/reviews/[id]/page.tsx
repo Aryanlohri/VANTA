@@ -1,7 +1,7 @@
 'use client';
 
 import { toast } from '@/lib/toast';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -11,6 +11,7 @@ import {
   Copy, Check, Download
 } from 'lucide-react';
 import { ThinkingOrb } from 'thinking-orbs';
+import { MetalFx, MetalBadge, useMetalBend } from 'metal-fx';
 import { reviewApi } from '@/lib/api';
 import { useSocket } from '@/lib/socket';
 import { timeAgo } from '@/lib/timeAgo';
@@ -34,6 +35,8 @@ const SEVERITY_CONFIG: Record<string, { color: string; icon: any }> = {
 };
 
 export default function ReviewDetailPage() {
+  const backRef = useRef<HTMLDivElement>(null);
+  useMetalBend(backRef);
   const params = useParams();
   const reviewId = params.id as string;
   const [review, setReview] = useState<any>(null);
@@ -208,10 +211,17 @@ export default function ReviewDetailPage() {
 
   return (
     <div>
-      <Link href="/dashboard/reviews" className="inline-flex items-center gap-2 text-sm mb-4 transition-colors"
-        style={{ color: 'var(--color-text-secondary)' }}>
-        <ArrowLeft size={14} /> Back to Reviews
-      </Link>
+      <div className="flex items-center gap-3 mb-4">
+        <MetalFx preset="chromatic" variant="circle" innerShadow ref={backRef}>
+          <Link href="/dashboard/reviews"
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-[#0a0a0a] text-[#898989] hover:text-[#e8e8e8] transition-colors"
+            aria-label="Back to Reviews"
+          >
+            <ArrowLeft size={14} />
+          </Link>
+        </MetalFx>
+        <span className="text-xs text-[#898989] font-medium tracking-wide">Back to Reviews</span>
+      </div>
 
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
@@ -254,6 +264,7 @@ export default function ReviewDetailPage() {
 
           {/* Post to GitHub button for PRs */}
           {review.status === 'completed' && review.pull_request_number && (
+            <MetalFx preset="chromatic" theme="dark" strength={1} innerShadow>
             <button
               onClick={handlePostToGithub}
               disabled={postingToGithub || postedToGithub}
@@ -277,6 +288,7 @@ export default function ReviewDetailPage() {
                 {postingToGithub ? 'Posting...' : postedToGithub ? 'Posted to PR' : 'Post to GitHub'}
               </span>
             </button>
+          </MetalFx>
           )}
 
           {/* Status badge */}
@@ -296,12 +308,9 @@ export default function ReviewDetailPage() {
 
           {/* Mode badge */}
           {review.mode && (
-            <div className="flex items-center gap-2 px-4 py-2 rounded-xl"
-              style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)' }}>
-              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>
-                {review.mode.replace('_', ' ')}
-              </span>
-            </div>
+            <MetalBadge theme="dark" scale={0.9} textColor="#e8e8e8">
+              {review.mode.replace('_', ' ').toUpperCase()}
+            </MetalBadge>
           )}
         </div>
       </div>

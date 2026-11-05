@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileCode, FolderOpen, ChevronRight, Send, ArrowLeft } from 'lucide-react';
 import { ThinkingOrb } from 'thinking-orbs';
+import { MetalFx } from 'metal-fx';
 import Link from 'next/link';
 import { repoApi, reviewApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
@@ -248,12 +249,14 @@ export default function NewReviewPage() {
                 style={{ background: 'var(--color-bg-hover)', color: 'var(--color-text-secondary)' }}>
                 Back
               </button>
-              <button onClick={submitReview} disabled={!title || submitting}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))', color: 'white' }}>
-                {submitting ? <ThinkingOrb state="working" size={20} theme="dark" /> : <Send size={16} />}
-                {submitting ? 'Submitting...' : 'Submit for AI Review'}
-              </button>
+              <MetalFx preset="chromatic" theme="dark" strength={1} innerShadow className="flex-1">
+                <button onClick={submitReview} disabled={!title || submitting}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))', color: 'white' }}>
+                  {submitting ? <ThinkingOrb state="working" size={20} theme="dark" /> : <Send size={16} />}
+                  {submitting ? 'Submitting...' : 'Submit for AI Review'}
+                </button>
+              </MetalFx>
             </div>
 
             {submitError && (

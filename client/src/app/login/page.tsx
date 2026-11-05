@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { authApi } from '@/lib/api';
 import { enableDemoMode } from '@/lib/demoData';
 import { useAuthStore } from '@/lib/auth';
+import { MetalFx } from 'metal-fx';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -65,14 +66,16 @@ export default function LoginPage() {
           </p>
 
           {/* GitHub Login Button */}
-          <button
-            onClick={handleGitHubLogin}
-            disabled={loginLoading}
-            className="w-full btn-metal flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed mb-3"
-          >
-            <GitBranch size={18} strokeWidth={1.5} />
-            {loginLoading ? 'Redirecting...' : 'Continue with GitHub'}
-          </button>
+          <MetalFx preset="chromatic" theme="dark" strength={1} innerShadow className="w-full mb-3">
+            <button
+              onClick={handleGitHubLogin}
+              disabled={loginLoading}
+              className="w-full btn-metal flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl text-sm font-medium tracking-wider uppercase disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <GitBranch size={18} strokeWidth={1.5} />
+              {loginLoading ? 'Redirecting...' : 'Continue with GitHub'}
+            </button>
+          </MetalFx>
           
           <button
             onClick={enableDemoMode}

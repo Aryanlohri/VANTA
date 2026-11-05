@@ -11,6 +11,7 @@ import { useAuthStore } from '@/lib/auth';
 import { CommandPalette } from '@/components/dashboard/CommandPalette';
 import { ReviewRow } from '@/components/dashboard/ReviewRow';
 import { ShimmerText } from '@/components/ui/ShimmerText';
+import { MetalFx, MetalBadge } from 'metal-fx';
 import { buildGreetingSummary, GreetingStats } from '@/lib/utils';
 import { FirstRunGuide } from '@/components/ui/FirstRunGuide';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -98,14 +99,18 @@ export default function DashboardPage() {
           </div>
           
           <div className="flex items-center gap-3">
-            <Link href="/dashboard/repositories"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--color-border)] bg-transparent text-[#e8e8e8] hover:bg-white/5 transition-colors">
-              <GitBranch size={14} /> Connect Repo
-            </Link>
-            <Link href="/dashboard/reviews/new"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium btn-metal transition-transform hover:scale-[1.02]">
-              <Plus size={14} /> New Review
-            </Link>
+            <MetalFx preset="silver" theme="dark" strength={0.7}>
+              <Link href="/dashboard/repositories"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--color-border)] bg-transparent text-[#e8e8e8] hover:bg-white/5 transition-colors">
+                <GitBranch size={14} /> Connect Repo
+              </Link>
+            </MetalFx>
+            <MetalFx preset="chromatic" theme="dark" strength={0.9} innerShadow>
+              <Link href="/dashboard/reviews/new"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium btn-metal transition-transform hover:scale-[1.02]">
+                <Plus size={14} /> New Review
+              </Link>
+            </MetalFx>
           </div>
         </div>
 

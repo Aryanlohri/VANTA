@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { GitBranch, Plus, Search, Star, Globe, Lock, Unplug, X, Check } from 'lucide-react';
 import { ThinkingOrb } from 'thinking-orbs';
+import { MetalFx, MetalBadge } from 'metal-fx';
 import { repoApi, reviewApi } from '@/lib/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -113,12 +114,14 @@ export default function RepositoriesPage() {
         title="Repositories"
         subtitle={`${connected.length} connected ${connected.length === 1 ? 'repository' : 'repositories'}`}
         action={
-          <button onClick={loadGithubRepos}
-            className="btn-metal flex items-center justify-center gap-2 px-5 h-10 rounded-lg text-[13px] font-medium tracking-wider uppercase"
-          >
-            <Plus size={16} strokeWidth={1.5} />
-            Connect Repository
-          </button>
+          <MetalFx preset="chromatic" theme="dark" strength={0.9} innerShadow>
+            <button onClick={loadGithubRepos}
+              className="btn-metal flex items-center justify-center gap-2 px-5 h-10 rounded-lg text-[13px] font-medium tracking-wider uppercase"
+            >
+              <Plus size={16} strokeWidth={1.5} />
+              Connect Repository
+            </button>
+          </MetalFx>
         }
       />
 
@@ -331,12 +334,14 @@ export default function RepositoriesPage() {
                     )}
                   </div>
 
-                  <Link
-                    href="/dashboard/reviews/new"
-                    className="text-[10px] font-medium tracking-wider uppercase text-[#898989] hover:text-[#e8e8e8] transition-colors bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 rounded-md border border-[var(--color-border)]"
-                  >
-                    Review Now
-                  </Link>
+                  <MetalFx preset="silver" theme="dark" strength={0.75}>
+                    <Link
+                      href="/dashboard/reviews/new"
+                      className="text-[10px] font-medium tracking-wider uppercase text-[#898989] hover:text-[#e8e8e8] transition-colors bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 rounded-md border border-[var(--color-border)]"
+                    >
+                      Review Now
+                    </Link>
+                  </MetalFx>
                 </div>
               </GlowCard>
             );

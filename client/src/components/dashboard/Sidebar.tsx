@@ -29,6 +29,7 @@ interface SidebarProps {
 }
 
 import { VantaLogo } from '@/components/ui/VantaLogo';
+import { MetalBadge } from 'metal-fx';
 
 export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }: SidebarProps) {
   const pathname = usePathname();
@@ -256,9 +257,12 @@ export function Sidebar({ collapsed, setCollapsed, isMobileOpen, setMobileOpen }
                   !isExpanded ? "left-3 w-48" : "left-3 right-3"
                 )}
               >
-                <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1">
-                  <p className="text-xs font-medium text-[#e8e8e8] truncate">{(user as any)?.display_name || (user as any)?.first_name || user?.username}</p>
-                  <p className="text-[10px] text-[#616161] truncate">{user?.email}</p>
+                <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1 flex items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium text-[#e8e8e8] truncate">{(user as any)?.display_name || (user as any)?.first_name || user?.username}</p>
+                    <p className="text-[10px] text-[#616161] truncate">{user?.email}</p>
+                  </div>
+                  <MetalBadge theme="dark" scale={0.75} textColor="#e8e8e8">PRO</MetalBadge>
                 </div>
                 <Link 
                   href="/dashboard/settings"

@@ -2,6 +2,7 @@
 'use client';
 
 import { ThinkingOrb } from 'thinking-orbs';
+import { MetalFx, MetalBadge, MetalText } from 'metal-fx';
 
 import { useState } from 'react';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -139,14 +140,16 @@ export default function SettingsPage() {
 
           {/* Save Action */}
           <div className="pt-4 flex justify-end">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex items-center gap-2 bg-[#e8e8e8] text-black px-6 py-2.5 rounded-lg font-medium hover:bg-white transition-colors disabled:opacity-50"
-            >
-              {saving ? <ThinkingOrb state="composing" size={20} /> : <Save size={16} />}
-              {saving ? 'Saving...' : 'Save AI Settings'}
-            </button>
+            <MetalFx preset="silver" theme="dark" strength={0.9} innerShadow>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center gap-2 bg-[#e8e8e8] text-black px-6 py-2.5 rounded-lg font-medium hover:bg-white transition-colors disabled:opacity-50"
+              >
+                {saving ? <ThinkingOrb state="composing" size={20} /> : <Save size={16} />}
+                {saving ? 'Saving...' : 'Save AI Settings'}
+              </button>
+            </MetalFx>
           </div>
         </div>
       )}
@@ -163,7 +166,10 @@ export default function SettingsPage() {
                     <GitBranch size={20} className="text-[#e8e8e8]" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-[#e8e8e8]">GitHub</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-[#e8e8e8]">GitHub</h4>
+                      <MetalBadge theme="dark" scale={0.75} textColor="#34d399">CONNECTED</MetalBadge>
+                    </div>
                     <p className="text-xs text-[#898989] mt-0.5">Connected as {user?.username}</p>
                   </div>
                 </div>
