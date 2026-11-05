@@ -7,9 +7,10 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import {
   ArrowLeft, FileCode, Shield, Bug, Zap, Palette, CheckCircle,
-  AlertTriangle, Info, ChevronDown, ChevronRight, Lightbulb, Loader2, GitPullRequest,
+  AlertTriangle, Info, ChevronDown, ChevronRight, Lightbulb, GitPullRequest,
   Copy, Check, Download
 } from 'lucide-react';
+import { ThinkingOrb } from 'thinking-orbs';
 import { reviewApi } from '@/lib/api';
 import { useSocket } from '@/lib/socket';
 import { timeAgo } from '@/lib/timeAgo';
@@ -153,7 +154,7 @@ export default function ReviewDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 size={24} className="animate-spin" style={{ color: 'var(--color-accent-start)' }} />
+        <ThinkingOrb state="searching" size={64} theme="dark" />
         <span className="ml-3 text-sm" style={{ color: 'var(--color-text-secondary)' }}>Loading review...</span>
       </div>
     );
@@ -266,7 +267,7 @@ export default function ReviewDetailPage() {
               }}
             >
               {postingToGithub ? (
-                <Loader2 size={16} className="animate-spin" />
+                <ThinkingOrb state="connecting" size={20} theme="dark" />
               ) : postedToGithub ? (
                 <CheckCircle size={16} />
               ) : (
@@ -282,7 +283,7 @@ export default function ReviewDetailPage() {
           {review.status === 'processing' ? (
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl"
               style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)' }}>
-              <Loader2 size={14} className="animate-spin" style={{ color: '#3b82f6' }} />
+              <ThinkingOrb state="solving" size={20} theme="dark" />
               <span className="text-xs font-medium" style={{ color: '#3b82f6' }}>AI is reviewing...</span>
             </div>
           ) : review.status === 'completed' ? (
@@ -309,7 +310,7 @@ export default function ReviewDetailPage() {
       {review.status === 'processing' && (
         <div className="mb-6">
           <h3 className="text-sm font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-            <Loader2 size={14} className="animate-spin" /> Live AI Analysis Stream
+            <ThinkingOrb state="weaving" size={20} theme="dark" /> Live AI Analysis Stream
           </h3>
           <pre className="p-4 rounded-xl text-xs shadow-inner h-[280px] overflow-y-auto whitespace-pre-wrap flex flex-col-reverse"
             style={{ background: '#0a0a0a', color: '#4ade80', border: '1px solid #1f2937', fontFamily: 'var(--font-mono)' }}>

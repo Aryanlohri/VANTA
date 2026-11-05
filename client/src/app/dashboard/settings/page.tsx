@@ -1,6 +1,8 @@
 
 'use client';
 
+import { ThinkingOrb } from 'thinking-orbs';
+
 import { useState } from 'react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Save, Bot, Shield, Zap, Sliders, Check, FileCode, GitBranch, Bell, AlertTriangle } from 'lucide-react';
@@ -142,7 +144,7 @@ export default function SettingsPage() {
               disabled={saving}
               className="flex items-center gap-2 bg-[#e8e8e8] text-black px-6 py-2.5 rounded-lg font-medium hover:bg-white transition-colors disabled:opacity-50"
             >
-              {saving ? <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <Save size={16} />}
+              {saving ? <ThinkingOrb state="composing" size={20} /> : <Save size={16} />}
               {saving ? 'Saving...' : 'Save AI Settings'}
             </button>
           </div>

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { GitBranch, Plus, Search, Star, Loader2, Globe, Lock, Unplug, X, Check } from 'lucide-react';
+import { GitBranch, Plus, Search, Star, Globe, Lock, Unplug, X, Check } from 'lucide-react';
+import { ThinkingOrb } from 'thinking-orbs';
 import { repoApi, reviewApi } from '@/lib/api';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -467,7 +468,7 @@ export default function RepositoriesPage() {
                               )}
                             >
                               {connecting === repo.id ? (
-                                <Loader2 size={13} className="animate-spin" />
+                                <ThinkingOrb state="connecting" size={20} theme="dark" />
                               ) : (
                                 'Connect'
                               )}

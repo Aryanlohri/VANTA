@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, FileCode, Shield, Server, Activity, CreditCard, Loader2 } from 'lucide-react';
+import { Users, FileCode, Shield, Server, Activity, CreditCard } from 'lucide-react';
+import { ThinkingOrb } from 'thinking-orbs';
 import { adminApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 
@@ -45,7 +46,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 size={32} className="animate-spin text-green-500" />
+        <ThinkingOrb state="searching" size={64} theme="dark" />
       </div>
     );
   }

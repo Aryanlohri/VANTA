@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileCode, FolderOpen, ChevronRight, Send, Loader2, ArrowLeft } from 'lucide-react';
+import { FileCode, FolderOpen, ChevronRight, Send, ArrowLeft } from 'lucide-react';
+import { ThinkingOrb } from 'thinking-orbs';
 import Link from 'next/link';
 import { repoApi, reviewApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
@@ -177,7 +178,7 @@ export default function NewReviewPage() {
           <div className="glass-card p-4 max-h-96 overflow-y-auto">
             {loadingFiles ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 size={20} className="animate-spin" style={{ color: 'var(--color-accent-start)' }} />
+                <ThinkingOrb state="searching" size={64} theme="dark" />
                 <span className="ml-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>Loading files...</span>
               </div>
             ) : files.length === 0 ? (
@@ -250,7 +251,7 @@ export default function NewReviewPage() {
               <button onClick={submitReview} disabled={!title || submitting}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, var(--color-accent-start), var(--color-accent-end))', color: 'white' }}>
-                {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                {submitting ? <ThinkingOrb state="working" size={20} theme="dark" /> : <Send size={16} />}
                 {submitting ? 'Submitting...' : 'Submit for AI Review'}
               </button>
             </div>
